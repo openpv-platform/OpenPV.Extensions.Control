@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:material="using:Material.Icons.Avalonia"
+			 xmlns:progRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="100"
+             x:Class="Ahsoka.DeveloperTools.Views.CANMessageView" >
+
+
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/UserInputStyles.axaml" />
+	</UserControl.Styles>
+	<Border Grid.Row="4" Margin="0,5,15,5" BorderBrush="{Binding IconColor}" Background="{Binding BackColor}" BorderThickness="1" >
+		<Grid Margin="5" RowDefinitions="24,24,*" ColumnDefinitions="170,2*,4*">
+			<Border BorderBrush="{Binding IconColor, FallbackValue=SteelBlue}" 
+					BorderThickness="0,0,1,0" Background="{Binding IconColor, FallbackValue=SteelBlue}" Margin="-5,-5,5,-5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Grid.Column="0" Grid.RowSpan="3">
+				<StackPanel VerticalAlignment="Center" Margin="0,10,0,0">
+					<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0"
+					   Foreground="WhiteSmoke" FontWeight="Bold" FontSize="22"  Margin="0,-10,0,0"
+					   Text="{Binding IdMasked, StringFormat='ID:{0}',FallbackValue=1234}"/>
+					<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-8,0,0" Grid.Column="0"
+							  Foreground="WhiteSmoke" FontSize="22"
+							  Text="{Binding IdMasked, StringFormat='0x{0:x8}', FallbackValue=0x00FF00FF}"/>
+				</StackPanel>
+			</Border>
+			<TextBlock Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="0" FontWeight="Black" Text="{Binding Name}"/>
+			<StackPanel Grid.Column="1" Orientation="Horizontal" Grid.Row="1">
+				<TextBlock Margin="10,0,0,2" Text="Message Type:"/>
+				<TextBlock Margin="-6,0,0,2" Text="{Binding MessageType}"/>
+				<TextBlock Margin="10,0,0,2" Text="Sent From:"/>
+				<TextBlock Margin="-6,0,0,2" Text="{Binding Transmitter}"/>
+			</StackPanel>
+			<Button  Margin="20,0,0,2"  Grid.Row="0" Command="{Binding ShowEditor}"
+					 Grid.Column="2" HorizontalAlignment="Right"  Width="26" Height="26" Background="Transparent" BorderBrush="Transparent">
+				<material:MaterialIcon Width="24" Height="24" Foreground="SteelBlue" Background="Transparent" Kind="Gear"></material:MaterialIcon>
+			</Button>
+			</Grid>
+	</Border>
+
+	</UserControl>

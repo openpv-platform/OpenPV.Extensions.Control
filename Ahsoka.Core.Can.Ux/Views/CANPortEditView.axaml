@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:material="using:Material.Icons.Avalonia"
+			 xmlns:progRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="Ahsoka.DeveloperTools.Views.CANPortEditView">
+
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/UserInputStyles.axaml" />
+	</UserControl.Styles>
+	<Border Background="#44888888">
+		<Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+			<Border BoxShadow="5 5 10 2 DarkGray" BorderBrush="DarkGray" BorderThickness="1" Background="White">
+				<StackPanel >
+					<Border BorderBrush="Gainsboro" Background="WhiteSmoke" BorderThickness="0,0,0,1" DockPanel.Dock="Top">
+						<DockPanel LastChildFill="False">
+							<TextBlock Foreground="SteelBlue" FontSize="16" Margin="0" Padding="10">EDIT PORT DETAILS</TextBlock>
+							<Button DockPanel.Dock="Right" Content="Close" Command="{Binding CloseEditor}" />
+						</DockPanel>
+					</Border>
+					<Border Margin="20,20,20,20" Padding="3" BorderBrush="WhiteSmoke" BorderThickness="0,0,0,0">
+						<StackPanel>
+							<Grid Margin="5" ColumnDefinitions="145,Auto" RowDefinitions="*,*,*,*,*">
+								<TextBlock Text="Port ID:" Grid.Row="0" Grid.Column="0"/>
+								<StackPanel Orientation="Horizontal" Grid.Column="1">
+									<TextBox Text="{Binding Port}" Width="100"  />
+									<TextBlock Text="Enabled:"/>
+									<CheckBox IsChecked="{Binding IsEnabled}"/>
+								</StackPanel>
+								<TextBlock Text="Port Setup:" Grid.Row="1" Grid.Column="0"/>
+								<StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
+									<ComboBox ItemsSource="{Binding CanInterfaces}"  DockPanel.Dock="Right" SelectedItem="{Binding CanInterface}" Width="200" Grid.Row="5" Grid.Column="1" />
+									<ComboBox ItemsSource="{Binding BaudRates}"  DockPanel.Dock="Right" SelectedItem="{Binding BaudRate}" Width="200" Grid.Row="5" Grid.Column="1" />
+								</StackPanel>
+								<TextBlock Text="Promiscuous Receive:" Grid.Row="2" Grid.Column="0"/>
+								<CheckBox  Grid.Row="2" FontSize="12" ToolTip.Tip="Allows sending messages that are not included in the Message Definition list"
+											Grid.Column="3" Margin="4,0,12,0"  IsChecked="{Binding PromiscuousReceive}"  />
+								<TextBlock Text="Promiscuous Transmit:" Grid.Row="3" Grid.Column="0"/>
+								<CheckBox  Grid.Row="3" FontSize="12"  ToolTip.Tip="Allows sending messages that are not included in the Message Definition list"
+										  Grid.Column="3" Margin="4,0,12,0"  IsChecked="{Binding PromiscuousTransmit}"  />
+							</Grid>													
+						</StackPanel>
+					</Border>
+				</StackPanel>
+			</Border>
+		</Grid>
+	</Border>
+</UserControl>

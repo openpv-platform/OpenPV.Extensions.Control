@@ -1,0 +1,51 @@
+
+public class CanModelMetadata : ICanMetadata
+{
+	Dictionary<uint, Dictionary<string, CanPropertyInfo>> metadata = new();
+
+    static CanModelMetadata eventMetadata = null;
+
+    public Dictionary<uint, Dictionary<string, CanPropertyInfo>> GetMetadata() { return metadata; }
+
+    public Dictionary<string, CanPropertyInfo> GetMetadata(uint canID) { return metadata[canID]; }
+
+	public void AddMetadata(uint canID, Dictionary<string, CanPropertyInfo> properties)
+	{
+		metadata.Add(canID, properties);
+	}
+
+	public CanPropertyInfo GetPropertyInfo(uint canID, uint signalID)
+	{
+		return metadata[canID].Values.FirstOrDefault(x => x.SignalId == signalID);
+	}
+
+	public CanPropertyInfo GetPropertyInfo(uint canID, string signalName)
+	{
+		return metadata[canID][signalName];
+	}
+
+    public CanViewModelBase CreateObject(CanMessageData data)
+    {
+        switch (data.Id)
+        {
+%METADATA_BUILDER%
+            default:
+                return null;
+        }
+    }
+
+    public static CanModelMetadata EventMetadata
+    {
+        get
+        {
+            if (eventMetadata == null)
+                eventMetadata = new();
+            return eventMetadata;
+        }
+    }
+
+    CanModelMetadata()
+    {
+%METADATA_BODY%
+    }
+}

@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<!--Disable Build Outputs-->
+	<Target Name="Build" />
+	<Target Name="Rebuild" />
+
+	<PropertyGroup>
+		<CP_Source_Root>$([System.IO.Path]::GetFullPath('$(Solutiondir)..\..\'))</CP_Source_Root>
+	</PropertyGroup>
+
+	<Target Name="Clean Coprocessor Firmware" BeforeTargets="BeforeClean">
+		<Message Text="Cleaning Coprocessor Firmware $(CP_Source_Root)" Importance="high" />
+		<Delete Files="$(CP_Source_Root)\Ahsoka.Extensions\Control\Ahsoka.Core.CAN\Resources\OpenViewLinux_TargetSupport_firmware_CM4.elf" />
+	</Target>
+	
+	<Target Name="BuildCoprocessorFirmware" AfterTargets="PostBuildEvent" Condition="!Exists('$(CP_Source_Root)Ahsoka.Extensions\Control\Ahsoka.Core.CAN\Resources\OpenViewLinux_TargetSupport_firmware_CM4.elf')">
+		
+		<Message Text="Stopping Containers" Importance="high" />
+		<Exec ContinueOnError="true" IgnoreExitCode="true" WorkingDirectory="$(CP_Source_Root)" Command="docker kill Ahsoka.CoProcessorBuilder" />
+		
+		<Message Text="Building CM4 Firmwware at $(CP_Source_Root)" Importance="high" />
+		<Exec WorkingDirectory="$(CP_Source_Root)" Command="docker pull openpv/openview_cubeide" />
+		<Exec Condition="'$(OS)' == 'Unix'" WorkingDirectory="$(CP_Source_Root)" Command="chmod +x $(CP_Source_Root)Ahsoka.Extensions/Control/Ahsoka.Coprocessor/openview_s/build_setup.sh" />
+		<Exec ContinueOnError="false" Timeout="300000" WorkingDirectory="$(CP_Source_Root)" Command="docker run -v $(CP_Source_Root):/source --rm --entrypoint /source/Ahsoka.Extensions/Control/Ahsoka.Coprocessor/openview_s/build_setup.sh --name Ahsoka.CoProcessorBuilder openpv/openview_cubeide" />
+	</Target>
+
+	<ItemGroup>
+	  <None Include="..\Ahsoka.Coprocessor\openview_s\build_firmware.sh" Link="build_firmware.sh" />
+	  <None Include="..\Ahsoka.Coprocessor\openview_s\build_setup.sh" Link="build_setup.sh" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+</Project>
