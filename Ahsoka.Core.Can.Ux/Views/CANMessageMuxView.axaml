@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:material="using:Material.Icons.Avalonia"
+			 xmlns:progRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="Ahsoka.DeveloperTools.Views.CANMessageMuxView" >
+
+
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/UserInputStyles.axaml" />
+	</UserControl.Styles>
+	<Border Background="#44888888">
+		<Grid  VerticalAlignment="Center" HorizontalAlignment="Center">
+			<Border BoxShadow="5 5 10 2 DarkGray" BorderBrush="DarkGray" BorderThickness="1" Background="White">
+				<StackPanel >
+					<Border BorderBrush="Gainsboro" Background="WhiteSmoke" BorderThickness="0,0,0,1" DockPanel.Dock="Top">
+						<DockPanel LastChildFill="False">
+							<TextBlock Foreground="SteelBlue" FontSize="16" Margin="0" Padding="10">EDIT MUX VALUES </TextBlock>
+							<Button DockPanel.Dock="Right" Content="Close" Command="{Binding CloseEditor}" />
+						</DockPanel>
+					</Border>
+
+					<Border Margin="20,20,20,20" Padding="3" BorderBrush="WhiteSmoke" BorderThickness="0,0,0,0">
+						<StackPanel>
+							<Grid Margin="5" ColumnDefinitions="110,Auto" RowDefinitions="*,*,*,*,*">
+								<TextBlock Text="Mux Role:" Grid.Row="1" Grid.Column="0"/>
+								<ComboBox ItemsSource="{Binding MuxRoles}"
+										  SelectedItem="{Binding SelectedSignal.MuxRole}" Width="200" Grid.Row="1" Grid.Column="1" />
+
+								<TextBlock Text="Group:" Grid.Row="2" Grid.Column="0"/>
+								<TextBox Text="{Binding SelectedSignal.MuxGroupValid}"  HorizontalContentAlignment="Center" Grid.Row="2" Width="125"  TextWrapping="NoWrap" Grid.Column="1" />
+							</Grid>
+						</StackPanel>
+					</Border>
+				</StackPanel>
+			</Border>
+		</Grid>
+		</Border>
+</UserControl>

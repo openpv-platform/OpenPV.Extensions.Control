@@ -1,0 +1,81 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:material="using:Material.Icons.Avalonia"
+			 xmlns:progRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="Ahsoka.DeveloperTools.Views.CANDiagnosticEventEditView" >
+
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/UserInputStyles.axaml" />
+	</UserControl.Styles>
+	<Border Background="#44888888">
+		<Grid  VerticalAlignment="Center" HorizontalAlignment="Center">
+			<Border BoxShadow="5 5 10 2 DarkGray" BorderBrush="DarkGray" BorderThickness="1" Background="White">
+				<StackPanel >
+					
+					<Border BorderBrush="Gainsboro" Background="WhiteSmoke" BorderThickness="0,0,0,1" DockPanel.Dock="Top">
+						<DockPanel LastChildFill="False">
+							<TextBlock Foreground="SteelBlue" FontSize="16" Margin="0" Padding="10">EDIT DIAGNOSTIC EVENT DETAILS</TextBlock>
+							<Button DockPanel.Dock="Right" Content="Close" Command="{Binding CloseEditor}" />
+						</DockPanel>
+					</Border>
+					<Border Margin="20,20,20,25" Padding="3" BorderBrush="WhiteSmoke" BorderThickness="0,0,0,0" DockPanel.Dock="Top">
+						<DockPanel  LastChildFill="True">
+							<Grid DockPanel.Dock="Top" Margin="5" ColumnDefinitions="120,Auto,Auto, Auto" RowDefinitions="*,*,*,*,*,*" IsEnabled="{Binding IsEditable}">
+								
+								<TextBlock Text="Name:"  Grid.Row="0" Grid.Column="0"/>
+								<StackPanel  Grid.Column="1" Orientation="Horizontal">
+									<TextBox Text="{Binding EventDefinition.Name}" Width="200"/>
+									<CheckBox Margin="20,2,2,2" IsChecked="{Binding EventDefinition.Discard}" Content="Drop Event" />
+								</StackPanel>
+								
+								<TextBlock Text="Comment:"  Grid.Row="1" Grid.Column="0"/>
+								<TextBox Text="{Binding EventDefinition.Comment}" HorizontalAlignment="Stretch" Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="1" />
+
+								<TextBlock Text="Address:"  Grid.Row="2" Grid.Column="0"/>
+								<TextBox Text="{Binding EventDefinition.Address}" Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="1" />
+
+
+								<TextBlock Text="Fault Type:"  Grid.Row="3" Grid.Column="0"/>
+								<StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
+									<ComboBox ItemsSource="{Binding EventTypes}"   SelectedItem="{Binding EventType}" Width="175"  />
+								</StackPanel>
+
+								<TextBlock Text="SPN:" IsVisible="{Binding IsJ1939}" Grid.Row="4" Grid.Column="0"/>
+								<StackPanel IsVisible="{Binding IsJ1939}" Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
+									<TextBox Text="{Binding EventDefinition.J1939Dm.Spn}" Width="120" />
+									<TextBlock Text="FMI:"  HorizontalAlignment="Right"/>
+									<TextBox Text="{Binding EventDefinition.J1939Dm.Fmi}" Width="120" />
+								</StackPanel>
+
+								<TextBlock Text="Lamp:" IsVisible="{Binding IsJ1939}" Grid.Row="5" Grid.Column="0"/>
+								<StackPanel IsVisible="{Binding IsJ1939}" Grid.Row="5" Grid.Column="1" Orientation="Horizontal">
+									<ComboBox ItemsSource="{Binding LampTypes}"   SelectedItem="{Binding EventDefinition.J1939Dm.Lamp}" Width="175"  />
+								</StackPanel>
+
+								<TextBlock Text="DTC Type:" IsVisible="{Binding !IsJ1939}"   Grid.Row="4" Grid.Column="0"/>
+								<StackPanel IsVisible="{Binding !IsJ1939}" Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
+									<ComboBox ItemsSource="{Binding FaultTypes}"  SelectedItem="{Binding EventDefinition.ObdDtc.FaultType}" Width="175"  />
+									<TextBlock Text="Mfg:" HorizontalAlignment="Right"/>
+									<TextBox Text="{Binding EventDefinition.ObdDtc.ManufacturerCode}" Width="120" />
+								</StackPanel>
+
+								<TextBlock Text="System:" IsVisible="{Binding !IsJ1939}" Grid.Row="5" Grid.Column="0"/>
+								<StackPanel IsVisible="{Binding !IsJ1939}" Grid.Row="5" Grid.Column="1" Orientation="Horizontal">
+									<TextBox Text="{Binding EventDefinition.ObdDtc.VehicleSystem}" Width="120"
+											 Grid.Row="1" Grid.Column="1" />
+									<TextBlock Text="Code:"
+											   Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right"/>
+									<TextBox Text="{Binding EventDefinition.ObdDtc.Code}" Width="120" />
+								</StackPanel>
+							</Grid>
+						</DockPanel>
+					</Border>
+
+				</StackPanel>
+			</Border>
+		</Grid>
+		</Border>
+</UserControl>

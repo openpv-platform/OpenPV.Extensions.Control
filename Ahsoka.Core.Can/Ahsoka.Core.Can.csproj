@@ -1,0 +1,68 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<RootNamespace>Ahsoka</RootNamespace>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<DebugType>portable</DebugType>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<None Include="LICENSE.txt" Pack="true" PackagePath="\" />
+		<None Include="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<AdditionalFiles Include="Proto\Can*.proto"/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SocketCANSharp" Version="0.11.0" />
+		<PackageReference Include="DbcParserLib" Version="1.6.0" />
+		<PackageReference Include="ELFSharp" Version="2.17.3" />
+		<PackageReference Include="protobuf-net" Version="3.2.30" />
+		<PackageReference Include="protobuf-net.BuildTools" Version="3.2.33">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\Ahsoka.Platform\Ahsoka.Core\Ahsoka.Core.csproj" />
+	</ItemGroup>
+
+	<!--To help Debugging since this is loaded dynamically-->
+	<Target Name="AfterCanBuild" AfterTargets="Build" Condition="$(SolutionName)=='Ahsoka.Platform'">
+		<Message Text="Copy CAN Extension...$(SolutionName)" Importance="high" />
+		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\Ahsoka.Core.Can.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\Can Service Extension\lib\Ahsoka.Core.Can.dll" />
+		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\SocketCANSharp.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\Can Service Extension\lib\SocketCANSharp.dll" />
+		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\ELFSharp.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\Can Service Extension\lib\ELFSharp.dll" />
+		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\DbcParserLib.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\Can Service Extension\lib\DbcParserLib.dll" />
+    	<Copy SourceFiles="$(ProjectDir)Ahsoka.Core.Can.extensioninfo.json" DestinationFiles="$(ProjectDir)..\..\..\Extensions\Can Service Extension\Ahsoka.Core.Can.extensioninfo.json" />
+	</Target>
+
+	<ItemGroup>
+		<PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Properties\CANResources.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>CANResources.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Properties\CANResources.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>CANResources.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+</Project>

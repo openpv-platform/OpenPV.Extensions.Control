@@ -1,0 +1,26 @@
+###############################################################################
+# Set default behavior to automatically normalize line endings.
+###############################################################################
+*                  text=auto
+
+###############################################################################
+# Embedded Files
+###############################################################################
+*.sh        eol=lf
+*.lua       eol=lf
+*.c         eol=lf
+*.cpp       eol=lf
+*.cxx       eol=lf
+*.h         eol=lf
+*.mk        eol=lf
+MakeFile    eol=lf
+MakeFile.*  eol=lf
+*.cc        eol=lf
+*.proto     eol=lf
+*cfg        eol=lf
+exports     eol=lf
+*.conf      eol=lf
+*.desktop	eol=lf
+*.service   eol=lf
+*.network   eol=lf
+

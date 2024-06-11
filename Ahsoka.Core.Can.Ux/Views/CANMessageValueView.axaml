@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:material="using:Material.Icons.Avalonia"
+			 xmlns:progRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="Ahsoka.DeveloperTools.Views.CANMessageValueView" >
+
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/UserInputStyles.axaml" />
+	</UserControl.Styles>
+	<Border Background="#44888888">
+		<Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+			<Border BoxShadow="5 5 10 2 DarkGray" BorderBrush="DarkGray" BorderThickness="1" Background="White">
+				<StackPanel >
+					<Border BorderBrush="Gainsboro" Background="WhiteSmoke" BorderThickness="0,0,0,1" DockPanel.Dock="Top">
+						<DockPanel LastChildFill="False">
+							<TextBlock Foreground="SteelBlue" FontSize="16" Margin="0" Padding="10">EDIT VALUE TABLE </TextBlock>
+							<Button DockPanel.Dock="Right" Content="Close" Margin="15,0,3,0" Command="{Binding CloseEditor}" />
+							<Button DockPanel.Dock="Right" Command="{Binding RemoveValue}"
+								Width="26" Height="26" Background="Transparent"  BorderBrush="Transparent">
+								<material:MaterialIcon Width="20" Height="20" Foreground="SteelBlue" Kind="Minus"></material:MaterialIcon>
+							</Button>
+							<Button DockPanel.Dock="Right" Command="{Binding AddValue}" Margin="15,0,3,0"
+								 Width="26" Height="26" Background="Transparent"  BorderBrush="Transparent">
+								<material:MaterialIcon Width="20" Height="20" Foreground="SteelBlue" Kind="Plus"></material:MaterialIcon>
+							</Button>
+						</DockPanel>
+					</Border>
+
+					<Border Margin="20,0,20,20" Padding="3" BorderBrush="WhiteSmoke" BorderThickness="0,0,0,0">
+						<StackPanel>
+							<DataGrid Grid.ColumnSpan="1" Name="Releases" MinHeight="200" MinWidth="400" SelectionMode="Single"
+									ItemsSource="{Binding SignalValues}" 
+									SelectedItem="{Binding SelectedSignalValue}" Margin="10,10,20,0" AutoGenerateColumns="False">
+								<DataGrid.Columns>
+									<DataGridTextColumn Header="Key" CellStyleClasses="gdp" Width="Auto" Binding="{Binding Key}" IsReadOnly="False"/>
+									<DataGridTextColumn Header="Value" MinWidth="250" Width="Auto" Binding="{Binding Value}" IsReadOnly="False"/>
+								</DataGrid.Columns>
+							</DataGrid>
+						</StackPanel>
+					</Border>
+				</StackPanel>
+			</Border>
+		</Grid>
+	</Border>
+</UserControl>

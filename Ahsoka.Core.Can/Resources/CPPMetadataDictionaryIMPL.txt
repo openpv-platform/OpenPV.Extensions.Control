@@ -1,0 +1,48 @@
+
+    std::map<uint, std::map<int, CanPropertyInfo>>& CanModelMetadata::GetMetadata() 
+    { 
+        return metadata; 
+    }
+
+    std::map<int, CanPropertyInfo>& CanModelMetadata::GetMetadata(uint canID) 
+    { 
+        return metadata[canID]; 
+    }
+
+    void CanModelMetadata::AddMetadata(uint canID, std::map<int, CanPropertyInfo> properties)
+    {
+        metadata[canID] = properties;
+    }
+
+    CanPropertyInfo& CanModelMetadata::GetPropertyInfo(uint canID, int signalID)
+    {
+        return metadata[canID][signalID]; 
+    }
+
+
+    unique_ptr<CanViewModelBase> CanModelMetadata::CreateObject(CanMessageData data)
+    {
+        switch (data.id())
+        {
+%METADATA_BUILDER%
+            default:
+                return nullptr;
+        }
+    }
+
+    CanModelMetadata* CanModelMetadata::CanMetadata()
+    {
+        if (messageMetadata == NULL)
+        {
+            messageMetadata  = new CanModelMetadata();
+        }
+
+        return messageMetadata;
+    }
+
+    CanModelMetadata* CanModelMetadata::messageMetadata = NULL;
+
+    CanModelMetadata::CanModelMetadata()
+    {
+%METADATA_BODY%     
+    }

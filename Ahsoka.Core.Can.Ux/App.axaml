@@ -1,0 +1,94 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Ahsoka.DeveloperTools.App" 
+			 Name="OpenPV.DeveloperToolkit"
+			 xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+			 RequestedThemeVariant="Light">
+    <Application.Styles>
+		<StyleInclude Source="avares://AvaloniaProgressRing/Styles/ProgressRing.xaml"/>
+		<FluentTheme/>
+		<materialIcons:MaterialIconStyles />
+		<StyleInclude Source="/Styles/Styles.axaml"/>
+		<Style Selector="Button">
+			<Setter Property="Padding" Value="8,4"/>
+			<Setter Property="FontSize" Value="13"/>
+			<Setter Property="Margin" Value="0,5,8,5"/>
+			<Setter Property="CornerRadius" Value="3"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="BorderBrush" Value="Gainsboro"/>
+			<Setter Property="Background" Value="Transparent"/>
+		</Style>
+		<Style Selector="ComboBox">
+			<Setter Property="BorderBrush" Value="Gainsboro"/>
+			<Setter Property="Height" Value="32"/>
+			<Setter Property="Margin" Value="2,2,0,2"/>
+			<Setter Property="Padding" Value="4,2"/>
+			<Setter Property="FontSize" Value="13"/>
+			<Setter Property="HorizontalContentAlignment" Value="Left"/>
+		</Style>
+		
+		<Style Selector="DataGridCell.gdp">
+			<Setter Property="HorizontalAlignment" Value="Stretch" />
+			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		</Style>
+		<Style Selector="Button.link">
+			<Setter Property="Foreground" Value="SteelBlue" />
+			<Setter Property="Padding" Value="0" />
+			<Setter Property="Cursor" Value="Hand" />
+			<Setter Property="BorderThickness" Value="0" />
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="Template">
+				<ControlTemplate>
+					<ContentPresenter Content="{TemplateBinding Content}">
+						<ContentPresenter.Styles>
+							<Style Selector="TextBlock">
+								<Setter Property="Foreground" Value="{TemplateBinding Foreground}"/>
+								<Setter Property="FontSize" Value="{TemplateBinding FontSize}"/>
+							</Style>
+						</ContentPresenter.Styles>
+					</ContentPresenter>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+		<Style Selector="DataValidationErrors">
+			<Setter Property="Template">
+				<ControlTemplate>
+					<DockPanel LastChildFill="True">
+						<ContentControl DockPanel.Dock="Right"
+										ContentTemplate="{TemplateBinding ErrorTemplate}"
+										DataContext="{TemplateBinding Owner}"
+										Content="{Binding (DataValidationErrors.Errors)}"
+										IsVisible="{Binding (DataValidationErrors.HasErrors)}"/>
+						<ContentPresenter Name="PART_ContentPresenter"
+										  Background="{TemplateBinding Background}"
+										  BorderBrush="{TemplateBinding BorderBrush}"
+										  BorderThickness="{TemplateBinding BorderThickness}"
+										  CornerRadius="{TemplateBinding CornerRadius}"
+										  ContentTemplate="{TemplateBinding ContentTemplate}"
+										  Content="{TemplateBinding Content}"
+										  Padding="{TemplateBinding Padding}"/>
+					</DockPanel>
+				</ControlTemplate>
+			</Setter>
+			<Setter Property="ErrorTemplate">
+				<DataTemplate>
+					<Canvas Width="14" Height="14" Margin="4 0 1 0"
+							Background="Transparent">
+						<Canvas.Styles>
+							<Style Selector="ToolTip">
+								<Setter Property="Background" Value="Salmon"/>
+								<Setter Property="BorderBrush" Value="Red"/>
+							</Style>
+						</Canvas.Styles>
+						<ToolTip.Tip>
+							<ItemsControl  ItemsSource="{Binding}"/>
+						</ToolTip.Tip>
+						<Path Data="M14,7 A7,7 0 0,0 0,7 M0,7 A7,7 0 1,0 14,7 M7,3l0,5 M7,9l0,2"
+							  Stroke="Red"
+							  StrokeThickness="2"/>
+					</Canvas>
+				</DataTemplate>
+			</Setter>
+		</Style>
+	</Application.Styles>
+</Application>

@@ -1,0 +1,25 @@
+
+
+    class CanModelMetadata
+    {
+        public:
+
+            std::map<uint, std::map<int, CanPropertyInfo>>& GetMetadata();
+
+            std::map<int, CanPropertyInfo>& GetMetadata(uint canID);
+
+            void AddMetadata(uint canID, std::map<int, CanPropertyInfo> properties);
+
+            CanPropertyInfo& GetPropertyInfo(uint canID, int signalID);
+
+            unique_ptr<CanViewModelBase> CreateObject(CanMessageData data);
+
+            static CanModelMetadata* CanMetadata();
+
+        private:
+            std::map<uint,std::map<int, CanPropertyInfo>> metadata;
+
+            static CanModelMetadata* messageMetadata;
+
+            CanModelMetadata();
+    };

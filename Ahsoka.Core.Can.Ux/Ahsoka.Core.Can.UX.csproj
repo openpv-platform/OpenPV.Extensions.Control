@@ -1,0 +1,105 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<RuntimeIdentifiers>win-x64;linux-arm;linux-x64;osx-arm64</RuntimeIdentifiers>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<SignAssembly>False</SignAssembly>
+		<TrimMode>copyused</TrimMode>
+		<UseRidGraph>true</UseRidGraph>
+		<DebugType>portable</DebugType>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+	</PropertyGroup>
+
+	<PropertyGroup Label="Suppress Errors for GPIO Project">
+		<SuppressWindowsPlatformTargetingRequiredError>true</SuppressWindowsPlatformTargetingRequiredError>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="LICENSE.txt" Pack="true" PackagePath="\" />
+		<None Include="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Remove=".gitignore" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Avalonia.Controls.DataGrid" Version="11.1.0-beta1" />
+		<PackageReference Include="Avalonia.Desktop" Version="11.1.0-beta1" />
+		<PackageReference Include="Avalonia.Fonts.Inter" Version="11.1.0-beta1" />
+		<PackageReference Include="Packaging.Targets" Version="0.1.220-*">
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\Ahsoka.Platform\Ahsoka.Core\Ahsoka.Core.csproj" />
+		<ProjectReference Include="..\..\..\Ahsoka.Extensions\Control\Ahsoka.Core.Can\Ahsoka.Core.Can.csproj" />
+		<ProjectReference Include="..\..\..\Ahsoka.Platform\Ahsoka.DeveloperTools.Core\Ahsoka.DeveloperTools.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<AvaloniaResource Include="..\..\..\Ahsoka.Platform\Ahsoka.DeveloperTools\Styles\Styles.axaml" Link="Styles\Styles.axaml" />
+		<AvaloniaResource Include="..\..\..\Ahsoka.Platform\Ahsoka.DeveloperTools\Styles\UserInputStyles.axaml" Link="Styles\UserInputStyles.axaml" />
+		<EmbeddedResource Update="Properties\Resources.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+	</ItemGroup>
+
+	<!--To help Debugging since this is loaded dynamically-->
+	<Target Name="AfterExtensionBuild" AfterTargets="Build" Condition="$(SolutionName)=='Ahsoka.Platform'">
+		<Message Text="Building.." Importance="high" />
+		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\Ahsoka.Core.Can.UX.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\CAN Service Extension\ux\Ahsoka.Core.Can.UX.dll" />
+	</Target>
+	
+	<ItemGroup>
+	  <Compile Update="App.axaml.cs">
+	    <DependentUpon>%(Filename)</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\CANDiagnosticEventEditView.axaml.cs">
+	    <DependentUpon>CANDiagnosticEventEditView.axaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\CANDiagnosticEventView.axaml.cs">
+	    <DependentUpon>CANDiagnosticEventView.axaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\CANDiagnosticEventView.axaml.cs">
+	    <DependentUpon>CANDiagnosticEventView.axaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\CANMessageMuxView.axaml.cs">
+	    <DependentUpon>CANMessageMuxView.axaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\CANMessageSignalView.axaml.cs">
+	    <DependentUpon>CANMessageSignalView.axaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\CANMessageValueView.axaml.cs">
+	    <DependentUpon>CANMessageValueView.axaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\CANMessageView.axaml.cs">
+	    <DependentUpon>CANMessageView.axaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\CANNodeEditView.axaml.cs">
+	    <DependentUpon>CANNodeEditView.axaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\CANNodeView.axaml.cs">
+	    <DependentUpon>CANNodeView.axaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\CANPortEditView.axaml.cs">
+	    <DependentUpon>CANPortEditView.axaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\CANPortView.axaml.cs">
+	    <DependentUpon>CANPortView.axaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\CANSetup.axaml.cs">
+	    <DependentUpon>CANSetup.axaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+</Project>
