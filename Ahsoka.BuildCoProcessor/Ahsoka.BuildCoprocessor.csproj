@@ -10,23 +10,24 @@
 	<Target Name="Rebuild" />
 
 	<PropertyGroup>
-		<CP_Source_Root>$([System.IO.Path]::GetFullPath('$(Solutiondir)..\'))</CP_Source_Root>
+		<CAN_Source_Root>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)..\..\..\..\'))</CAN_Source_Root>
 	</PropertyGroup>
 
 	<Target Name="Clean Coprocessor Firmware" BeforeTargets="BeforeClean">
-		<Message Text="Cleaning Coprocessor Firmware $(CP_Source_Root)" Importance="high" />
-		<Delete Files="$(CP_Source_Root)\Ahsoka.Extensions\Control\Ahsoka.Core.CAN\Resources\OpenViewLinux_TargetSupport_firmware_CM4.elf" />
+		<Message Text="Cleaning Coprocessor Firmware $(CAN_Source_Root)" Importance="high" />
+		<Delete Files="$(CAN_Source_Root)\Ahsoka.Extensions\Control\Ahsoka.Core.CAN\Resources\OpenViewLinux_TargetSupport_firmware_CM4.elf" />
 	</Target>
 	
-	<Target Name="BuildCoprocessorFirmware" AfterTargets="PostBuildEvent" Condition="!Exists('$(CP_Source_Root)Ahsoka.Extensions\Control\Ahsoka.Core.CAN\Resources\OpenViewLinux_TargetSupport_firmware_CM4.elf')">
+	<Target Name="BuildCoprocessorFirmware" AfterTargets="PostBuildEvent" Condition="!Exists('$(CAN_Source_Root)Ahsoka.Extensions\Control\Ahsoka.Core.CAN\Resources\OpenViewLinux_TargetSupport_firmware_CM4.elf')">
 		
 		<Message Text="Stopping Containers" Importance="high" />
-		<Exec ContinueOnError="true" IgnoreExitCode="true" WorkingDirectory="$(CP_Source_Root)" Command="docker kill Ahsoka.CoProcessorBuilder" />
+		<Exec ContinueOnError="true" IgnoreExitCode="true" WorkingDirectory="$(CAN_Source_Root)" Command="docker kill Ahsoka.CoProcessorBuilder" />
 		
-		<Message Text="Building CM4 Firmwware at $(CP_Source_Root)" Importance="high" />
-		<Exec WorkingDirectory="$(CP_Source_Root)" Command="docker pull openpv/openview_cubeide" />
-		<Exec Condition="'$(OS)' == 'Unix'" WorkingDirectory="$(CP_Source_Root)" Command="chmod +x $(CP_Source_Root)Ahsoka.Extensions/Control/Ahsoka.Coprocessor/openview_s/build_setup.sh" />
-		<Exec ContinueOnError="false" Timeout="300000" WorkingDirectory="$(CP_Source_Root)" Command="docker run -v $(CP_Source_Root):/source --rm --entrypoint /source/Ahsoka.Extensions/Control/Ahsoka.Coprocessor/openview_s/build_setup.sh --name Ahsoka.CoProcessorBuilder openpv/openview_cubeide" />
+		<Message Text="Building CM4 Firmwware at $(CAN_Source_Root)" Importance="high" />
+		<Exec WorkingDirectory="$(CAN_Source_Root)" Command="docker pull openpv/openview_cubeide" />
+		<Exec Condition="'$(OS)' == 'Unix'" WorkingDirectory="$(CAN_Source_Root)" Command="chmod +x $(CAN_Source_Root)Ahsoka.Extensions/Control/Ahsoka.Coprocessor/openview_s/build_setup.sh" />
+		<Exec ContinueOnError="false" Timeout="300000" WorkingDirectory="$(CAN_Source_Root)" Command="docker run -v $(CAN_Source_Root):/source --rm --entrypoint /source/Ahsoka.Extensions/Control/Ahsoka.Coprocessor/openview_s/build_setup.sh --name Ahsoka.CoProcessorBuilder openpv/openview_cubeide" />
+	
 	</Target>
 
 	<ItemGroup>
