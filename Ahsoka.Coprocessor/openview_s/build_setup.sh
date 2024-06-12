@@ -8,7 +8,7 @@ rsync -a /source/Ahsoka.Extensions/Control/Ahsoka.Coprocessor/ /workspaces/Ahsok
 rsync -a /source/Ahsoka.Interop/Ahsoka.Proto/ /workspaces/Ahsoka.Proto/
 cp /source/Ahsoka.Extensions/Control/Ahsoka.Core.CAN/Proto/CanConfiguration.proto /workspaces/Ahsoka.Proto/
 cp /source/Ahsoka.Extensions/Control/Ahsoka.Core.CAN/Proto/CanService.proto /workspaces/Ahsoka.Proto/
-cp /source/Ahsoka.Platform/Ahsoka.Core/Proto/Services.proto /workspaces/Ahsoka.Proto/
+cp /source/Ahsoka.Core/Ahsoka.Core/Proto/Services.proto /workspaces/Ahsoka.Proto/
 
 cd /workspaces
 chmod 777 -R .
