@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
 		<RuntimeIdentifiers>win-x64;linux-arm;linux-x64;osx-arm64</RuntimeIdentifiers>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<SignAssembly>False</SignAssembly>
 		<TrimMode>copyused</TrimMode>
 		<UseRidGraph>true</UseRidGraph>
@@ -34,21 +34,21 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\Ahsoka.Platform\Ahsoka.Core\Ahsoka.Core.csproj" />
+		<ProjectReference Include="..\..\..\Ahsoka.Core\Ahsoka.Core\Ahsoka.Core.csproj" />
 		<ProjectReference Include="..\..\..\Ahsoka.Extensions\Control\Ahsoka.Core.Can\Ahsoka.Core.Can.csproj" />
-		<ProjectReference Include="..\..\..\Ahsoka.Platform\Ahsoka.DeveloperTools.Core\Ahsoka.DeveloperTools.Core.csproj" />
+		<ProjectReference Include="..\..\..\Ahsoka.Core\Ahsoka.DeveloperTools.Core\Ahsoka.DeveloperTools.Core.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<AvaloniaResource Include="..\..\..\Ahsoka.Platform\Ahsoka.DeveloperTools\Styles\Styles.axaml" Link="Styles\Styles.axaml" />
-		<AvaloniaResource Include="..\..\..\Ahsoka.Platform\Ahsoka.DeveloperTools\Styles\UserInputStyles.axaml" Link="Styles\UserInputStyles.axaml" />
+		<AvaloniaResource Include="..\..\..\Ahsoka.Core\Ahsoka.DeveloperTools\Styles\Styles.axaml" Link="Styles\Styles.axaml" />
+		<AvaloniaResource Include="..\..\..\Ahsoka.Core\Ahsoka.DeveloperTools\Styles\UserInputStyles.axaml" Link="Styles\UserInputStyles.axaml" />
 		<EmbeddedResource Update="Properties\Resources.resx">
 	    <Generator>ResXFileCodeGenerator</Generator>
 	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
 	</ItemGroup>
-	
-	<ItemGroup>
+
+	<ItemGroup  Condition="false">
 	  <PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
 	    <PrivateAssets>all</PrivateAssets>
 	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

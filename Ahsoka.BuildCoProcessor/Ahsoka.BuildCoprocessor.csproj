@@ -10,7 +10,7 @@
 	<Target Name="Rebuild" />
 
 	<PropertyGroup>
-		<CAN_Source_Root>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)..\..\..\..\'))</CAN_Source_Root>
+		<CP_Source_Root>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)..\..\..\..\'))</CP_Source_Root> 
 	</PropertyGroup>
 
 	<Target Name="Clean Coprocessor Firmware" BeforeTargets="BeforeClean">
