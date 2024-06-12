@@ -10,7 +10,7 @@
 	<Target Name="Rebuild" />
 
 	<PropertyGroup>
-		<CP_Source_Root>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)..\..\..\..\'))</CP_Source_Root> 
+		<CAN_Source_Root>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)..\..\..\..\'))</CAN_Source_Root> 
 	</PropertyGroup>
 
 	<Target Name="Clean Coprocessor Firmware" BeforeTargets="BeforeClean">
@@ -27,7 +27,6 @@
 		<Exec WorkingDirectory="$(CAN_Source_Root)" Command="docker pull openpv/openview_cubeide" />
 		<Exec Condition="'$(OS)' == 'Unix'" WorkingDirectory="$(CAN_Source_Root)" Command="chmod +x $(CAN_Source_Root)Ahsoka.Extensions/Control/Ahsoka.Coprocessor/openview_s/build_setup.sh" />
 		<Exec ContinueOnError="false" Timeout="300000" WorkingDirectory="$(CAN_Source_Root)" Command="docker run -v $(CAN_Source_Root):/source --rm --entrypoint /source/Ahsoka.Extensions/Control/Ahsoka.Coprocessor/openview_s/build_setup.sh --name Ahsoka.CoProcessorBuilder openpv/openview_cubeide" />
-	
 	</Target>
 
 	<ItemGroup>
