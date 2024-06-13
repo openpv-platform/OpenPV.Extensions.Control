@@ -34,11 +34,11 @@
 	</ItemGroup>
 
 
-	<Import Label="Ahsoka Local Build Properties" Condition="Exists('../../Core.Extensions.Build.props')" Project="../../Core.Extensions.Build.props" />
+	<Import Label="Ahsoka Local Build Properties" Condition="Exists('../../Core.Build.props')" Project="../../Core.Build.props" />
 	<Import Label="Ahsoka Local Build Properties" Condition="Exists('../../UX.Extensions.Build.props')" Project="../../UX.Extensions.Build.props" />
 
 	
-	<ItemGroup Condition="!Exists('../../Core.Extensions.Build.props')">
+	<ItemGroup Condition="!Exists('../../Core.Build.props')">
 		<PackageReference Include="Ahsoka.Core" Version="(3.*,4.0)" />
 		<PackageReference Include="Ahsoka.DeveloperTools.Core" Version="3.1.1-jake.6" />
 		<AvaloniaResource Include="..\Ahsoka.Shared\UX\Styles\Styles.axaml" Link="Styles\Styles.axaml" />

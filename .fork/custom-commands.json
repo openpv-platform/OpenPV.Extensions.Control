@@ -1,0 +1,57 @@
+[
+  {
+    "version" : 1
+  },
+  {
+    "name" : "Clean Repos",
+    "target" : "repository",
+    "ui" : {
+      "buttons" : [
+        {
+          "action" : {
+            "script" : "echo 'Cleaning Repos'\ngit clean -dfx\ngit submodule foreach --recursive git clean -dfx",
+            "showOutput" : true,
+            "type" : "sh",
+            "waitForExit" : true
+          },
+          "title" : "OK"
+        },
+        {
+          "action" : {
+            "type" : "cancel"
+          },
+          "title" : "Cancel"
+        }
+      ],
+      "controls" : [],
+      "description" : "Are you sure you want to execute custom command?",
+      "title" : "Execute custom command"
+    }
+  },
+  {
+    "name" : "Sync Dev and Main",
+    "target" : "repository",
+    "ui" : {
+      "buttons" : [
+        {
+          "action" : {
+            "script" : "git fetch --update-head-ok origin main:main develop:develop",
+            "showOutput" : false,
+            "type" : "sh",
+            "waitForExit" : true
+          },
+          "title" : "Execute"
+        },
+        {
+          "action" : {
+            "type" : "cancel"
+          },
+          "title" : "Cancel"
+        }
+      ],
+      "controls" : [],
+      "description" : "Pull Main and Dev?",
+      "title" : "Execute Sync"
+    }
+  }
+]
