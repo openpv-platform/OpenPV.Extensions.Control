@@ -30,9 +30,12 @@
 		</PackageReference>
 	</ItemGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\..\..\Ahsoka.Core\Ahsoka.Core\Ahsoka.Core.csproj" />
+	<Import Label="Ahsoka Local Build Properties" Condition="Exists('../../Core.Extensions.Build.props')" Project="../../Core.Extensions.Build.props" />
+	
+	<ItemGroup Condition="!Exists('../../Core.Extensions.Build.props')">
+		<PackageReference Include="Ahsoka.Core" Version="(3.*,4.0)" />
 	</ItemGroup>
+
 
 	<!--To help Debugging since this is loaded dynamically-->
 	<Target Name="AfterCanBuild" AfterTargets="Build" Condition="$(SolutionName)=='Ahsoka.Platform'">

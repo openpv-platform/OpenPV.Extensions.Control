@@ -1,3 +1,6 @@
 [submodule "Ahsoka.Coprocessor/openview_s/firmware/CM4/Middlewares/Third_Party/lwip"]
 	path = Ahsoka.Coprocessor/openview_s/firmware/CM4/Middlewares/Third_Party/lwip
 	url = ../Forks.stm32_mw_lwip
+[submodule "Ahsoka.Shared"]
+	path = Ahsoka.Shared
+	url = https://enovation.visualstudio.com/OpenPV/_git/OpenPV.Shared

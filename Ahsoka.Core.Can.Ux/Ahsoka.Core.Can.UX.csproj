@@ -33,15 +33,23 @@
 		</PackageReference>
 	</ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\..\..\Ahsoka.Core\Ahsoka.Core\Ahsoka.Core.csproj" />
-		<ProjectReference Include="..\..\..\Ahsoka.Extensions\Control\Ahsoka.Core.Can\Ahsoka.Core.Can.csproj" />
-		<ProjectReference Include="..\..\..\Ahsoka.Core\Ahsoka.DeveloperTools.Core\Ahsoka.DeveloperTools.Core.csproj" />
+
+	<Import Label="Ahsoka Local Build Properties" Condition="Exists('../../Core.Extensions.Build.props')" Project="../../Core.Extensions.Build.props" />
+	<Import Label="Ahsoka Local Build Properties" Condition="Exists('../../UX.Extensions.Build.props')" Project="../../UX.Extensions.Build.props" />
+
+	
+	<ItemGroup Condition="!Exists('../../Core.Extensions.Build.props')">
+		<PackageReference Include="Ahsoka.Core" Version="(3.*,4.0)" />
+		<PackageReference Include="Ahsoka.DeveloperTools.Core" Version="3.1.1-jake.6" />
+		<AvaloniaResource Include="..\Ahsoka.Shared\UX\Styles\Styles.axaml" Link="Styles\Styles.axaml" />
+		<AvaloniaResource Include="..\Ahsoka.Shared\UX\Styles\UserInputStyles.axaml" Link="Styles\UserInputStyles.axaml" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<AvaloniaResource Include="..\..\..\Ahsoka.Core\Ahsoka.DeveloperTools\Styles\Styles.axaml" Link="Styles\Styles.axaml" />
-		<AvaloniaResource Include="..\..\..\Ahsoka.Core\Ahsoka.DeveloperTools\Styles\UserInputStyles.axaml" Link="Styles\UserInputStyles.axaml" />
+		<ProjectReference Include="..\Ahsoka.Core.Can\Ahsoka.Core.Can.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<EmbeddedResource Update="Properties\Resources.resx">
 	    <Generator>ResXFileCodeGenerator</Generator>
 	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
