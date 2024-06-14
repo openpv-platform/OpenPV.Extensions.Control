@@ -5,6 +5,7 @@ using Ahsoka.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Diagnostics;
+using System.IO;
 
 namespace Ahsoka.Test;
 
@@ -15,6 +16,10 @@ public class TestInitializer : LinearTestBase
     public static void AssemblyInit(TestContext context)
     {
         ProcessUtility.RunProcess("taskkill", "/im Ahsoka.CommandLine.exe /f",null, out string result, out string error);
+
+        string platformSupportPath = PlatformSupportPathInfo.GetDeveloperToolPath();
+
+        HardwareInfo.LoadHardwareInfo(platformSupportPath);
 
         Extensions.LoadExtensions();
 
