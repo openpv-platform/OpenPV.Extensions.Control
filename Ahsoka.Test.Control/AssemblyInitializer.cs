@@ -18,7 +18,7 @@ public class TestInitializer : LinearTestBase
         // Fall back to Developer Support Folder if running Standalone.
         if (HardwareInfo.GetHardwareInfoDescriptions().Count == 0)
         {
-            string platformSupportPath = PlatformSupportPathInfo.GetDeveloperToolSupportPath();
+            string platformSupportPath = PlatformSupportPathInfo.GetDeveloperPlatformSupportPath();
             HardwareInfo.LoadHardwareInfo(platformSupportPath);
         }
 

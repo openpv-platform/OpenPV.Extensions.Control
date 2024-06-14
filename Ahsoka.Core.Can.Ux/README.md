@@ -1,7 +1,5 @@
-﻿# OpenPV - Ahsoka.DeveloperTools.Extensions
+﻿# OpenPV - Ahsoka.Core.CAN.Ux
 
-Ahsoka.DeveloperTools.Extensions contains UX Extensions for OpenPV 
-Developer Toolkit.
-&nbsp;
+Ahsoka.Core.CAN.UX contains the Ahsoka User Interface for Configuring CAN Services
 
 **[For more information about developing in OpenPV Click Here.](https://support.enovationcontrols.com/hc/en-us)**

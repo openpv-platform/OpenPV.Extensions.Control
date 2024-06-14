@@ -1,14 +1,12 @@
 ﻿using Ahsoka.DeveloperTools.Core;
 using Ahsoka.DeveloperTools.Views;
 using Ahsoka.Services.Can;
-using Ahsoka.Services.IO;
 using Ahsoka.Utility;
 using Avalonia.Controls;
 using Avalonia.Media;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Device.Gpio;
 
 namespace Ahsoka.DeveloperTools;
 

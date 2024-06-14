@@ -1,0 +1,71 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<RootNamespace>Ahsoka</RootNamespace>
+		<GenerateDocumentationFile>false</GenerateDocumentationFile>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<DebugType>portable</DebugType>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<None Include="LICENSE.txt" Pack="true" PackagePath="\" />
+		<None Include="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<AdditionalFiles Include="Proto\*.proto" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="System.Device.Gpio" Version="3.1.0" />
+		<PackageReference Include="protobuf-net" Version="3.2.30" />
+		<PackageReference Include="protobuf-net.BuildTools" Version="3.2.33">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<Import Label="Ahsoka Local Build Properties" Condition="Exists('../../Core.Build.props')" Project="../../Core.Build.props" />
+
+	<ItemGroup Label="Submodule Dev References" Condition="!Exists('../../Core.Build.props')">
+		<PackageReference Include="Ahsoka.Core" Version="3.1.1-zzz-develop.12" />
+	</ItemGroup>
+
+	<ItemGroup Label="Ahsoka Dev References" Condition="Exists('../../Core.Build.props')">
+		<ProjectReference Include="$(AhsokaRootFolder)Ahsoka.Core\Ahsoka.Core\Ahsoka.Core.csproj" />
+	</ItemGroup>
+
+
+	<!--To help Debugging since this is loaded dynamically-->
+	<Target Name="AfterIOBuild" AfterTargets="Build" Condition="$(SolutionName)=='Ahsoka.Platform'">
+		<Message Text="Copy IO Extension...$(SolutionName)" Importance="high" />
+		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\Ahsoka.Core.IO.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\IO Service Extension\lib\Ahsoka.Core.IO.dll" />
+		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\System.Device.Gpio.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\IO Service Extension\lib\System.Device.Gpio.dll" />
+		<Copy SourceFiles="$(ProjectDir)Ahsoka.Core.IO.extensioninfo.json" DestinationFiles="$(ProjectDir)..\..\..\Extensions\IO Service Extension\Ahsoka.Core.IO.extensioninfo.json" />
+	</Target>
+
+	<ItemGroup Condition="false">
+		<PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Properties\IOResources.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>IOResources.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Properties\IOResources.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>IOResources.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+</Project>

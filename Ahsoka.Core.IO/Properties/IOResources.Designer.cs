@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Ahsoka.Test.Can.Properties {
+namespace Ahsoka.Properties {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace Ahsoka.Test.Can.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class CanTestResources {
+    internal class IOResources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal CanTestResources() {
+        internal IOResources() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Ahsoka.Test.Can.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Ahsoka.Test.Can.Properties.CanTestResources", typeof(CanTestResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Ahsoka.Properties.IOResources", typeof(IOResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,49 +61,12 @@ namespace Ahsoka.Test.Can.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to VERSION &quot;&quot;
-        ///
-        ///NS_ :
-        ///	BA_
-        ///	BA_DEF_
-        ///	BA_DEF_DEF_
-        ///	BA_DEF_DEF_REL_
-        ///	BA_DEF_REL_
-        ///	BA_DEF_SGTYPE_
-        ///	BA_REL_
-        ///	BA_SGTYPE_
-        ///	BO_TX_BU_
-        ///	BU_BO_REL_
-        ///	BU_EV_REL_
-        ///	BU_SG_REL_
-        ///	CAT_
-        ///	CAT_DEF_
-        ///	CM_
-        ///	ENVVAR_DATA_
-        ///	EV_DATA_
-        ///	FILTER
-        ///	NS_DESC_
-        ///	SGTYPE_
-        ///	SGTYPE_VAL_
-        ///	SG_MUL_VAL_
-        ///	SIGTYPE_VALTYPE_
-        ///	SIG_GROUP_
-        ///	SIG_TYPE_REF_
-        ///	SIG_VALTYPE_
-        ///	VAL_
-        ///	VAL_TABLE_
-        ///
-        ///BS_:
-        ///
-        ///BU_: DBG CONTROLLER IO MOTOR SENSOR
-        ///
-        ///
-        ///BO_ 100 DRIVER_HEARTBEAT: 1 CONTROLLER
-        /// SG_ DRIVER_HEARTBEAT_cmd : 0|8@1+ (1,0) [0|0] &quot;&quot; SENSOR [rest of string was truncated]&quot;;.
+        ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static string TestFile {
+        internal static byte[] IOService {
             get {
-                return ResourceManager.GetString("TestFile", resourceCulture);
+                object obj = ResourceManager.GetObject("IOService", resourceCulture);
+                return ((byte[])(obj));
             }
         }
     }

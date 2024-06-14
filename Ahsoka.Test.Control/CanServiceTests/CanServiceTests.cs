@@ -4,7 +4,7 @@ using Ahsoka.ServiceFramework;
 using Ahsoka.Services.Can;
 using Ahsoka.System;
 using Ahsoka.System.Hardware;
-using Ahsoka.Test.Can.Properties;
+using Ahsoka.Test.Control.Properties;
 using Ahsoka.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -13,7 +13,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using static Ahsoka.Services.Can.J1939Helper;
 using ValueType = Ahsoka.Services.Can.ValueType;
 
 namespace Ahsoka.Test;

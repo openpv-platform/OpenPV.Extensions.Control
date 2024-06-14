@@ -17,6 +17,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Ahsoka.Core.CAN\Ahsoka.Core.Can.csproj" />
+		<ProjectReference Include="..\Ahsoka.Core.IO\Ahsoka.Core.IO.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

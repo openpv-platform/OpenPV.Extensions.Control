@@ -1,0 +1,18 @@
+﻿{
+  "extensionName": "IO Service Extension",
+  "packageName": "Ahsoka.Core.IO",
+  "serviceConfigurations": [
+    {
+      "socketType": "TcpSocket",
+      "serviceName": "IOService",
+      "tcpListenAddress": "*",
+      "tcpConnectionAddress": "localhost",
+      "bleServiceUuidBase": "96730000-8f5d-4cef-8289-744c8faa1a66",
+      "dataChannel": 5006,
+      "behaviors": "AutoStart"
+    }
+  ],
+  "hasCommands": "true",
+  "hasUx": "false",
+  "hasSdkGenerator": "true"
+}

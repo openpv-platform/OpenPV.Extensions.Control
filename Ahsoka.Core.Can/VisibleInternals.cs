@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 [assembly: InternalsVisibleTo("OpenPV.DeveloperToolkit")]
 [assembly: InternalsVisibleTo("Ahsoka.Core.Can.Ux")]
 [assembly: InternalsVisibleTo("Ahsoka.Test")]
-[assembly: InternalsVisibleTo("Ahsoka.Test.Can")]
+[assembly: InternalsVisibleTo("Ahsoka.Test.Control")]
 [assembly: InternalsVisibleTo("Ahsoka.Core.Can")]
 
 namespace Ahsoka.Core.CAN;
