@@ -15,11 +15,12 @@ public class TestInitializer : LinearTestBase
    [AssemblyInitialize]
     public static void AssemblyInit(TestContext context)
     {
-        ProcessUtility.RunProcess("taskkill", "/im Ahsoka.CommandLine.exe /f",null, out string result, out string error);
-
-        string platformSupportPath = PlatformSupportPathInfo.GetDeveloperToolPath();
-
-        HardwareInfo.LoadHardwareInfo(platformSupportPath);
+        // Fall back to Developer Support Folder
+        if (HardwareInfo.GetHardwareInfoDescriptions().Count == 0)
+        {
+            string platformSupportPath = PlatformSupportPathInfo.GetDeveloperToolRootPath();
+            HardwareInfo.LoadHardwareInfo(platformSupportPath);
+        }
 
         Extensions.LoadExtensions();
 
