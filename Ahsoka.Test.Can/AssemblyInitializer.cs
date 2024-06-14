@@ -15,10 +15,10 @@ public class TestInitializer : LinearTestBase
    [AssemblyInitialize]
     public static void AssemblyInit(TestContext context)
     {
-        // Fall back to Developer Support Folder
+        // Fall back to Developer Support Folder if running Standalone.
         if (HardwareInfo.GetHardwareInfoDescriptions().Count == 0)
         {
-            string platformSupportPath = PlatformSupportPathInfo.GetDeveloperToolRootPath();
+            string platformSupportPath = PlatformSupportPathInfo.GetDeveloperToolSupportPath();
             HardwareInfo.LoadHardwareInfo(platformSupportPath);
         }
 
@@ -29,12 +29,14 @@ public class TestInitializer : LinearTestBase
 
         var prep = RemoteTargetToolFactory.GetToolsForPlatform(PlatformFamily.Windows64);
 
-        // Create Hardware Info
+        // Load Hardware Info
         HardwareInfo hardware = HardwareInfo.GetHardwareInfo(PlatformFamily.Windows64, "Desktop");
 
         var info = new TargetConnectionInfo() { PlatformFamily = hardware.PlatformFamily, PlatformQualifier = hardware.PlatformQualifier, HostName = "localhost", UserName = "" };
 
+        // Prep Local Machine
         bool returnValue = prep.Prep(info, null, progress);
+
     }
 
 }
