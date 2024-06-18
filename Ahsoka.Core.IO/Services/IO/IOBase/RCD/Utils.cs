@@ -1,3 +1,4 @@
+using Ahsoka.ServiceFramework;
 using System;
 using System.Collections.Generic;
 using System.Device.Gpio;
@@ -59,23 +60,43 @@ internal static class MuxSelectUtils
         {ADCInput.DIN2,      new PinValue[] {PinValue.High, PinValue.High, PinValue.High} }, // A=1  B=1  C=1
     };
 
-    private static void SetMux(GpioController muxController, int MuxPin, PinValue pv)
+    private static bool SetMux(GpioController muxController, int MuxPin, PinValue pv, bool throwOnError)
     {
-        muxController.OpenPin(MuxPin, PinMode.Output);
-        muxController.Write(MuxPin, pv);
-        muxController.ClosePin(MuxPin);
+        try
+        {
+            muxController.OpenPin(MuxPin, PinMode.Output);
+            muxController.Write(MuxPin, pv);
+            muxController.ClosePin(MuxPin);
+            return true;
+        }
+        catch (IOException ex) 
+        {
+            if (throwOnError)
+            {
+                AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"Retry Failed Reading IO Value {ex.ToString()}");
+                throw;
+            }
+            AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"Error Reading IO Value - Attempting Retry");
+            return false;
+        };
     }
 
     public static void SetMuxSelect(ADCInput index)
     {
         // Set Mux Select A
-        SetMux(muxControllerA, MuxPinA, BitMask[index][0]);
+        bool result = SetMux(muxControllerA, MuxPinA, BitMask[index][0],false);
+        if (!result) 
+            result = SetMux(muxControllerA, MuxPinA, BitMask[index][0], true); // Retry
 
         // Set Mux Select B
-        SetMux(muxControllerB, MuxPinB, BitMask[index][1]);
+        result = SetMux(muxControllerB, MuxPinB, BitMask[index][1], false);
+        if (!result)
+            result = SetMux(muxControllerB, MuxPinB, BitMask[index][1], true); // Retry
 
         // Set Mux Select C
-        SetMux(muxControllerC, MuxPinC, BitMask[index][2]);
+        result = SetMux(muxControllerC, MuxPinC, BitMask[index][2], false);
+        if (!result)
+            result = SetMux(muxControllerC, MuxPinC, BitMask[index][2], true); // Retry
     }
 }
 

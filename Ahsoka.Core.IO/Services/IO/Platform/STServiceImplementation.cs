@@ -136,6 +136,4 @@ internal class STServiceImplementation : IOServiceImplementationBase
 
         return new IgnitionState() { MilliVolts = returnValue, State = state };
     }
-
-
 }

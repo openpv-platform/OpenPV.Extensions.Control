@@ -1,6 +1,9 @@
+using Ahsoka.ServiceFramework;
 using Ahsoka.Services.System;
 using Ahsoka.System.Hardware;
+using System;
 using System.Collections.Concurrent;
+using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -75,23 +78,30 @@ internal abstract class IOServiceImplementationBase
     {
         lock (_ioService)
         {
-            // Load each IO Pin 
-            foreach (var item in latestAnalogValues.Keys)
+            try
             {
-                var newValue = analogInputImplementation.ReadVolts(item);
-                if (newValue.Ret == ReturnCode.Success)
-                    _ioService.UpdateCacheValue(IOServiceDataKeys.AnalogInput_ + item.ToString(), newValue.Value);
+                // Load each IO Pin 
+                foreach (var item in latestAnalogValues.Keys)
+                {
+                    var newValue = analogInputImplementation.ReadVolts(item);
+                    if (newValue.Ret == ReturnCode.Success)
+                        _ioService.UpdateCacheValue(IOServiceDataKeys.AnalogInput_ + item.ToString(), newValue.Value);
 
-                latestAnalogValues[item] = newValue;
+                    latestAnalogValues[item] = newValue;
+                }
+
+                foreach (var item in latestDigitalValues.Keys)
+                {
+                    var newValue = digitalInputImplementation.ReadVolts(item);
+                    if (newValue.Ret == ReturnCode.Success)
+                        _ioService.UpdateCacheValue(IOServiceDataKeys.DigitalInput_ + item.ToString(), newValue.Value);
+
+                    latestDigitalValues[item] = newValue;
+                }
             }
-
-            foreach (var item in latestDigitalValues.Keys)
-            {
-                var newValue = digitalInputImplementation.ReadVolts(item);
-                if (newValue.Ret == ReturnCode.Success)
-                    _ioService.UpdateCacheValue(IOServiceDataKeys.DigitalInput_ + item.ToString(), newValue.Value);
-
-                latestDigitalValues[item] = newValue;
+            catch (IOException ex) 
+            { 
+                AhsokaLogging.LogMessage(AhsokaVerbosity.High, ex.ToString()); 
             }
         }
     }
