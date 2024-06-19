@@ -31,7 +31,7 @@
 	<Import Label="Ahsoka Local Build Properties" Condition="Exists('../../Core.Build.props')" Project="../../Core.Build.props" />
 
 	<ItemGroup Label="Submodule Dev References" Condition="!Exists('../../Core.Build.props')">
-		<PackageReference Include="Ahsoka.Core" Version="3.1.1-zzz-develop.12" />
+		<PackageReference Include="Ahsoka.Core" Version="3.1.1-zzz-develop.20" />
 	</ItemGroup>
 
 	<ItemGroup Label="Ahsoka Dev References" Condition="Exists('../../Core.Build.props')">
@@ -44,10 +44,9 @@
 		<Message Text="Copy IO Extension...$(SolutionName)" Importance="high" />
 		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\Ahsoka.Core.IO.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\IO Service Extension\lib\Ahsoka.Core.IO.dll" />
 		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\System.Device.Gpio.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\IO Service Extension\lib\System.Device.Gpio.dll" />
-		<Copy SourceFiles="$(ProjectDir)Ahsoka.Core.IO.extensioninfo.json" DestinationFiles="$(ProjectDir)..\..\..\Extensions\IO Service Extension\Ahsoka.Core.IO.extensioninfo.json" />
 	</Target>
 
-	<ItemGroup Condition="false">
+	<ItemGroup>
 		<PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
