@@ -25,30 +25,44 @@
 		<None Remove=".gitignore" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Avalonia.Controls.DataGrid" Version="11.1.0-beta1" />
-		<PackageReference Include="Avalonia.Desktop" Version="11.1.0-beta1" />
-		<PackageReference Include="Avalonia.Fonts.Inter" Version="11.1.0-beta1" />
-		<PackageReference Include="Packaging.Targets" Version="0.1.220-*">
+		<PackageReference Include="Avalonia.Controls.DataGrid" Version="11.1.0-rc1" />
+		<PackageReference Include="Avalonia.Desktop" Version="11.1.0-rc1" />
+		<PackageReference Include="Avalonia.Fonts.Inter" Version="11.1.0-rc1" />
+		<PackageReference Include="Packaging.Targets" Version="0.1.226">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 	</ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\..\..\Ahsoka.Core\Ahsoka.Core\Ahsoka.Core.csproj" />
-		<ProjectReference Include="..\..\..\Ahsoka.Extensions\Control\Ahsoka.Core.Can\Ahsoka.Core.Can.csproj" />
-		<ProjectReference Include="..\..\..\Ahsoka.Core\Ahsoka.DeveloperTools.Core\Ahsoka.DeveloperTools.Core.csproj" />
+
+	<Import Label="Ahsoka Local Build Properties" Condition="Exists('../../Core.Build.props')" Project="../../Core.Build.props" />
+
+	<ItemGroup Label="Ahsoka Dev References" Condition="Exists('../../Core.Build.props')">
+		<ProjectReference Include="$(AhsokaRootFolder)Ahsoka.Core\Ahsoka.Core\Ahsoka.Core.csproj" />
+		<ProjectReference Include="$(AhsokaRootFolder)Ahsoka.Core\Ahsoka.DeveloperTools.Core\Ahsoka.DeveloperTools.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup Label="Submodule Dev References" Condition="!Exists('../../Core.Build.props')">
+		<PackageReference Include="Ahsoka.Core" Version="3.1.1-zzz-develop.20" />
+		<PackageReference Include="Ahsoka.DeveloperTools.Core" Version="3.1.1-zzz-develop.20" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<AvaloniaResource Include="..\..\..\Ahsoka.Core\Ahsoka.DeveloperTools\Styles\Styles.axaml" Link="Styles\Styles.axaml" />
-		<AvaloniaResource Include="..\..\..\Ahsoka.Core\Ahsoka.DeveloperTools\Styles\UserInputStyles.axaml" Link="Styles\UserInputStyles.axaml" />
+		<AvaloniaResource Include="..\Ahsoka.Shared\UX\Styles\Styles.axaml" Link="Styles\Styles.axaml" />
+		<AvaloniaResource Include="..\Ahsoka.Shared\UX\Styles\UserInputStyles.axaml" Link="Styles\UserInputStyles.axaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Ahsoka.Core.Can\Ahsoka.Core.Can.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<EmbeddedResource Update="Properties\Resources.resx">
 	    <Generator>ResXFileCodeGenerator</Generator>
 	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
 	</ItemGroup>
 
-	<ItemGroup  Condition="false">
+	<ItemGroup>
 	  <PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
 	    <PrivateAssets>all</PrivateAssets>
 	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

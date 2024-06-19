@@ -391,5 +391,6 @@ FodyWeavers.xsd
 *.project
 */StoryboardExport/
 *.buildpath
-Ahsoka.OpenPV.Installer\Components.wxs
+
+Ahsoka.Coprocessor/openview_s/firmware/CM4/Middlewares/Third_Party/proto/*
 Ahsoka.Core.Can/Resources/OpenViewLinux_TargetSupport_firmware_CM4.elf

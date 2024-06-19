@@ -1,8 +1,7 @@
-﻿# OpenPV - Ahsoka.Core.BLE
+﻿# OpenPV - Ahsoka.Core.CAN
 
-Ahsoka.Core.BLE contains the Ahsoka Service for interacting 
-with a BLE Bluetooth Stack.   Dpending on the platform this 
-stack may use native stacks or BlueZ on Linux.
+Ahsoka.Core.CAN contains the Ahsoka Service for interacting 
+with a CAN Networks.
 &nbsp;
 
 **[For more information about developing in OpenPV Click Here.](https://support.enovationcontrols.com/hc/en-us)**

@@ -16,13 +16,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<AdditionalFiles Include="Proto\Can*.proto"/>
+		<AdditionalFiles Include="Proto\*.proto" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SocketCANSharp" Version="0.11.0" />
-		<PackageReference Include="DbcParserLib" Version="1.6.0" />
-		<PackageReference Include="ELFSharp" Version="2.17.3" />
+		<PackageReference Include="System.Device.Gpio" Version="3.1.0" />
 		<PackageReference Include="protobuf-net" Version="3.2.30" />
 		<PackageReference Include="protobuf-net.BuildTools" Version="3.2.33">
 			<PrivateAssets>all</PrivateAssets>
@@ -42,13 +40,11 @@
 
 
 	<!--To help Debugging since this is loaded dynamically-->
-	<Target Name="AfterCanBuild" AfterTargets="Build" Condition="$(SolutionName)=='Ahsoka.Platform'">
-		<Message Text="Copy CAN Extension...$(SolutionName)" Importance="high" />
-		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\Ahsoka.Core.Can.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\Can Service Extension\lib\Ahsoka.Core.Can.dll" />
-		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\SocketCANSharp.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\Can Service Extension\lib\SocketCANSharp.dll" />
-		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\ELFSharp.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\Can Service Extension\lib\ELFSharp.dll" />
-		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\DbcParserLib.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\Can Service Extension\lib\DbcParserLib.dll" />
- 	</Target>
+	<Target Name="AfterIOBuild" AfterTargets="Build" Condition="$(SolutionName)=='Ahsoka.Platform'">
+		<Message Text="Copy IO Extension...$(SolutionName)" Importance="high" />
+		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\Ahsoka.Core.IO.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\IO Service Extension\lib\Ahsoka.Core.IO.dll" />
+		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\System.Device.Gpio.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\IO Service Extension\lib\System.Device.Gpio.dll" />
+	</Target>
 
 	<ItemGroup>
 		<PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
@@ -58,17 +54,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Properties\CANResources.Designer.cs">
+	  <Compile Update="Properties\IOResources.Designer.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
-	    <DependentUpon>CANResources.resx</DependentUpon>
+	    <DependentUpon>IOResources.resx</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Update="Properties\CANResources.resx">
+	  <EmbeddedResource Update="Properties\IOResources.resx">
 	    <Generator>ResXFileCodeGenerator</Generator>
-	    <LastGenOutput>CANResources.Designer.cs</LastGenOutput>
+	    <LastGenOutput>IOResources.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
 	</ItemGroup>
 </Project>

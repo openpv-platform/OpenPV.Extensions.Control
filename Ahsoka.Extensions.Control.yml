@@ -1,0 +1,150 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+  branches:
+    include:
+    - develop
+
+variables:
+    solutionname: 'Ahsoka.Control'
+    solutiondir:  $(Build.SourcesDirectory)
+    solution: '*.sln'
+    buildPlatform: 'Any CPU'
+    buildConfiguration: 'Release'
+    system_accesstoken: $(System.AccessToken)
+    isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+    isRelease: $[startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')]
+    isDevelop: $[eq(variables['Build.SourceBranch'], 'refs/heads/develop')]
+  
+# This build has 2 Stages
+# Stage 2: Builds the Code and Run Tests
+# Stage 3: Uploads to Spark:
+stages:
+   
+- stage: PCBuild
+
+  dependsOn:
+
+  jobs:
+  - job: BuildOnLocalPC
+    condition: true
+    pool: 'OpenPV Pool'
+   
+    steps:
+    - checkout: self
+      submodules: recursive
+      persistCredentials: true
+
+    - task: gitversion/setup@0
+      displayName: Install GitVersion
+      inputs:
+        versionSpec: '5.x'
+        preferLatestVersion: true
+
+    - task: gitversion/execute@0
+      displayName: Determine Version
+      inputs:
+        useConfigFile: true
+        configFilePath: 'GitVersion.yml'
+
+    - task: UseDotNet@2
+      displayName: Load DotNet 8
+      inputs:
+        version: '8.x'
+
+    - task: NuGetAuthenticate@0
+      displayName: 'NuGet Authenticate'
+  
+    - task: NuGetToolInstaller@1
+
+    - task: NuGetCommand@2
+      displayName: Restore Platform
+      inputs:
+        command: 'restore'
+        restoreSolution: 'Ahsoka.Control.sln'
+        feedsToUse: 'config'
+        nugetConfigPath: 'nuget.config'
+        externalFeedCredentials: 'Ahsoka.Nuget'
+        noCache: true
+
+    - task: VSBuild@1
+      displayName: 'Build Solution'
+      inputs:
+        solution: 'Ahsoka.Control.csproj'
+        vsVersion: '17.0'
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
+        maximumCpuCount: true
+        msbuildArchitecture: 'x64'
+
+    - task: DotNetCoreCLI@2
+      displayName: Run Ahsoka Tests
+      enabled: true
+      inputs:
+        command: test
+        projects: '**/*Ahsoka.Test.*/*.csproj'
+        arguments: '--configuration $(buildConfiguration) --collect "Code coverage" --blame-hang --blame-hang-timeout 120s -m:1 --logger:"console;verbosity=detailed" --settings: Ahsoka.Core/codecoverage.runsettings'
+
+    - task: CopyFiles@2
+      displayName: 'Moving Nugets to Upload Area'
+      inputs:
+        Contents: |
+          $(Build.SourcesDirectory)/**/*.nupkg
+          $(Build.SourcesDirectory)/**/*.snupkg
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/nuget'
+        OverWrite: true
+        flattenFolders: true
+
+
+- stage: SparkUpload
+  dependsOn:
+    - PCBuild
+   
+  jobs:
+  - job: FinalizeBuild
+    condition: true
+    pool: 'OpenPV Pool'  
+    
+    steps:
+
+    - checkout: self
+      submodules: recursive
+      persistCredentials: true
+    
+    - task: DownloadBuildArtifacts@1
+      displayName: 'Fetching Spark Artifacts to Publish'
+      inputs:
+        buildType: 'current'
+        downloadType: 'single'
+        artifactName: 'drop'
+        downloadPath: '$(Build.SourcesDirectory)\PublishArea'
+     
+    - task: DownloadSecureFile@1
+      displayName: 'Download PowerVision Cert'
+      inputs:
+        secureFile: PowerVisionSigningCert.p12
+
+    - task: NuGetCommand@2
+      displayName: 'Push to Nuget.org if dev or main'
+      condition: and(succeeded(), or(eq(variables.isMain, 'true'), eq(variables.isRelease, 'true'), eq(variables.isDevelop, 'true')))
+      inputs:
+        command: 'push'
+        packagesToPush: '$(Build.SourcesDirectory)/PublishArea/drop/nuget/Ahsoka.*.nupkg'
+        nuGetFeedType: 'external'
+        publishFeedCredentials: 'Ahsoka.Nuget'      
+
+    - task: PowerShell@2
+      condition: and(succeeded(), or(eq(variables.isMain, 'true'), eq(variables.isRelease, 'true')))
+      displayName: 'Tag Sources'
+      env:       
+        BuildNumber: $(Build.BuildNumber)
+      inputs:
+        targetType: 'inline'
+        script: |
+           Write-Host "Tagging Build: $env:BuildNumber"
+
+           git tag $env:BuildNumber
+           git push origin $env:BuildNumber
