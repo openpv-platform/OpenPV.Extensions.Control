@@ -106,5 +106,35 @@ namespace Ahsoka.Test.Control.Properties {
                 return ResourceManager.GetString("TestFile", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;factoryInfo&quot;: {
+        ///    &quot;rootPath&quot;: &quot;%USERPROFILE%\\Ahsoka&quot;,
+        ///    &quot;platformFamily&quot;: &quot;Windows64&quot;,
+        ///    &quot;platformQualifier&quot;: &quot;Desktop&quot;,
+        ///    &quot;partNumber&quot;: &quot;88888888&quot;,
+        ///    &quot;serialNumber&quot;: &quot;7777777777&quot;,
+        ///    &quot;securityModelNumber&quot;: &quot;&quot;,
+        ///    &quot;hostName&quot;: &quot;OpenView&quot;,
+        ///    &quot;userName&quot;: &quot;root&quot;,
+        ///    &quot;password&quot;: &quot;&quot;
+        ///  },
+        ///  &quot;screenInfo&quot;: {
+        ///    &quot;screenWidth&quot;: &quot;1024&quot;,
+        ///    &quot;screenHeight&quot;: &quot;768&quot;,
+        ///    &quot;screenDpi&quot;: &quot;96&quot;
+        ///  },
+        ///  &quot;bluetoothInfo&quot;: {
+        ///    &quot;bluetoothAdapters&quot;: [
+        ///      {
+        ///        &quot;index&quot;: &quot;0&quot;,
+        ///        &quot;d [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string WindowsHardwareConfiguration {
+            get {
+                return ResourceManager.GetString("WindowsHardwareConfiguration", resourceCulture);
+            }
+        }
     }
 }

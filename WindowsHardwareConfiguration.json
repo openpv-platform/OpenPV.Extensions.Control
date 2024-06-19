@@ -1,0 +1,44 @@
+{
+  "factoryInfo": {
+    "rootPath": "%USERPROFILE%\\Ahsoka",
+    "platformFamily": "Windows64",
+    "platformQualifier": "Desktop",
+    "partNumber": "88888888",
+    "serialNumber": "7777777777",
+    "securityModelNumber": "",
+    "hostName": "OpenView",
+    "userName": "root",
+    "password": ""
+  },
+  "screenInfo": {
+    "screenWidth": "1024",
+    "screenHeight": "768",
+    "screenDpi": "96"
+  },
+  "bluetoothInfo": {
+    "bluetoothAdapters": [
+      {
+        "index": "0",
+        "deviceInterfacePath": "",
+        "stack": "Desktop"
+      }
+    ]
+  },
+  "networkInfo": {
+    "adapterInfoList": [
+    ]
+  },
+  "canInfo": {
+    "canPorts": [
+      {
+        "port": "1"
+      }
+    ]
+  },
+  "ioInfo": {
+    "analogInputs": [ 1, 2 ],
+    "analogOutputs": [],
+    "digitalInputs": [ 1, 2 ],
+    "digitalOutputs": [ 1, 2 ]
+  }
+}

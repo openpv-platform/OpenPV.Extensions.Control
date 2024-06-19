@@ -1,11 +1,14 @@
 ﻿
 using Ahsoka.System;
 using Ahsoka.System.Hardware;
+using Ahsoka.Test.Control.Properties;
 using Ahsoka.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 
 namespace Ahsoka.Test;
 
@@ -18,8 +21,8 @@ public class TestInitializer : LinearTestBase
         // Fall back to Developer Support Folder if running Standalone.
         if (HardwareInfo.GetHardwareInfoDescriptions().Count == 0)
         {
-            string platformSupportPath = PlatformSupportPathInfo.GetDeveloperPlatformSupportPath();
-            HardwareInfo.LoadHardwareInfo(platformSupportPath);
+            var hd = JsonUtility.Deserialize<HardwareInfo>(CanTestResources.WindowsHardwareConfiguration);
+            HardwareInfo.AddHardwareInfo(hd);
         }
 
         Extensions.LoadExtensions();
@@ -30,7 +33,7 @@ public class TestInitializer : LinearTestBase
         var prep = RemoteTargetToolFactory.GetToolsForPlatform(PlatformFamily.Windows64);
 
         // Load Hardware Info
-        HardwareInfo hardware = HardwareInfo.GetHardwareInfo(PlatformFamily.Windows64, "Desktop");
+        HardwareInfo hardware = HardwareInfo.GetHardwareInfo(PlatformFamily.Windows64, "TestHardware");
 
         var info = new TargetConnectionInfo() { PlatformFamily = hardware.PlatformFamily, PlatformQualifier = hardware.PlatformQualifier, HostName = "localhost", UserName = "" };
 

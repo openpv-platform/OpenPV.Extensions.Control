@@ -104,8 +104,11 @@ public class IOService : AhsokaServiceBase<IOMessageTypes.Ids>
             }
             catch (Exception ex)
             {
-                AhsokaLogging.LogMessage(AhsokaVerbosity.High, $"Ignition notifications terminated with exception: {ex.Message}");
-                AhsokaLogging.LogMessage(AhsokaVerbosity.High, ex.StackTrace);
+                if (!(ex.InnerException is OperationCanceledException))
+                {
+                    AhsokaLogging.LogMessage(AhsokaVerbosity.High, $"Ignition notifications terminated with exception: {ex.Message}");
+                    AhsokaLogging.LogMessage(AhsokaVerbosity.High, ex.StackTrace);
+                }
             }
         });
 
