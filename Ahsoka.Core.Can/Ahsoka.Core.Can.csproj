@@ -9,6 +9,22 @@
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	</PropertyGroup>
+
+
+	<PropertyGroup Label="Debugging Support">
+		<DebugSymbols>true</DebugSymbols>
+		<EmbedAllSources>true</EmbedAllSources>
+		<DebugType>portable</DebugType>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+	</PropertyGroup>
+
+	<ItemGroup Label="Debugging Source Support">
+		<PackageReference Include="Microsoft.SourceLink.AzureRepos.Git" Version="8.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
 	
 	<ItemGroup>
 		<None Include="LICENSE.txt" Pack="true" PackagePath="\" />
@@ -30,25 +46,9 @@
 		</PackageReference>
 	</ItemGroup>
 
-	<Import Label="Ahsoka Local Build Properties" Condition="Exists('../../Core.Build.props')" Project="../../Core.Build.props" />
-
-	<ItemGroup Label="Submodule Dev References" Condition="!Exists('../../Core.Build.props')">
+	<ItemGroup Label="Submodule Dev References">
 		<PackageReference Include="Ahsoka.Core" Version="3.1.1-zzz-develop.21" />
 	</ItemGroup>
-
-	<ItemGroup Label="Ahsoka Dev References" Condition="Exists('../../Core.Build.props')">
-		<ProjectReference Include="$(AhsokaRootFolder)Ahsoka.Core\Ahsoka.Core\Ahsoka.Core.csproj" />
-	</ItemGroup>
-
-
-	<!--To help Debugging since this is loaded dynamically-->
-	<Target Name="AfterCanBuild" AfterTargets="Build" Condition="$(SolutionName)=='Ahsoka.Platform'">
-		<Message Text="Copy CAN Extension...$(SolutionName)" Importance="high" />
-		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\Ahsoka.Core.Can.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\Can Service Extension\lib\Ahsoka.Core.Can.dll" />
-		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\SocketCANSharp.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\Can Service Extension\lib\SocketCANSharp.dll" />
-		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\ELFSharp.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\Can Service Extension\lib\ELFSharp.dll" />
-		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\DbcParserLib.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\Can Service Extension\lib\DbcParserLib.dll" />
- 	</Target>
 
 	<ItemGroup>
 		<PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
