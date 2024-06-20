@@ -33,7 +33,7 @@ public class TestInitializer : LinearTestBase
         var prep = RemoteTargetToolFactory.GetToolsForPlatform(PlatformFamily.Windows64);
 
         // Load Hardware Info
-        HardwareInfo hardware = HardwareInfo.GetHardwareInfo(PlatformFamily.Windows64, "TestHardware");
+        HardwareInfo hardware = HardwareInfo.GetHardwareInfo(PlatformFamily.Windows64, "Desktop");
 
         var info = new TargetConnectionInfo() { PlatformFamily = hardware.PlatformFamily, PlatformQualifier = hardware.PlatformQualifier, HostName = "localhost", UserName = "" };
 
