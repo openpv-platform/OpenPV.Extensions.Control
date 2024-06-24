@@ -1,0 +1,60 @@
+{
+  "version": "3.0.1.20073",
+  "applicationType": "Cpp",
+  "systemOrientation": "DefaultOrientation",
+  "execCommand": "Ahsoka.QT.CAN",
+  "packageName": "Ahsoka.QT.CAN",
+  "packageDescription": "CAN Starter project for using QT with OpenPV",
+  "applicationVersion": "1.0",
+  "packageApplicationFolder": "Outputs",
+  "packageOutputDirectory": "..\\PackageOutput",
+  "includeInstallerUI": false,
+  "includeFirmwareUpdate": false,
+  "licenses": [],
+  "cppInfo": {
+    "projectPath": "."
+  },
+  "serviceInfo": {
+    "runtimeConfiguration": {
+      "serviceStartup": "NoAutoStart",
+      "releaseOption": "NoAutoStart",
+      "extensions": [
+        "CAN Service Extension"
+      ],
+      "startupDelay": 3,
+      "requireChallenge": "NotRequired",
+      "services": [
+        {
+          "socketType": "TcpSocket",
+          "serviceName": "SystemService",
+          "tcpListenAddress": "*",
+          "tcpConnectionAddress": "localhost",
+          "bleServiceUuidBase": "96730000-8f5d-4cef-8289-744c8faa1a66",
+          "dataChannel": 5001,
+          "isExtension": false,
+          "behaviors": "AutoStart",
+          "configurationFile": ""
+        },
+        {
+          "socketType": "TcpSocket",
+          "serviceName": "CanService",
+          "tcpListenAddress": "*",
+          "tcpConnectionAddress": "localhost",
+          "bleServiceUuidBase": "96730000-8f5d-4cef-8289-744c8faa1a66",
+          "dataChannel": 5007,
+          "isExtension": true,
+          "behaviors": "AutoStart",
+          "configurationFile": "STDemoPackage.1.cancalibration.json"
+        }
+      ]
+    },
+    "environmentValues": []
+  },
+  "packageType": "opvEncrypted",
+  "packageStructureVersion": 1,
+  "platformFamily": "OpenViewLinux",
+  "platformQualifier": "S70",
+  "securityMode": "None",
+  "applicationId": "3f0b605c-f79e-4242-924e-4319d7ee670c",
+  "components": []
+}

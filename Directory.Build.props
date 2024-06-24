@@ -5,7 +5,7 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<NoWarn>CA2101;NU5100;AD0001;CA1822;SYSLIB1054;IDE0057;CA1822;IDE0060;CS1587;CS1570</NoWarn> 
 		<NoDefaultExcludes>true</NoDefaultExcludes>
-		<PackageOutputPath>LocalNugetFeed</PackageOutputPath>
+		<PackageOutputPath>../LocalNugetFeed</PackageOutputPath>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<DebugType>portable</DebugType>
