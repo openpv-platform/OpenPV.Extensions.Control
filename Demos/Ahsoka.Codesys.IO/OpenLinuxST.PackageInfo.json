@@ -1,0 +1,48 @@
+{
+  "version": "2.4.1.10025",
+  "applicationType": "CODESYS",
+  "userInterfaceType": "CODESYS",
+  "systemOrientation": "DefaultOrientation",
+  "execCommand": "Application.app",
+  "packageName": "Ahsoka.Codesys.IO",
+  "packageDescription": "Starter App for CODESYS",
+  "applicationVersion": "1.0",
+  "packageApplicationFolder": "Output",
+  "packageOutputDirectory": "..\\PackageOutput",
+  "includeInstallerUI": false,
+  "licenses": [],
+  "storyboardInfo": {},
+  "cppInfo": {
+    "projectPath": "."
+  },
+  "serviceInfo": {
+    "runtimeConfiguration": {
+      "services": [
+        {
+          "serviceName": "SystemService",
+          "tcpListenAddress": "*",
+          "tcpConnectionAddress": "localhost",
+          "bleServiceUuidBase": "96730000-8f5d-4cef-8289-744c8faa1a66",
+          "dataChannel": 5001,
+          "notificationChannel": 6001,
+          "dataKeyValues": []
+        }
+      ],
+      "customServiceEnabled": "Enabled",
+      "serviceStartup": "AfterApplicationStart",
+      "releaseOption": "AfterApplicationStart",
+      "startupDelay": 0
+    },
+    "environmentValues": []
+  },
+  "canCalibrationFiles": {
+    "1": null
+  },
+  "packageType": "opvEncrypted",
+  "packageStructureVersion": 1,
+  "platformFamily": "OpenViewLinux",
+  "platformQualifier": "S70",
+  "securityMode": "None",
+  "applicationId": "00000000-0000-0000-0000-000000000000",
+  "components": []
+}

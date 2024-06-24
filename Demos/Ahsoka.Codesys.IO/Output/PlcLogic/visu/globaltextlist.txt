@@ -1,0 +1,17 @@
+Id;Default
+553;%s
+362;Analog Input 1
+459;Analog Input 2
+775;Brightnes
+900;Brightness
+536;Buzzer
+200;Buzzer Hertz
+851;Buzzer Volume
+314;Digital Input 1
+369;Digital Input 2
+987;Digital out 1
+398;Digital Out 1
+833;Digital Out 2
+122;Ignition
+891;Ingnition
+844;V Batt
