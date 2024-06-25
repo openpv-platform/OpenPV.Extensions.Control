@@ -5,13 +5,13 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Platforms>AnyCPU;x64</Platforms>
     <TargetFramework>net8.0</TargetFramework>
-    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
 	<ItemGroup Label="Reference to Ahsoka Nuget Packages">
-		<PackageReference Include="Ahsoka.Core.Drawing" Version="3.1.1-zzz-develop.25" />
-		<PackageReference Include="Ahsoka.Core" Version="3.1.1-zzz-develop.25" />
-		<PackageReference Include="Ahsoka.Core.CAN" Version="3.3.2-zzz-develop.6" />
+		<PackageReference Include="Ahsoka.Core.Drawing" Version="3.1.*-*" />
+		<PackageReference Include="Ahsoka.Core" Version="3.1.*-*" />
+		<PackageReference Include="Ahsoka.Core.CAN" Version="3.3.*-*" />
 	</ItemGroup>
   <!--Beginning in OpenPV 3.0, Command Line Code Generators have been simplified and now execute as part of the 
 	SDK Installation so Targets (ExportCanClasses) & Properties (Can Generator Properties) below are no 

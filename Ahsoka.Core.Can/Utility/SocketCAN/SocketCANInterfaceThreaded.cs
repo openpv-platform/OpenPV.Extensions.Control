@@ -71,20 +71,14 @@ internal class SocketCANInterfaceThreaded : SocketCANInterfaceBase
         if (writeMessageQueue.Count > watermark)
         {
             if (!hitWatermarkAdd)
-            {
-                AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, "SocketCAN Interface - Hit Watermark, Dropping Message");
                 hitWatermarkAdd = true;
-            }
 
             return false;
         }
 
         // Restore Watermark Indicator
         if (hitWatermarkSend)
-        {
             hitWatermarkAdd = false;
-            AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, "SocketCAN Interface - Below Watermark. Accepting Messages");
-        }
 
         // Create a deep copy of the message to be stored in the queue to avoid any accidental sharing of object
         // references.
