@@ -67,6 +67,25 @@ internal class SocketCANInterfaceThreaded : SocketCANInterfaceBase
             throw new InvalidOperationException("The socket hasn't been started yet.");
         }
 
+        // Don't accept any more messages if we can't send them
+        if (writeMessageQueue.Count > watermark)
+        {
+            if (!hitWatermarkAdd)
+            {
+                AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, "SocketCAN Interface - Hit Watermark, Dropping Message");
+                hitWatermarkAdd = true;
+            }
+
+            return false;
+        }
+
+        // Restore Watermark Indicator
+        if (hitWatermarkSend)
+        {
+            hitWatermarkAdd = false;
+            AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, "SocketCAN Interface - Below Watermark. Accepting Messages");
+        }
+
         // Create a deep copy of the message to be stored in the queue to avoid any accidental sharing of object
         // references.
         CanFrame msgCopy = new()
@@ -75,21 +94,6 @@ internal class SocketCANInterfaceThreaded : SocketCANInterfaceBase
             Length = msg.Length,
             Data = (byte[])msg.Data.Clone(),
         };
-
-        // Don't accept any more messages if we can't send them
-        if (writeMessageQueue.Count > watermark)
-        {
-            if (!hitWatermarkAdd)
-            {
-                AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, "Hit Watermark, Dropping Message");
-                hitWatermarkAdd = true;
-            }
-
-            return false;
-        }
-
-        // Restore Watermark Indicator
-        hitWatermarkAdd = false;
 
         writeMessageQueue.TryAdd(msgCopy);
 
@@ -119,14 +123,14 @@ internal class SocketCANInterfaceThreaded : SocketCANInterfaceBase
 
                     if (!result && !hitWatermarkSend)
                     {
-                        AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, "Hit Watermark - Failed to Send CAN Message, Dropping Message");
+                        AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, "SocketCAN Interface - Hit Watermark - Failed to Send CAN Message, Dropping Message");
                         hitWatermarkSend = true;
                     }
                 }
                 else if (hitWatermarkSend)
                 {
                     hitWatermarkSend = false;
-                    AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, "CAN Transmission Restored");
+                    AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, "SocketCAN Interface - CAN Transmission Restored");
                 }
             }
         }

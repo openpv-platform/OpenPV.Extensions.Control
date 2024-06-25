@@ -6,13 +6,14 @@
 		<Platforms>AnyCPU;x64</Platforms>
 		<TargetFramework>net8.0</TargetFramework>
 		<NoWarn>CS0612</NoWarn>
+		<UserSecretsId>ac893322-a798-4c0f-be34-b41fd02b0d47</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup Label="Reference to Ahsoka Nuget Packages">
+		<PackageReference Include="Ahsoka.Core.DataService" Version="3.3.3-zzz-develop.3" />
 		<PackageReference Include="Ahsoka.Core.Drawing" Version="3.1.1-zzz-develop.25" />
 		<PackageReference Include="Ahsoka.Core" Version="3.1.1-zzz-develop.25" />
-		<PackageReference Include="Ahsoka.Core.DataService" Version="3.3.2-zzz-develop.1" />
-		<PackageReference Include="Ahsoka.Core.IO" Version="3.1.1-zzz-develop.25" />
+		<PackageReference Include="Ahsoka.Core.IO" Version="3.3.2-zzz-develop.6" />
 	</ItemGroup>
 	
 	
