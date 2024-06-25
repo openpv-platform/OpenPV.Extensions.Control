@@ -29,9 +29,9 @@
 	</Target>
 
 	<ItemGroup Label="CanDemos" >
-		<Content Include="$(DemoRoot)DemoOutputs\Ahsoka.CS.GTK.zip">
-			<Link>Demos\Ahsoka.CS.GTK.zip</Link>
-			<PackagePath>demos/Ahsoka.CS.GTK.zip</PackagePath>
+		<Content Include="$(DemoRoot)DemoOutputs\Ahsoka.CS.CAN.zip">
+			<Link>Demos\Ahsoka.CS.CAN.zip</Link>
+			<PackagePath>demos/Ahsoka.CS.CAN.zip</PackagePath>
 			<PackageCopyToOutput>true</PackageCopyToOutput>
 			<IncludeInPackage>true</IncludeInPackage>
 			<Pack>true</Pack>

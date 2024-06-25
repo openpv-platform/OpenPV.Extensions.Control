@@ -27,7 +27,7 @@
 
 	</Target>
 
-	<ItemGroup Label="CanDemos" >
+	<ItemGroup Label="IO Demos" >
 		<Content Include="$(DemoRoot)DemoOutputs\Ahsoka.CS.GTK.zip">
 			<Link>Demos\Ahsoka.CS.GTK.zip</Link>
 			<PackagePath>demos/Ahsoka.CS.GTK.zip</PackagePath>

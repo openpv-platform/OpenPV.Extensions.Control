@@ -1,4 +1,5 @@
-﻿using SocketCANSharp;
+﻿using Ahsoka.ServiceFramework;
+using SocketCANSharp;
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
@@ -14,11 +15,13 @@ namespace Ahsoka.Utility.SocketCAN;
 internal class SocketCANInterfaceThreaded : SocketCANInterfaceBase
 {
     #region Fields
+    bool hitWatermarkAdd = false;
+    bool hitWatermarkSend = false;
+    int watermark = 1000;
     readonly CancellationTokenSource cts = new();
 
     // Write thread fields
-    private readonly ConcurrentQueue<CanFrame> writeMessageQueue = new();
-    private readonly ManualResetEventSlim mres = new();
+    private readonly BlockingCollection<CanFrame> writeMessageQueue = new();
     private Task writeBackgroundTask;
 
     // Read thread fields
@@ -44,7 +47,6 @@ internal class SocketCANInterfaceThreaded : SocketCANInterfaceBase
         // Dispose the things that we are using in this class.
         readBackgroundTask.Dispose();
         writeBackgroundTask.Dispose();
-        mres.Dispose();
         cts.Dispose();
     }
     #endregion
@@ -74,10 +76,23 @@ internal class SocketCANInterfaceThreaded : SocketCANInterfaceBase
             Data = (byte[])msg.Data.Clone(),
         };
 
-        writeMessageQueue.Enqueue(msgCopy);
+        // Don't accept any more messages if we can't send them
+        if (writeMessageQueue.Count > watermark)
+        {
+            if (!hitWatermarkAdd)
+            {
+                AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, "Hit Watermark, Dropping Message");
+                hitWatermarkAdd = true;
+            }
 
-        // Release the semaphore to allow the write thread to continue operating.
-        mres.Set();
+            return false;
+        }
+
+        // Restore Watermark Indicator
+        hitWatermarkAdd = false;
+
+        writeMessageQueue.TryAdd(msgCopy);
+
         return true;
     }
 
@@ -85,41 +100,35 @@ internal class SocketCANInterfaceThreaded : SocketCANInterfaceBase
     {
         CanFrame msg;
 
-        while (true)
+        while (!cts.IsCancellationRequested)
         {
-            // We are going to wait here, with no cancellation token passed through. This is because we want to make
-            // sure this thread doesn't terminate before all the messages that are in the write queue have been
-            // successfully written out to the socket.
-            // mres.Wait();
-            // Wait until the semaphore is released.
-            try
+            // Dequeue the next item
+            if (writeMessageQueue.TryTake(out msg, 1000, cts.Token))
             {
-                mres.Wait(cts.Token);
-            }
-            catch (OperationCanceledException)
-            {
-                if (writeMessageQueue.IsEmpty)
+                // Keep trying to write a message to the socket until we are successful.
+                bool result = TryWriteMessage(msg);
+                if (!result)
                 {
-                    Console.WriteLine("Done sending the messages.");
-                    return;
+                    while (!cts.IsCancellationRequested &&
+                        !result &&
+                        writeMessageQueue.Count < watermark) // We Have Room to Keep Trying
+                    {
+                        Thread.Sleep(1);
+                        result = TryWriteMessage(msg);
+                    }
+
+                    if (!result && !hitWatermarkSend)
+                    {
+                        AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, "Hit Watermark - Failed to Send CAN Message, Dropping Message");
+                        hitWatermarkSend = true;
+                    }
+                }
+                else if (hitWatermarkSend)
+                {
+                    hitWatermarkSend = false;
+                    AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, "CAN Transmission Restored");
                 }
             }
-
-            // Make sure that we only run the loop if there are items in the queue. Rerun the dequeue step until we are
-            // able to successfully pull an item.
-            while (!writeMessageQueue.IsEmpty)
-            {
-                // Dequeue the next item, if we fail to dequeue the item then sleep for at least 1 ms and then try again
-                while (!writeMessageQueue.TryDequeue(out msg)) { Thread.Sleep(1); }
-
-                // Keep trying to write a message to the socket until we are successful. If we aren't able to write the
-                // message out, sleep for a bit and then try to continue writing the message out.
-                while (!TryWriteMessage(msg)) { Thread.Sleep(10); }
-            }
-
-            // Once we are done with the loop sending out the messages in the queue, reset the Manual Reset Event to
-            // wait until there are more messages in the queue.
-            mres.Reset();
         }
     }
     #endregion
@@ -159,9 +168,7 @@ internal class SocketCANInterfaceThreaded : SocketCANInterfaceBase
     {
         base.Start();
 
-        // writeBackgroundTask = Task.Run(WriteSocketBackgroundThread, cts.Token);
         writeBackgroundTask = Task.Run(WriteSocketBackgroundThread);
-        // readBackgroundTask  = Task.Run(ReadSocketBackgroundThread, cts.Token);
         readBackgroundTask = Task.Run(ReadSocketBackgroundThread);
     }
 
@@ -173,7 +180,6 @@ internal class SocketCANInterfaceThreaded : SocketCANInterfaceBase
         cts.Cancel();
 
         writeBackgroundTask.Wait();
-
         readBackgroundTask.Wait();
 
         base.Stop();

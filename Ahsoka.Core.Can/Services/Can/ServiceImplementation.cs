@@ -184,6 +184,8 @@ internal abstract class CanServiceImplementation
                             }
                             else if (datetime >= item.Value.NextTransmit)
                             {
+                                item.Value.NextTransmit = datetime.AddMilliseconds(item.Value.Message.TransmitIntervalInMs);
+                                
                                 // Set Next Send Intervals.
                                 var messageCollection = new CanMessageDataCollection
                                 {
@@ -192,9 +194,6 @@ internal abstract class CanServiceImplementation
                                 messageCollection.Messages.Add(item.Value.Message.Message);
                                 AhsokaLogging.LogMessage(AhsokaVerbosity.Low, $"Sending recursive {item.Value.Message.Message.Id}");
                                 OnSendCanMessages(messageCollection);
-
-
-                                item.Value.NextTransmit = datetime.AddMilliseconds(item.Value.Message.TransmitIntervalInMs);
                             }
 
                             // Calculate Next Transmit Interval
