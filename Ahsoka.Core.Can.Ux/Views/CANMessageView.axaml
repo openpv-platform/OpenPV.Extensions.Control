@@ -28,7 +28,7 @@
 			<StackPanel Grid.Column="1" Orientation="Horizontal" Grid.Row="1">
 				<TextBlock Margin="10,0,0,2" Text="Message Type:"/>
 				<TextBlock Margin="-6,0,0,2" Text="{Binding MessageType}"/>
-				<TextBlock Margin="10,0,0,2" Text="Sent From:"/>
+				<TextBlock Margin="10,0,0,2" Text="Transmit Status:"/>
 				<TextBlock Margin="-6,0,0,2" Text="{Binding Transmitter}"/>
 			</StackPanel>
 			<Button  Margin="20,0,0,2"  Grid.Row="0" Command="{Binding ShowEditor}"

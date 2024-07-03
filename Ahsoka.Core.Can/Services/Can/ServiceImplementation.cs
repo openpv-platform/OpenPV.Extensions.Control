@@ -110,7 +110,8 @@ internal abstract class CanServiceImplementation
             recurringCanMessage.Message.Id = configId;
             dataHandler.HandleMesssage(recurringCanMessage.Message);
         }
-       
+
+
         return new CanMessageResult() { Status = MessageStatus.Success };
     }
 

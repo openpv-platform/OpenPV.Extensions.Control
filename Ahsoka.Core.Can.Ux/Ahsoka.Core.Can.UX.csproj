@@ -21,6 +21,17 @@
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 	</PropertyGroup>
 
+
+	<PropertyGroup>
+		<UxInputPath>$([System.IO.Path]::GetFullPath('$(SolutionDir)\Ahsoka.Core.Can.Ux\bin\$(Configuration)\$(TargetFramework)\'))</UxInputPath>
+		<UxPath>$([System.IO.Path]::GetFullPath('$(USERPROFILE)\AppData\Local\AhsokaData\3.0\Extensions\CAN Service Extension\ux\'))</UxPath>
+	</PropertyGroup>
+
+	<Target Name="ControlBuild" AfterTargets="PostBuildEvent">
+		<Message Text="Copy UX Files to Extensions Folder @ $(UxPath)" Importance="high" />
+		<Copy SourceFiles="$(UxInputPath)Ahsoka.Core.Can.UX.dll" DestinationFiles="$(UxPath)Ahsoka.Core.Can.UX.dll" />
+	</Target>
+
 	<ItemGroup Label="Debugging Source Support">
 		<PackageReference Include="Microsoft.SourceLink.AzureRepos.Git" Version="8.0.0">
 			<PrivateAssets>all</PrivateAssets>

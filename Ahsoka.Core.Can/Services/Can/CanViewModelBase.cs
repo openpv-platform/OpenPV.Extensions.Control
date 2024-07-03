@@ -98,7 +98,7 @@ public abstract class CanViewModelBase : INotifyPropertyChanged, IHasCanData
     {
         if (GetMetadata().TryGetValue(memberName, out CanPropertyInfo info))
         {
-            T baseValue = info.GetValue<T>(data);
+            T baseValue = info.GetValue<T>(data, true, true);
             if (!baseValue.Equals(newValue))
             {
                 info.SetValue<T>(ref data, newValue);

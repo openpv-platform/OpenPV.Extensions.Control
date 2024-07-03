@@ -239,7 +239,7 @@ enum ValueType
 enum CrcType
 {
     None = 0;
-    CRC6 = 1;
+    //CRC6 = 1;
     CheckSum = 2;
     TSC1 = 3;
 }

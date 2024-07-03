@@ -56,13 +56,13 @@ namespace AhsokaCAN
             }
 
             template <typename T>
-            T GetValue(string * data, bool scaleValue = true) 
+            T GetValue(string* data, bool scaleValue = true, bool getRaw = false)
             {
                 uint64_t longData[data->size() / 8];
                 
                 memcpy(&longData, data->c_str(), data->size());
 
-                return GetValue<T>(longData, scaleValue);
+                return GetValue<T>(longData, scaleValue, getRaw);
             }
 
             template <typename T>
@@ -79,7 +79,7 @@ namespace AhsokaCAN
             }
 
             template <typename T>
-            T GetValue(uint64_t data[], bool scaleValue = true) 
+            T GetValue(uint64_t data[], bool scaleValue = true, bool getRaw = false)
             {
                 int startByte = startBit / 8;
                 int messageIndex = startByte / 8;
@@ -87,15 +87,15 @@ namespace AhsokaCAN
                 T retVal;
 
                 if (dataType == ValueType::Signed)
-                    return (T)Unpack(data[messageIndex], scaleValue);
+                    return (T)Unpack(data[messageIndex], scaleValue, getRaw);
                 else if (dataType == ValueType::Unsigned)
-                    return (T)Unpack(data[messageIndex], scaleValue);
+                    return (T)Unpack(data[messageIndex], scaleValue, getRaw);
                 else if (dataType == ValueType::Float)
-                    return (T)Unpack(data[messageIndex], scaleValue);
+                    return (T)Unpack(data[messageIndex], scaleValue, getRaw);
                 else if (dataType == ValueType::Double)
-                    return (T)Unpack(data[messageIndex], scaleValue);
+                    return (T)Unpack(data[messageIndex], scaleValue, getRaw);
                 else if (dataType == ValueType::Enum)
-                    return (T)(Unpack(data[messageIndex]));
+                    return (T)(Unpack(data[messageIndex], scaleValue, getRaw));
                 
                 return retVal;
             }
@@ -126,7 +126,7 @@ namespace AhsokaCAN
                     return MirrorMsg(((uint64_t)iVal & bitMask) << GetStartBitLE());
             }
 
-            double Unpack(uint64_t data, bool scaleValue = true)
+            double Unpack(uint64_t data, bool scaleValue = true, bool getRaw = false)
             {
                 long iVal;
                 double retVal = 0;
@@ -146,7 +146,7 @@ namespace AhsokaCAN
                     retVal = iVal;
 
                 // All FF's
-                if ((unsigned long)iVal == bitMask)
+                if ((unsigned long)iVal == bitMask && !getRaw)
                     return defaultValue;
 
                 // Apply scaling

@@ -49,6 +49,19 @@
 	</ItemGroup>
 
 
+
+
+	<PropertyGroup>
+		<IOInputPath>$([System.IO.Path]::GetFullPath('$(SolutionDir)\Ahsoka.Core.IO\bin\$(Configuration)\$(TargetFramework)\'))</IOInputPath>
+		<IOPath>$([System.IO.Path]::GetFullPath('$(USERPROFILE)\AppData\Local\AhsokaData\3.0\Extensions\IO Service Extension\ux\'))</IOPath>
+	</PropertyGroup>
+
+	<Target Name="IOBuild" AfterTargets="PostBuildEvent">
+		<Message Text="Copy UX Files to Extensions Folder @ $(IOPath)" Importance="high" />
+		<Copy SourceFiles="$(IOInputPath)Ahsoka.Core.IO.dll" DestinationFiles="$(IOPath)Ahsoka.Core.IO.dll" />
+		<Copy SourceFiles="$(IOInputPath)System.Device.GPIO.dll" DestinationFiles="$(IOPath)System.Device.GPIO.dll" />
+	</Target>
+
 	<ItemGroup>
 		<PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
 			<PrivateAssets>all</PrivateAssets>

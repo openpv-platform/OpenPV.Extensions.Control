@@ -56,6 +56,20 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
+	
+	<PropertyGroup>
+		<InputPath>$([System.IO.Path]::GetFullPath('$(SolutionDir)\Ahsoka.Core.Can\bin\$(Configuration)\$(TargetFramework)\'))</InputPath>
+		<ControlPath>$([System.IO.Path]::GetFullPath('$(USERPROFILE)\AppData\Local\AhsokaData\3.0\Extensions\CAN Service Extension\lib\'))</ControlPath>
+	</PropertyGroup>
+	
+	
+	<Target Name="ControlBuild" AfterTargets="PostBuildEvent">
+		<Message Text="Copy LIB Files to Extensions Folder @ $(ControlPath)" Importance="high" />
+		<Copy SourceFiles="$(InputPath)Ahsoka.Core.Can.dll" DestinationFiles="$(ControlPath)Ahsoka.Core.Can.dll" />
+		<Copy SourceFiles="$(InputPath)SocketCANSharp.dll" DestinationFiles="$(ControlPath)SocketCANSharp.dll" />
+		<Copy SourceFiles="$(InputPath)ELFSharp.dll" DestinationFiles="$(ControlPath)ELFSharp.dll" />
+		<Copy SourceFiles="$(InputPath)DbcParserLib.dll" DestinationFiles="$(ControlPath)DbcParserLib.dll" />
+	</Target>
 
 	<ItemGroup>
 	  <Compile Update="Properties\CANResources.Designer.cs">

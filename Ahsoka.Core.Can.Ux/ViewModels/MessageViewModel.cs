@@ -312,6 +312,15 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>
         }
     }
 
+    public enum TransmitOption
+    {
+        No_Node,
+        Sending,
+        Receiving
+    }
+
+    public TransmitOption[] TransmitOptions { get; init; } = Enum.GetValues<TransmitOption>();
+
     public CrcType[] CrcTypes { get; init; } = Enum.GetValues<CrcType>();
 
     public MuxRole[] MuxRoles { get; init; } = Enum.GetValues<MuxRole>();
@@ -323,11 +332,22 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>
         get
         {
             var transmit = "";
-            foreach (var node in MessageDefinition.TransmitNodes)
+
+            if (IsJ1939)
             {
-                var nodeVm = ParentViewModel.Nodes.FirstOrDefault(x => x.NodeDefinition.Id == node);
-                if (nodeVm != null && (nodeVm.SelectedPort == null ||  nodeVm.SelectedPort.IsEnabled))
-                    transmit += $"{nodeVm.NodeDefinition.Id}: {nodeVm.Name}";
+                foreach (var node in MessageDefinition.TransmitNodes)
+                {
+                    var nodeVm = ParentViewModel.Nodes.FirstOrDefault(x => x.NodeDefinition.Id == node);
+                    if (nodeVm != null && (nodeVm.SelectedPort == null || nodeVm.SelectedPort.IsEnabled))
+                        transmit += $"{nodeVm.NodeDefinition.Id}: {nodeVm.Name}";
+                }
+            }              
+            else
+            {
+                if (SelectedTransmitNode_P0?.SelectedPort?.IsEnabled ?? false)
+                    transmit += $"0: {TransmitOption_P0} ";
+                if (SelectedTransmitNode_P1?.SelectedPort?.IsEnabled ?? false)
+                    transmit += $"1: {TransmitOption_P1} ";
             }
             return transmit;
         }
@@ -368,6 +388,31 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>
         }
     }
 
+    public TransmitOption TransmitOption_P0
+    {
+        get 
+        {
+            if (port0SelectedTransmitter.NodeDefinition.Id < 0)
+                return TransmitOption.No_Node;
+            else if ((bool)(port0SelectedTransmitter.IsSelf))
+                return TransmitOption.Sending;
+            else
+                return TransmitOption.Receiving;
+        }
+        set
+        {
+            if (value == TransmitOption.No_Node)
+                SelectedTransmitNode_P0 = Nodes_P0.FirstOrDefault(x => !x.IsSelf &&
+                    x.NodeDefinition.NodeType == NodeType.UserDefined && x.NodeDefinition.Id < 0);
+            if (value == TransmitOption.Sending)
+                SelectedTransmitNode_P0 = Nodes_P0.FirstOrDefault(x => x.IsSelf);
+            else
+                SelectedTransmitNode_P0 = Nodes_P0.FirstOrDefault(x => !x.IsSelf && 
+                    x.NodeDefinition.NodeType == NodeType.UserDefined && x.NodeDefinition.Id >= 0);
+            OnPropertyChanged();
+        }
+    }
+
     public NodeViewModel SelectedTransmitNode_P1
     {
         get { return port1SelectedTransmitter; }
@@ -388,6 +433,31 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>
             OnPropertyChanged();
             if (value != null)
                 UpdateNodeValues(false, 1, value.NodeDefinition.Id);
+        }
+    }
+
+    public TransmitOption TransmitOption_P1
+    {
+        get
+        {
+            if (port1SelectedTransmitter.NodeDefinition.Id < 0)
+                return TransmitOption.No_Node;
+            else if ((bool)(port1SelectedTransmitter.IsSelf))
+                return TransmitOption.Sending;
+            else
+                return TransmitOption.Receiving;
+        }
+        set
+        {
+            if (value == TransmitOption.No_Node)
+                SelectedTransmitNode_P1 = Nodes_P1.FirstOrDefault(x => !x.IsSelf &&
+                    x.NodeDefinition.NodeType == NodeType.UserDefined && x.NodeDefinition.Id < 0);
+            if (value == TransmitOption.Sending)
+                SelectedTransmitNode_P1 = Nodes_P1.FirstOrDefault(x => x.IsSelf);
+            else
+                SelectedTransmitNode_P1 = Nodes_P1.FirstOrDefault(x => !x.IsSelf &&
+                    x.NodeDefinition.NodeType == NodeType.UserDefined && x.NodeDefinition.Id >= 0);
+            OnPropertyChanged();
         }
     }
 
