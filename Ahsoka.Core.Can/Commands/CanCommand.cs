@@ -38,12 +38,15 @@ internal class CanCodeGenerator : IExtensionGenerator
     public void GetCommands(PackageInformation packageInfo, Dictionary<string, GeneratorCommandType> commandsToExecute, CommandTypes commandtypes)
     {
         string config = packageInfo.ServiceInfo.RuntimeConfiguration.ExtensionInfo.FirstOrDefault(x => x.ExtensionName == "CAN Service Extension").ConfigurationFile;
-        string configFile = Path.Combine(Path.GetDirectoryName(packageInfo.GetPackageInfoPath()), config);
-        if (File.Exists(configFile) && commandtypes.HasFlag(CommandTypes.ModelGenerators))
+        if (config != null)
         {
-            var calibration = JsonUtility.Deserialize<CanClientCalibration>(File.ReadAllText(configFile));
-            commandsToExecute.Add($"--GenerateCANClasses \"{Path.GetFileName(packageInfo.GetPackageInfoPath())}\" \"{calibration.GeneratorOutputFile}\" \"{calibration.GeneratorNamespace}\" \"{calibration.GeneratorBaseClass}\" {packageInfo.ApplicationType}",
-                      GeneratorCommandType.AhsokaCommandLine);
+            string configFile = Path.Combine(Path.GetDirectoryName(packageInfo.GetPackageInfoPath()), config);
+            if (File.Exists(configFile) && commandtypes.HasFlag(CommandTypes.ModelGenerators))
+            {
+                var calibration = JsonUtility.Deserialize<CanClientCalibration>(File.ReadAllText(configFile));
+                commandsToExecute.Add($"--GenerateCANClasses \"{Path.GetFileName(packageInfo.GetPackageInfoPath())}\" \"{calibration.GeneratorOutputFile}\" \"{calibration.GeneratorNamespace}\" \"{calibration.GeneratorBaseClass}\" {packageInfo.ApplicationType}",
+                          GeneratorCommandType.AhsokaCommandLine);
+            }
         }
     }
 }
