@@ -40,7 +40,7 @@ internal class CanInstallerComponent : InstallEngineComponent
         if (hardwareDef == null || hardwareDef.CANInfo == null || hardwareDef.CANInfo.CANPorts.Count == 0)
             return null;
 
-        string config = info.ServiceInfo.RuntimeConfiguration.Services.FirstOrDefault(x=>x.ServiceName == "CanService")?.ConfigurationFile;
+        string config = info.ServiceInfo.RuntimeConfiguration.ExtensionInfo.FirstOrDefault(x=>x.ExtensionName == "CAN Service Extension")?.ConfigurationFile;
         if (!File.Exists(config))
             return null;
 

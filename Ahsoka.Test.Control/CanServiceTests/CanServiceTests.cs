@@ -293,8 +293,9 @@ public class CanServiceTests : LinearTestBase
             DataChannel = serviceConfiguration.DataChannel,
             TcpConnectionAddress = serviceConfiguration.TcpConnectionAddress,
             TcpListenAddress = serviceConfiguration.TcpListenAddress,
-            ConfigurationFile = canConfigFile
         });
+
+        packageInformation.ServiceInfo.RuntimeConfiguration.ExtensionInfo = new List<ExtensionInfo>() { new ExtensionInfo() { ExtensionName = "CAN Service Extension", ConfigurationFile = canConfigFile } };
 
         // Load Test Generator
         Extensions.AddPrivateExtension(Assembly.GetExecutingAssembly());

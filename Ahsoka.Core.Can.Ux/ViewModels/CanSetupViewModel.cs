@@ -202,11 +202,18 @@ internal class CanSetupViewModel : ExtensionViewModelBase
         return new CANSetup() { DataContext = this };
     }
 
-    protected override void OnInitExtension(HardwareInfo hardwareInfo, string projectInfoFolder)
+    // Will Delete When removed from Obsolete
+    [Obsolete]
+    protected override void OnInitExtension(HardwareInfo hardwareInfo, string projectFolder)
+    {
+        // No longer used.
+    }
+
+    protected override void OnInitExtension(HardwareInfo hardwareInfo, string projectInfoFolder, string configurationFile)
     {
         this.hardwareInfo = hardwareInfo;
         projectFolder = projectInfoFolder;
-        configurationPath = CustomerToolViewModel.GetConfigurationPath("CanService");
+        configurationPath = configurationFile;
 
         LoadCANConfiguration();
 
