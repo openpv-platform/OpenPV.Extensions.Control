@@ -42,7 +42,11 @@ internal class CanInstallerComponent : InstallEngineComponent
 
         string config = info.ServiceInfo.RuntimeConfiguration.ExtensionInfo.FirstOrDefault(x=>x.ExtensionName == "CAN Service Extension")?.ConfigurationFile;
         if (!File.Exists(config))
-            return null;
+        {
+            string error = "A configuration file was not found for the CAN Service Extension.";
+            progress.Report(new PackageProgressInfo() { Message = error });
+            throw new ApplicationException(error);
+        }
 
         PackageComponent component = new()
         {

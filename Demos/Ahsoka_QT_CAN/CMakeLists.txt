@@ -45,15 +45,15 @@ File(GLOB Generated Generated/*.cpp)
 if(false)
 	add_custom_command(
 	  OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Generated/CANModels.generated.h ${CMAKE_CURRENT_SOURCE_DIR}/Generated/CANModels.generated.cpp
-	  COMMAND ${CMAKE_SOURCE_DIR}/Ahsoka.Client.Shared/Ubuntu64/CommandLine/Ahsoka.CommandLine --GenerateCANClasses ${CMAKE_SOURCE_DIR}/OpenLinuxST.QT.PackageInfo.json ${CMAKE_SOURCE_DIR}/Generated/CANModels.generated.h "DEMO_CAN" "CanViewModelBase" "Cpp"
+	  COMMAND ${CMAKE_SOURCE_DIR}/.platform_support/Ubuntu64_TargetSupport/CommandLine/Ahsoka.CommandLine --GenerateCANClasses ${CMAKE_SOURCE_DIR}/OpenLinuxST.QT.PackageInfo.json ${CMAKE_SOURCE_DIR}/Generated/CANModels.generated.h "DEMO_CAN" "CanViewModelBase" "Cpp"
 	  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/STDemoPackage.1.cancalibration.json ${CMAKE_SOURCE_DIR}/Ahsoka.Client.Shared/$ENV{AhsokaPlatform}/CommandLine/
-	  DEPENDS ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/Ahsoka.Client.Shared/Ubuntu64/CommandLine/Ahsoka.CommandLine main.cpp
+	  DEPENDS ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/.platform_support/Ubuntu64_TargetSupport/CommandLine/Ahsoka.CommandLine main.cpp
 	  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	)
 endif()
 
 #Add Ahsoka Library Subdirectory
-add_subdirectory ("Ahsoka.Client.Shared/$ENV{AhsokaPlatform}/SDK")
+add_subdirectory (".platform_support/$ENV{AhsokaPlatform}_TargetSupport/SDK")
 
 # CREATE Executable called Ahsoka.QT.CAN
 add_executable(Ahsoka.QT.CAN
