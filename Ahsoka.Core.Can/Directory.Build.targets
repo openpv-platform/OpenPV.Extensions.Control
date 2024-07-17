@@ -1,0 +1,51 @@
+﻿<Project TreatAsLocalProperty="IGNORE_PREREQS">
+
+
+	<PropertyGroup>
+		<DemoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\'))</DemoRoot>
+	</PropertyGroup>
+
+
+	<Target Name="CreateDemo" BeforeTargets="PreBuildEvent">
+
+		<!-- Create Demo Packages -->
+		<ItemGroup>
+			<DEMO_CAN Include="$(DemoRoot)Demos\Ahsoka.CS.CAN\**" />
+		</ItemGroup>
+	
+		<Message Text ="Preparing demos at $(DemoRoot)" Importance ="high"/>
+	
+		<!--CAN Demo-->
+		<Copy SourceFiles="@(DEMO_CAN)" DestinationFolder="$(DemoRoot)\DemoOutputs\Ahsoka.CS.CAN\%(RecursiveDir)" />
+		<RemoveDir ContinueOnError="true" Directories="$(DemoRoot)\DemoOutputs\Ahsoka.CS.CAN\bin\" />
+		<RemoveDir ContinueOnError="true" Directories="$(DemoRoot)\DemoOutputs\Ahsoka.CS.CAN\publish\" />
+		<RemoveDir ContinueOnError="true" Directories="$(DemoRoot)\DemoOutputs\Ahsoka.CS.CAN\obj\" />
+		<RemoveDir ContinueOnError="true" Directories="$(DemoRoot)\DemoOutputs\Ahsoka.CS.CAN\.vs\" />
+		<ZipDirectory Overwrite="true" SourceDirectory="$(DemoRoot)\DemoOutputs\Ahsoka.CS.CAN\" DestinationFile="$(DemoRoot)\DemoOutputs\Ahsoka.CS.CAN.zip" />
+
+		<!--QT CAN Demo-->
+		<ZipDirectory Overwrite="true" SourceDirectory="$(DemoRoot)\Demos\Ahsoka_QT_CAN" DestinationFile="$(DemoRoot)\DemoOutputs\Ahsoka_QT_CAN.zip" />
+
+	</Target>
+
+	<ItemGroup Label="CanDemos" >
+		<Content Include="$(DemoRoot)DemoOutputs\Ahsoka.CS.CAN.zip">
+			<Link>Demos\Ahsoka.CS.CAN.zip</Link>
+			<PackagePath>demos/Ahsoka.CS.CAN.zip</PackagePath>
+			<PackageCopyToOutput>true</PackageCopyToOutput>
+			<IncludeInPackage>true</IncludeInPackage>
+			<Pack>true</Pack>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Visible>true</Visible>
+		</Content>
+		<Content Include="$(DemoRoot)DemoOutputs\Ahsoka_QT_CAN.zip">
+			<Link>Demos\Ahsoka_QT_CAN.zip</Link>
+			<PackagePath>demos/Ahsoka_QT_CAN.zip</PackagePath>
+			<PackageCopyToOutput>true</PackageCopyToOutput>
+			<IncludeInPackage>true</IncludeInPackage>
+			<Pack>true</Pack>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Visible>true</Visible>
+		</Content>
+	</ItemGroup>
+</Project>

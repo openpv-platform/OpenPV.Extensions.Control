@@ -1,6 +1,10 @@
 ﻿using Ahsoka.Installer;
 using Ahsoka.ServiceFramework;
+using Ahsoka.Services.System;
+using Ahsoka.System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Ahsoka.Services.Can;
@@ -41,6 +45,57 @@ internal class CanServiceMessages : AhsokaMessagesBase
             result.Add("inc\\services\\CanServiceClientExtensions.cxx", Properties.CANResources.CanServiceClientExtensionsCXX);
 
         return result;
+    }
+
+    /// <InheritDoc/>
+    protected override void OnGetParameters(out string group, List<ParameterData> values, PackageInformation info)
+    {
+        group = CanService.Name;
+
+        string config = info?.ServiceInfo?.RuntimeConfiguration?.ExtensionInfo?.FirstOrDefault(x => x.ExtensionName == "CAN Service Extension").ConfigurationFile;
+        if (config != null)
+        {
+            string configFile = Path.Combine(Path.GetDirectoryName(info.GetPackageInfoPath()), config);
+            if (File.Exists(configFile))
+            {
+                CanClientCalibration canConfig = ConfigurationFileLoader.LoadFile<CanClientCalibration>(configFile);
+                foreach (var item in canConfig.Messages)
+                {
+                    foreach (var signal in item.Signals)
+                    {
+                        values.Add(new()
+                        {
+                            Name = $"{signal.Name}",
+                            SystemUniqueID = (int)(item.Id + signal.Id),
+                            DefaultValue = signal.DefaultValue,
+                            MinimumValue = signal.Minimum,
+                            MaximumValue = signal.Maximum,
+                            Enumerations = signal.Values,
+                            ValueType = GetValueTypes(signal)
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    private ParameterValueTypes GetValueTypes(MessageSignalDefinition signal)
+    {
+        switch (signal.ValueType)
+        {
+            case Can.ValueType.Signed:
+                return ParameterValueTypes.SignedInteger;
+            case Can.ValueType.Unsigned:
+                return ParameterValueTypes.UnsignedInteger;
+            case Can.ValueType.Float:
+                return ParameterValueTypes.Float;
+            case Can.ValueType.Double:
+                return ParameterValueTypes.Double;
+            case Can.ValueType.Enum:
+                return ParameterValueTypes.SignedInteger;
+            default:
+                return ParameterValueTypes.UnsignedInteger;
+        }
     }
 }
 

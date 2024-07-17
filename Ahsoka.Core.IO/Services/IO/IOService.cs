@@ -6,12 +6,10 @@ using Ahsoka.Services.System;
 using Ahsoka.System;
 using Ahsoka.System.Hardware;
 using Ahsoka.Utility;
-using Azure;
 using System;
-using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Ahsoka.Services.IO;
 
@@ -67,7 +65,7 @@ public class IOService : AhsokaServiceBase<IOMessageTypes.Ids>
         // If Hardware Enabled Start Ignition Thread
         cancelNotifications = new CancellationTokenSource();
 
-        UpdateCacheValue(SystemServiceDataKeys.CurrentIgnitionState, IgnitionStates.Unknown.EnumToInt());
+        UpdateCacheValue(IOServiceMessages.CurrentIgnitionState, IgnitionStates.Unknown.EnumToInt());
 
         Task.Factory.StartNew(() =>
         {
@@ -94,7 +92,7 @@ public class IOService : AhsokaServiceBase<IOMessageTypes.Ids>
                         };
 
                         // Update Ignition in Data Service
-                        UpdateCacheValue(SystemServiceDataKeys.CurrentIgnitionState, ignitionState.EnumToInt());
+                        UpdateCacheValue(IOServiceMessages.CurrentIgnitionState, ignitionState.EnumToInt());
 
                         SendMessageInternal(header, new EmptyNotification(), true);
                     }
@@ -104,8 +102,11 @@ public class IOService : AhsokaServiceBase<IOMessageTypes.Ids>
             }
             catch (Exception ex)
             {
-                AhsokaLogging.LogMessage(AhsokaVerbosity.High, $"Ignition notifications terminated with exception: {ex.Message}");
-                AhsokaLogging.LogMessage(AhsokaVerbosity.High, ex.StackTrace);
+                if (!(ex.InnerException is OperationCanceledException))
+                {
+                    AhsokaLogging.LogMessage(AhsokaVerbosity.High, $"Ignition notifications terminated with exception: {ex.Message}");
+                    AhsokaLogging.LogMessage(AhsokaVerbosity.High, ex.StackTrace);
+                }
             }
         });
 

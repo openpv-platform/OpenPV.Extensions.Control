@@ -204,6 +204,15 @@ internal abstract class SocketCANInterfaceBase : IDisposable
             throw new InvalidOperationException($"There was an error setting the timeout for the read call on the \"{interfaceName}\". Errno: {LibcNativeMethods.Errno}");
         }
 
+        sockOptsResult = LibcNativeMethods.SetSockOpt(socketHandle, SocketLevel.SOL_SOCKET, SocketLevelOptions.SO_SNDTIMEO, readTimeout, Marshal.SizeOf(typeof(Timeval)));
+        if (sockOptsResult != 0)
+        {
+            // There was an error setting the timeout of the read call.
+            throw new InvalidOperationException($"There was an error setting the timeout for the write call on the \"{interfaceName}\". Errno: {LibcNativeMethods.Errno}");
+        }
+
+
+
         var address = new SockAddrCan(interfaceRequest.IfIndex);
         int bindResult = LibcNativeMethods.Bind(socketHandle, address, Marshal.SizeOf(typeof(SockAddrCan)));
         if (bindResult == -1)

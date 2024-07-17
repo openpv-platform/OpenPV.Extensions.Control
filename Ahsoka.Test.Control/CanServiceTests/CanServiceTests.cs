@@ -54,6 +54,28 @@ public class CanServiceTests : LinearTestBase
         AhsokaRuntime.ShutdownAll();
     }
 
+
+    [TestMethod]
+    public void TestServiceParameters()
+    {
+        // Create Test Data from CAN Demo
+        string canConfigFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + CanMetadataTools.CanCalExtension);
+        string projectFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".packageinfo.json");
+        File.WriteAllText(canConfigFile, CanTestResources.STDemoPackage_1_cancalibration);
+        File.WriteAllText(projectFile, CanTestResources.OpenLinuxST_PackageInfo);
+
+        // Load package and point the config correctly.
+        PackageInformation info = PackageInformation.LoadPackageInformation(projectFile);
+        info.ServiceInfo.RuntimeConfiguration.ExtensionInfo.FirstOrDefault(x => x.ExtensionName == "CAN Service Extension").ConfigurationFile = Path.GetFileName(canConfigFile);
+
+        var parameters = AhsokaMessagesBase.GetAllServiceParameters(info);
+        Assert.IsTrue(parameters[CanService.Name].Any(x => x.Name == "DRIVER_HEARTBEAT_cmd"));
+
+        File.Delete(projectFile);
+        File.Delete(canConfigFile);
+
+    }
+
     private static CanApplicationCalibration TestAppConfigFile(string canConfigFile)
     {
         CanClientCalibration config = ConfigurationFileLoader.LoadFile<CanClientCalibration>(canConfigFile);
@@ -293,8 +315,9 @@ public class CanServiceTests : LinearTestBase
             DataChannel = serviceConfiguration.DataChannel,
             TcpConnectionAddress = serviceConfiguration.TcpConnectionAddress,
             TcpListenAddress = serviceConfiguration.TcpListenAddress,
-            ConfigurationFile = canConfigFile
         });
+
+        packageInformation.ServiceInfo.RuntimeConfiguration.ExtensionInfo = new List<ExtensionInfo>() { new ExtensionInfo() { ExtensionName = "CAN Service Extension", ConfigurationFile = canConfigFile } };
 
         // Load Test Generator
         Extensions.AddPrivateExtension(Assembly.GetExecutingAssembly());

@@ -71,8 +71,20 @@ internal abstract class BaseProtocolHandler
                     checksumProperty.SetValue(ref val, (uint)checksum, false);
                     Array.Copy(BitConverter.GetBytes(val[0]), 0, message.Data, wordIndex, sizeof(ulong));
                 }
-                else if (messageInfo.Message.CrcType == CrcType.CheckSum) { }
-                else if (messageInfo.Message.CrcType == CrcType.Crc6) { }
+                else if (messageInfo.Message.CrcType == CrcType.CheckSum) 
+                {
+                    var sum = 0;
+                    foreach (var data in message.Data)
+                        sum += data;
+
+                    var signal = messageInfo.Message.Signals.First(x => x.StartBit == messageInfo.Message.CrcBit);
+                    var checksumProperty = new CanPropertyInfo((int)messageInfo.Message.CrcBit, (int)signal.BitLength, signal.ByteOrder, signal.ValueType, signal.Scale, signal.Offset);
+                    int wordIndex = checksumProperty.StartBit / 64;
+                    var val = new ulong[] { BitConverter.ToUInt64(message.Data, wordIndex) };
+                    checksumProperty.SetValue(ref val, (uint)sum, false);
+                    Array.Copy(BitConverter.GetBytes(val[0]), 0, message.Data, wordIndex, sizeof(ulong));
+
+                }
             }
             else
                 return false;
@@ -141,7 +153,11 @@ internal abstract class BaseProtocolHandler
 
     internal virtual bool GetAvailableMessage(uint id, out AvailableMessage message, bool received = false)
     {
-        return Service.AvailableMessages.TryGetValue(id, out message);
+        var found = Service.AvailableMessages.TryGetValue(id, out message);
+
+        if (!found)
+            found = Service.AvailableMessages.TryGetValue(id | 0x80000000, out message);
+        return found;
     }
 
     protected abstract bool IsEnabled();  

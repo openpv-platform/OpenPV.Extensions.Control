@@ -1,4 +1,5 @@
-﻿using SocketCANSharp;
+﻿using Ahsoka.ServiceFramework;
+using SocketCANSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -97,7 +98,7 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
 
     internal override bool ProcessMessage(CanMessageData message, out uint modifiedId)
     {
-        if(!base.ProcessMessage(message, out modifiedId))
+        if (!base.ProcessMessage(message, out modifiedId))
             return false;
 
         if (GetAvailableMessage(message.Id, out AvailableMessage messageInfo))
@@ -107,8 +108,7 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
             modifiedId |= (CanState.CurrentAddress & 0xFF); 
             if (j1939id.PDUF < 240)
                 modifiedId |= (CanState.NodeAddresses[messageInfo.Message.ReceiveNodes[Service.Port]] & 0xFF) << 8;
-
-            // Allows SocketCan to send Extended Frame Messages
+           
             if (Service.PortConfig.MessageConfiguration.Ports.First(x => x.Port == Service.Port).CanInterface == CanInterface.SocketCan)
                 modifiedId |= (uint)CanIdFlags.CAN_EFF_FLAG;
         }

@@ -80,7 +80,7 @@ namespace AhsokaCAN
                 auto info = md.find(memberProperty);
                 if (info != md.end())
                 {
-                    T baseValue = info->second.GetValue<T>(data->data());
+                    T baseValue = info->second.GetValue<T>(data->data(), true, true);
                     if (baseValue != newValue)
                         info->second.SetValue<T>(data->data(), newValue);
                 }

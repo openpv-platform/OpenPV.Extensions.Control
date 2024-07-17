@@ -15,6 +15,21 @@
 		<None Include="README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
+	<PropertyGroup Label="Debugging Support">
+		<DebugSymbols>true</DebugSymbols>
+		<EmbedAllSources>true</EmbedAllSources>
+		<DebugType>portable</DebugType>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+	</PropertyGroup>
+
+	<ItemGroup Label="Debugging Source Support">
+		<PackageReference Include="Microsoft.SourceLink.AzureRepos.Git" Version="8.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
 	<ItemGroup>
 		<AdditionalFiles Include="Proto\*.proto" />
 	</ItemGroup>
@@ -28,22 +43,23 @@
 		</PackageReference>
 	</ItemGroup>
 
-	<Import Label="Ahsoka Local Build Properties" Condition="Exists('../../Core.Build.props')" Project="../../Core.Build.props" />
-
-	<ItemGroup Label="Submodule Dev References" Condition="!Exists('../../Core.Build.props')">
-		<PackageReference Include="Ahsoka.Core" Version="3.1.1-zzz-develop.20" />
-	</ItemGroup>
-
-	<ItemGroup Label="Ahsoka Dev References" Condition="Exists('../../Core.Build.props')">
-		<ProjectReference Include="$(AhsokaRootFolder)Ahsoka.Core\Ahsoka.Core\Ahsoka.Core.csproj" />
+	
+	<ItemGroup Label="Submodule Dev References" >
+		<PackageReference Include="Ahsoka.Core" Version="3.3.1-zzz-develop.10" />
 	</ItemGroup>
 
 
-	<!--To help Debugging since this is loaded dynamically-->
-	<Target Name="AfterIOBuild" AfterTargets="Build" Condition="$(SolutionName)=='Ahsoka.Platform'">
-		<Message Text="Copy IO Extension...$(SolutionName)" Importance="high" />
-		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\Ahsoka.Core.IO.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\IO Service Extension\lib\Ahsoka.Core.IO.dll" />
-		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\System.Device.Gpio.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\IO Service Extension\lib\System.Device.Gpio.dll" />
+
+
+	<PropertyGroup>
+		<IOInputPath>$([System.IO.Path]::GetFullPath('$(SolutionDir)\Ahsoka.Core.IO\bin\$(Configuration)\$(TargetFramework)\'))</IOInputPath>
+		<IOPath>$([System.IO.Path]::GetFullPath('$(USERPROFILE)\AppData\Local\AhsokaData\3.0\Extensions\IO Service Extension\ux\'))</IOPath>
+	</PropertyGroup>
+
+	<Target Name="IOBuild" AfterTargets="PostBuildEvent">
+		<Message Text="Copy UX Files to Extensions Folder @ $(IOPath)" Importance="high" />
+		<Copy SourceFiles="$(IOInputPath)Ahsoka.Core.IO.dll" DestinationFiles="$(IOPath)Ahsoka.Core.IO.dll" />
+		<Copy SourceFiles="$(IOInputPath)System.Device.GPIO.dll" DestinationFiles="$(IOPath)System.Device.GPIO.dll" />
 	</Target>
 
 	<ItemGroup>

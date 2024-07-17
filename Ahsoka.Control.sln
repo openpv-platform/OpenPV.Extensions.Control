@@ -23,6 +23,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ahsoka.Test.Control", "Ahso
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ahsoka.Core.IO", "Ahsoka.Core.IO\Ahsoka.Core.IO.csproj", "{C57B11AA-67C0-4010-BA98-294F3ECE44BB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{9D428ED2-954A-4EC1-BD40-83AE3764A10B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ahsoka.CS.CAN", "Demos\Ahsoka.CS.CAN\Ahsoka.CS.CAN.csproj", "{6ED0298C-DB10-4579-9053-6EA213B3F01D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ahsoka.CS.GTK", "Demos\Ahsoka.CS.GTK\Ahsoka.CS.GTK.csproj", "{FBF20838-7D94-438A-9B59-A88E3F4BD068}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,9 +77,29 @@ Global
 		{C57B11AA-67C0-4010-BA98-294F3ECE44BB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C57B11AA-67C0-4010-BA98-294F3ECE44BB}.Release|x64.ActiveCfg = Release|x64
 		{C57B11AA-67C0-4010-BA98-294F3ECE44BB}.Release|x64.Build.0 = Release|x64
+		{6ED0298C-DB10-4579-9053-6EA213B3F01D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6ED0298C-DB10-4579-9053-6EA213B3F01D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6ED0298C-DB10-4579-9053-6EA213B3F01D}.Debug|x64.ActiveCfg = Debug|x64
+		{6ED0298C-DB10-4579-9053-6EA213B3F01D}.Debug|x64.Build.0 = Debug|x64
+		{6ED0298C-DB10-4579-9053-6EA213B3F01D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6ED0298C-DB10-4579-9053-6EA213B3F01D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6ED0298C-DB10-4579-9053-6EA213B3F01D}.Release|x64.ActiveCfg = Release|x64
+		{6ED0298C-DB10-4579-9053-6EA213B3F01D}.Release|x64.Build.0 = Release|x64
+		{FBF20838-7D94-438A-9B59-A88E3F4BD068}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBF20838-7D94-438A-9B59-A88E3F4BD068}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBF20838-7D94-438A-9B59-A88E3F4BD068}.Debug|x64.ActiveCfg = Debug|x64
+		{FBF20838-7D94-438A-9B59-A88E3F4BD068}.Debug|x64.Build.0 = Debug|x64
+		{FBF20838-7D94-438A-9B59-A88E3F4BD068}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBF20838-7D94-438A-9B59-A88E3F4BD068}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBF20838-7D94-438A-9B59-A88E3F4BD068}.Release|x64.ActiveCfg = Release|x64
+		{FBF20838-7D94-438A-9B59-A88E3F4BD068}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6ED0298C-DB10-4579-9053-6EA213B3F01D} = {9D428ED2-954A-4EC1-BD40-83AE3764A10B}
+		{FBF20838-7D94-438A-9B59-A88E3F4BD068} = {9D428ED2-954A-4EC1-BD40-83AE3764A10B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3F75E384-37DB-46C9-9945-F50242578CC9}

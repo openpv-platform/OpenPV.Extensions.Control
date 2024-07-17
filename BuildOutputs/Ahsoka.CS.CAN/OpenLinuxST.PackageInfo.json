@@ -1,0 +1,63 @@
+{
+  "version": "3.1.1.20025",
+  "applicationType": "Dotnet",
+  "systemOrientation": "DefaultOrientation",
+  "execCommand": "Ahsoka.CS.CAN",
+  "packageName": "Ahsoka.CS.CAN",
+  "packageDescription": "CAN Services Demo",
+  "applicationVersion": "1.0",
+  "packageApplicationFolder": "publish",
+  "packageOutputDirectory": "../PackageOutput",
+  "startupLogoPath": "EnovLogo.png",
+  "includeInstallerUI": false,
+  "includeFirmwareUpdate": false,
+  "licenses": [],
+  "dotNetInfo": {
+    "projectPath": "Ahsoka.CS.CAN.csproj",
+    "publishProfile": "Properties/PublishProfiles/LinuxProfile.pubxml"
+  },
+  "cppInfo": {},
+  "serviceInfo": {
+    "runtimeConfiguration": {
+      "serviceStartup": "NoAutoStart",
+      "releaseOption": "NoAutoStart",
+      "extensions": [
+        "CAN Service Extension"
+      ],
+      "startupDelay": 0,
+      "requireChallenge": "NotRequired",
+      "services": [
+        {
+          "socketType": "TcpSocket",
+          "serviceName": "CanService",
+          "tcpListenAddress": "*",
+          "tcpConnectionAddress": "localhost",
+          "bleServiceUuidBase": "96730000-8f5d-4cef-8289-744c8faa1a66",
+          "dataChannel": 5007,
+          "isExtension": false,
+          "behaviors": "AutoStart",
+          "configurationFile": "STDemoPackage.1.cancalibration.json"
+        },
+        {
+          "socketType": "TcpSocket",
+          "serviceName": "SystemService",
+          "tcpListenAddress": "*",
+          "tcpConnectionAddress": "localhost",
+          "bleServiceUuidBase": "96730000-8f5d-4cef-8289-744c8faa1a66",
+          "dataChannel": 5001,
+          "isExtension": false,
+          "behaviors": "AutoStart",
+          "configurationFile": ""
+        }
+      ]
+    },
+    "environmentValues": []
+  },
+  "packageType": "opvEncrypted",
+  "packageStructureVersion": 1,
+  "platformFamily": "OpenViewLinux",
+  "platformQualifier": "S70",
+  "securityMode": "None",
+  "applicationId": "00000000-0000-0000-0000-000000000000",
+  "components": []
+}

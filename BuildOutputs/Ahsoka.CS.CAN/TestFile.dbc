@@ -1,0 +1,145 @@
+VERSION ""
+
+NS_ :
+	BA_
+	BA_DEF_
+	BA_DEF_DEF_
+	BA_DEF_DEF_REL_
+	BA_DEF_REL_
+	BA_DEF_SGTYPE_
+	BA_REL_
+	BA_SGTYPE_
+	BO_TX_BU_
+	BU_BO_REL_
+	BU_EV_REL_
+	BU_SG_REL_
+	CAT_
+	CAT_DEF_
+	CM_
+	ENVVAR_DATA_
+	EV_DATA_
+	FILTER
+	NS_DESC_
+	SGTYPE_
+	SGTYPE_VAL_
+	SG_MUL_VAL_
+	SIGTYPE_VALTYPE_
+	SIG_GROUP_
+	SIG_TYPE_REF_
+	SIG_VALTYPE_
+	VAL_
+	VAL_TABLE_
+
+BS_:
+
+BU_: DBG CONTROLLER IO MOTOR SENSOR
+
+
+BO_ 100 DRIVER_HEARTBEAT: 1 CONTROLLER
+ SG_ DRIVER_HEARTBEAT_cmd : 0|8@1+ (1,0) [0|0] "" SENSOR,MOTOR
+
+BO_ 500 IO_DEBUG: 4 IO
+ SG_ IO_DEBUG_test_unsigned : 0|8@1+ (1,0) [0|0] "" DBG
+ SG_ IO_DEBUG_test_enum : 8|8@1+ (1,0) [0|0] "" DBG
+ SG_ IO_DEBUG_test_signed : 16|8@1- (1,0) [0|0] "" DBG
+ SG_ IO_DEBUG_test_float : 24|8@1+ (0.5,0) [0|0] "" DBG
+
+BO_ 101 MOTOR_CMD: 1 CONTROLLER
+ SG_ MOTOR_CMD_steer : 0|4@1- (1,-5) [-5|5] "" MOTOR
+ SG_ MOTOR_CMD_drive : 4|4@1+ (1,0) [0|9] "" MOTOR
+
+BO_ 400 MOTOR_STATUS: 3 MOTOR
+ SG_ MOTOR_STATUS_wheel_error : 0|1@1+ (1,0) [0|0] "" CONTROLLER,IO
+ SG_ MOTOR_STATUS_speed_kph : 8|16@1+ (0.001,0) [0|0] "kph" CONTROLLER,IO
+
+BO_ 200 SENSOR_SONARS: 8 SENSOR
+ SG_ SENSOR_SONARS_mux M : 0|4@1+ (1,0) [0|0] "" CONTROLLER,IO
+ SG_ SENSOR_SONARS_err_count : 4|12@1+ (1,0) [0|0] "" CONTROLLER,IO
+ SG_ SENSOR_SONARS_left m0 : 16|12@1+ (0.1,0) [0|0] "" CONTROLLER,IO
+ SG_ SENSOR_SONARS_middle m0 : 28|12@1+ (0.1,0) [0|0] "" CONTROLLER,IO
+ SG_ SENSOR_SONARS_right m0 : 40|12@1+ (0.1,0) [0|0] "" CONTROLLER,IO
+ SG_ SENSOR_SONARS_rear m0 : 52|12@1+ (0.1,0) [0|0] "" CONTROLLER,IO
+ SG_ SENSOR_SONARS_no_filt_left m1 : 16|12@1+ (0.1,0) [0|0] "" DBG
+ SG_ SENSOR_SONARS_no_filt_middle m1 : 28|12@1+ (0.1,0) [0|0] "" DBG
+ SG_ SENSOR_SONARS_no_filt_right m1 : 40|12@1+ (0.1,0) [0|0] "" DBG
+ SG_ SENSOR_SONARS_no_filt_rear m1 : 52|12@1+ (0.1,0) [0|0] "" DBG
+
+BO_ 2348810494 TSC1 : 8 CONTROLLER
+ SG_ Override_Control_Mode_Priority : 4|2@1+ (1,0) [0|3] "bit" MOTOR
+ SG_ Engine_Requested_Speed_Speed_Limit : 8|16@1+ (0.125,0) [0|8031.88] "rpm" MOTOR
+ SG_ TSC1_Transmission_Rate : 32|3@1+ (1,0) [0|7] "bit" MOTOR
+ SG_ TSC1_Control_Purpose : 35|5@1+ (1,0) [0|31] "bit" MOTOR
+ SG_ Engine_Requested_Torque____High_Resolution : 40|4@1+ (0.125,0) [0|0.875] "%" MOTOR
+ SG_ Message_Counter : 56|4@1+ (1,0) [0|15] "count" MOTOR
+ SG_ Message_Checksum : 60|4@1+ (1,0) [0|15] "count" MOTOR
+ SG_ Engine_Override_Control_Mode : 0|2@1+ (1,0) [0|3] "bit" MOTOR
+ SG_ Engine_Requested_Speed_Control_Conditions : 2|2@1+ (1,0) [0|3] "bit" MOTOR
+ SG_ Engine_Requested_Torque_Torque_Limit : 24|8@1+ (1,-125) [-125|125] "%" MOTOR
+
+
+CM_ BU_ DRIVER "The driver controller driving the car";
+CM_ BU_ MOTOR "The motor controller of the car";
+CM_ BU_ SENSOR "The sensor controller of the car";
+CM_ BO_ 100 "Sync message used to synchronize the controllers";
+CM_ BO_ 2348810494 "Torque/Speed Control 1";
+CM_ SG_ 2348810494 Override_Control_Mode_Priority "This field is used as an input to the engine or retarder to determine the priority of the Override Control Mode received in the Torque/Speed Control message (see PGN 0).  The default is 11 (Low priority).  It is not required to us";
+CM_ SG_ 2348810494 Engine_Requested_Speed_Speed_Limit "Parameter provided to the engine from external sources in the torque/speed control message.  This is the engine speed which the engine is expected to operate at if the speed control mode is active or the engine speed which the eng";
+CM_ SG_ 2348810494 TSC1_Transmission_Rate "This parameter indicates the transmission rate at which the sending device will transmit the TSC1 message.  The engine shall adjust its timeout for TSC1 messages accordingly. Variable TSC1 transmission rates shall only apply to me";
+CM_ SG_ 2348810494 TSC1_Control_Purpose "State signal which indicates which control mode the sending device is using to generate the TSC1 command.  Note that the modes are not in prioritized order. Not all modes may be relevant for a given device. Some devices may not im";
+CM_ SG_ 2348810494 Engine_Requested_Torque____High_Resolution "This parameter displays an additional torque in percent of the reference engine torque. 
+
+When the MSB is set to 1, this parameter is not available.  When the MSB is set to 0, bits 1 to 3 indicate the desired torque with resolut";
+CM_ SG_ 2348810494 Message_Counter "The message counter is used to detect situations where the transmitting ECU malfunction repeats the same frame all the time.  The receiver of the information may use the counter parameter to detect this situation.  The transmittin";
+CM_ SG_ 2348810494 Message_Checksum "The checksum is used to verify the signal path from the transmitting device to the receiving device.
+
+The checksum is the sum of the high nibble and the low nibble of the sum of the identifier, the first 7 data bytes and the mes";
+CM_ SG_ 2348810494 Engine_Override_Control_Mode "The override control mode defines which sort of command is used:
+
+00 Override disabled - Disable any existing control commanded by the source of this command.
+01 Speed control - Govern speed to the included ?desired speed? valu";
+CM_ SG_ 2348810494 Engine_Requested_Speed_Control_Conditions "This mode tells the engine control system the governor characteristics that are desired during speed control.  The four characteristics defined are:
+
+00 Transient Optimized for driveline disengaged and non-lockup conditions
+01 ";
+CM_ SG_ 2348810494 Engine_Requested_Torque_Torque_Limit "Parameter provided to the engine or retarder in the torque/speed control message for controlling or limiting the output torque.
+
+BA_DEF_ "BusType" STRING ;
+BA_DEF_ BO_ "GenMsgCycleTime" INT 0 0;
+BA_DEF_ SG_ "FieldType" STRING ;
+
+BA_DEF_DEF_ "BusType" "CAN";
+BA_DEF_DEF_ "FieldType" "";
+BA_DEF_DEF_ "GenMsgCycleTime" 0;
+
+BA_ "GenMsgCycleTime" BO_ 100 1000;
+BA_ "GenMsgCycleTime" BO_ 500 100;
+BA_ "GenMsgCycleTime" BO_ 101 100;
+BA_ "GenMsgCycleTime" BO_ 400 100;
+BA_ "GenMsgCycleTime" BO_ 200 100;
+BA_ "FieldType" SG_ 100 DRIVER_HEARTBEAT_cmd "DRIVER_HEARTBEAT_cmd";
+BA_ "FieldType" SG_ 500 IO_DEBUG_test_enum "IO_DEBUG_test_enum";
+BA_DEF_ BO_  "VFrameFormat" ENUM  "StandardCAN","ExtendedCAN","reserved","J1939PG";
+BA_DEF_ BO_  "SingleFrame" INT 0 1;
+BA_DEF_ SG_  "SPN" INT 0 524287;
+BA_DEF_DEF_  "VFrameFormat" "J1939PG";
+BA_DEF_DEF_  "SingleFrame" 1;
+BA_DEF_DEF_  "SPN" 0;
+BA_ "SPN" SG_ 2348810494 Override_Control_Mode_Priority 897;
+BA_ "SPN" SG_ 2348810494 Engine_Requested_Speed_Speed_Limit 898;
+BA_ "SPN" SG_ 2348810494 TSC1_Transmission_Rate 3349;
+BA_ "SPN" SG_ 2348810494 TSC1_Control_Purpose 3350;
+BA_ "SPN" SG_ 2348810494 Engine_Requested_Torque____High_Resolution 4191;
+BA_ "SPN" SG_ 2348810494 Message_Counter 4206;
+BA_ "SPN" SG_ 2348810494 Message_Checksum 4207;
+BA_ "SPN" SG_ 2348810494 Engine_Override_Control_Mode 695;
+BA_ "SPN" SG_ 2348810494 Engine_Requested_Speed_Control_Conditions 696;
+BA_ "SPN" SG_ 2348810494 Engine_Requested_Torque_Torque_Limit 518;
+
+VAL_ 100 DRIVER_HEARTBEAT_cmd 2 "DRIVER_HEARTBEAT_cmd_REBOOT" 1 "DRIVER_HEARTBEAT_cmd_SYNC" 0 "DRIVER_HEARTBEAT_cmd_NOOP" ;
+VAL_ 500 IO_DEBUG_test_enum 2 "IO_DEBUG_test2_enum_two" 1 "IO_DEBUG_test2_enum_one" ;
+VAL_ 2348810494 TSC1_Control_Purpose 0 "P1 = Accelerator Pedal/Operator Selection" 1 "P2 = Cruise Control" 2 "P3 = PTO Governor" 3 "P4 = Road Speed Governor" 4 "P5 = Engine Protection" 31 "P32 = Temporary Power Train Control (Original use of TSC1 Command) " ;
+VAL_ 2348810494 TSC1_Transmission_Rate 0 "1000 ms transmission rate" 1 "750 ms transmission rate" 2 "500 ms transmission rate" 3 "250 ms transmission rate" 4 "100 ms transmission rate" 5 "50 ms transmission rate" 6 "20 ms transmission rate" 7 "Use standard TSC1 transmission rates of 10 ms to engine" ;
+VAL_ 2348810494 Override_Control_Mode_Priority 0 "Highest priority" 1 "High priority" 2 "Medium priority" 3 "Low priority" ;
+VAL_ 2348810494 Engine_Requested_Torque____High_Resolution 0 "+0.000%" 1 "+0.125%" 7 "+0.875%" ;
+VAL_ 2348810494 Engine_Requested_Speed_Control_Conditions 0 "Transient Optimized for driveline disengaged and non-lockup conditions" 1 "Stability Optimized for driveline disengaged and non-lockup conditions" 2 "Stability Optimized for driveline engaged and/or in lockup condition 1 (e.g., vehicle driveline)" 3 "Stability Optimized for driveline engaged and/or in lockup condition 2 (e.g., PTO driveline)" ;
+VAL_ 2348810494 Engine_Override_Control_Mode 0 "Override disabled - Disable any existing control commanded by the source of this command." 1 "Speed control - Govern speed to the included ?desired speed? value." 2 "Torque control - Control torque to the included ?desired torque? value." 3 "Speed/torque limit control - Limit speed and/or torque based on the included limit values. The speed limit governor is a droop governor where the speed limit value defines the speed at the maximum torque available during this oper" ;

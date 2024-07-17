@@ -533,18 +533,11 @@ void checksum(uint32_t id, uint8_t* data, uint8_t length, uint32_t bit)
 	data[index] &= ~(mask << rem);
 	data[index] |= (sum << rem);
 }
-void crc8(uint32_t id, uint8_t* data, uint8_t length, uint32_t bit)
-{
-
-}
 
 crcFunc getChecksumFunc(uint32_t type)
 {
 	switch(type)
 	{
-		case AhsokaCAN_CrcType_CRC6:
-			return &crc8;
-			break;
 		case AhsokaCAN_CrcType_CheckSum:
 			return &checksum;
 			break;

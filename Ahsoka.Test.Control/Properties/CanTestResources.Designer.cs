@@ -61,6 +61,61 @@ namespace Ahsoka.Test.Control.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;version&quot;: &quot;3.1.1.20025&quot;,
+        ///  &quot;applicationType&quot;: &quot;Dotnet&quot;,
+        ///  &quot;systemOrientation&quot;: &quot;DefaultOrientation&quot;,
+        ///  &quot;execCommand&quot;: &quot;Ahsoka.CS.CAN&quot;,
+        ///  &quot;packageName&quot;: &quot;Ahsoka.CS.CAN&quot;,
+        ///  &quot;packageDescription&quot;: &quot;CAN Services Demo&quot;,
+        ///  &quot;applicationVersion&quot;: &quot;1.0&quot;,
+        ///  &quot;packageApplicationFolder&quot;: &quot;publish&quot;,
+        ///  &quot;packageOutputDirectory&quot;: &quot;../PackageOutput&quot;,
+        ///  &quot;startupLogoPath&quot;: &quot;EnovLogo.png&quot;,
+        ///  &quot;includeInstallerUI&quot;: false,
+        ///  &quot;includeFirmwareUpdate&quot;: false,
+        ///  &quot;licenses&quot;: [],
+        ///  &quot;dotNetInfo&quot;: {
+        ///    &quot;projectPath&quot;: &quot; [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string OpenLinuxST_PackageInfo {
+            get {
+                return ResourceManager.GetString("OpenLinuxST_PackageInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;name&quot;: &quot;STDemoPackage.1&quot;,
+        ///  &quot;localIpAddress&quot;: &quot;192.168.8.2&quot;,
+        ///  &quot;remoteIpAddress&quot;: &quot;192.168.8.1&quot;,
+        ///  &quot;ports&quot;: [
+        ///    {
+        ///      &quot;port&quot;: 1,
+        ///      &quot;canInterfacePath&quot;: &quot;can1&quot;,
+        ///      &quot;baudRate&quot;: &quot;Baud250kb&quot;,
+        ///      &quot;canInterface&quot;: &quot;SocketCan&quot;,
+        ///      &quot;promiscuousTransmit&quot;: false,
+        ///      &quot;promiscuousReceive&quot;: false,
+        ///      &quot;userDefined&quot;: false
+        ///    }
+        ///  ],
+        ///  &quot;nodes&quot;: [
+        ///    {
+        ///      &quot;idValid&quot;: 0,
+        ///      &quot;id&quot;: 0,
+        ///      &quot;name&quot;: &quot;DBG&quot;,
+        ///      &quot;comment&quot;: &quot;&quot;,
+        ///      &quot;nodeType&quot;: &quot;UserDefined&quot;,
+        ///      &quot;transpo [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string STDemoPackage_1_cancalibration {
+            get {
+                return ResourceManager.GetString("STDemoPackage_1_cancalibration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to VERSION &quot;&quot;
         ///
         ///NS_ :
@@ -104,6 +159,36 @@ namespace Ahsoka.Test.Control.Properties {
         internal static string TestFile {
             get {
                 return ResourceManager.GetString("TestFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;factoryInfo&quot;: {
+        ///    &quot;rootPath&quot;: &quot;%USERPROFILE%\\Ahsoka&quot;,
+        ///    &quot;platformFamily&quot;: &quot;Windows64&quot;,
+        ///    &quot;platformQualifier&quot;: &quot;Desktop&quot;,
+        ///    &quot;partNumber&quot;: &quot;88888888&quot;,
+        ///    &quot;serialNumber&quot;: &quot;7777777777&quot;,
+        ///    &quot;securityModelNumber&quot;: &quot;&quot;,
+        ///    &quot;hostName&quot;: &quot;OpenView&quot;,
+        ///    &quot;userName&quot;: &quot;root&quot;,
+        ///    &quot;password&quot;: &quot;&quot;
+        ///  },
+        ///  &quot;screenInfo&quot;: {
+        ///    &quot;screenWidth&quot;: &quot;1024&quot;,
+        ///    &quot;screenHeight&quot;: &quot;768&quot;,
+        ///    &quot;screenDpi&quot;: &quot;96&quot;
+        ///  },
+        ///  &quot;bluetoothInfo&quot;: {
+        ///    &quot;bluetoothAdapters&quot;: [
+        ///      {
+        ///        &quot;index&quot;: &quot;0&quot;,
+        ///        &quot;d [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string WindowsHardwareConfiguration {
+            get {
+                return ResourceManager.GetString("WindowsHardwareConfiguration", resourceCulture);
             }
         }
     }

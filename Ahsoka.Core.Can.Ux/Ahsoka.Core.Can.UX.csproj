@@ -12,6 +12,33 @@
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 	</PropertyGroup>
 
+
+	<PropertyGroup Label="Debugging Support">
+		<DebugSymbols>true</DebugSymbols>
+		<EmbedAllSources>true</EmbedAllSources>
+		<DebugType>portable</DebugType>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+	</PropertyGroup>
+
+
+	<PropertyGroup>
+		<UxInputPath>$([System.IO.Path]::GetFullPath('$(SolutionDir)\Ahsoka.Core.Can.Ux\bin\$(Configuration)\$(TargetFramework)\'))</UxInputPath>
+		<UxPath>$([System.IO.Path]::GetFullPath('$(USERPROFILE)\AppData\Local\AhsokaData\3.0\Extensions\CAN Service Extension\ux\'))</UxPath>
+	</PropertyGroup>
+
+	<Target Name="ControlBuild" AfterTargets="PostBuildEvent">
+		<Message Text="Copy UX Files to Extensions Folder @ $(UxPath)" Importance="high" />
+		<Copy SourceFiles="$(UxInputPath)Ahsoka.Core.Can.UX.dll" DestinationFiles="$(UxPath)Ahsoka.Core.Can.UX.dll" />
+	</Target>
+
+	<ItemGroup Label="Debugging Source Support">
+		<PackageReference Include="Microsoft.SourceLink.AzureRepos.Git" Version="8.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
 	<PropertyGroup Label="Suppress Errors for GPIO Project">
 		<SuppressWindowsPlatformTargetingRequiredError>true</SuppressWindowsPlatformTargetingRequiredError>
 	</PropertyGroup>
@@ -33,17 +60,8 @@
 		</PackageReference>
 	</ItemGroup>
 
-
-	<Import Label="Ahsoka Local Build Properties" Condition="Exists('../../Core.Build.props')" Project="../../Core.Build.props" />
-
-	<ItemGroup Label="Ahsoka Dev References" Condition="Exists('../../Core.Build.props')">
-		<ProjectReference Include="$(AhsokaRootFolder)Ahsoka.Core\Ahsoka.Core\Ahsoka.Core.csproj" />
-		<ProjectReference Include="$(AhsokaRootFolder)Ahsoka.Core\Ahsoka.DeveloperTools.Core\Ahsoka.DeveloperTools.Core.csproj" />
-	</ItemGroup>
-
-	<ItemGroup Label="Submodule Dev References" Condition="!Exists('../../Core.Build.props')">
-		<PackageReference Include="Ahsoka.Core" Version="3.1.1-zzz-develop.20" />
-		<PackageReference Include="Ahsoka.DeveloperTools.Core" Version="3.1.1-zzz-develop.20" />
+	<ItemGroup>
+		<PackageReference Include="Ahsoka.DeveloperTools.Core" Version="3.3.1-zzz-develop.10" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -69,12 +87,6 @@
 	  </PackageReference>
 	</ItemGroup>
 
-	<!--To help Debugging since this is loaded dynamically-->
-	<Target Name="AfterExtensionBuild" AfterTargets="Build" Condition="$(SolutionName)=='Ahsoka.Platform'">
-		<Message Text="Building.." Importance="high" />
-		<Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\Ahsoka.Core.Can.UX.dll" DestinationFiles="$(ProjectDir)..\..\..\Extensions\CAN Service Extension\ux\Ahsoka.Core.Can.UX.dll" />
-	</Target>
-	
 	<ItemGroup>
 	  <Compile Update="App.axaml.cs">
 	    <DependentUpon>%(Filename)</DependentUpon>

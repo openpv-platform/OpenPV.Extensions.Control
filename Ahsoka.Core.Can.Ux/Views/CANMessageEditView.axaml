@@ -54,10 +54,14 @@
 								<TextBlock IsVisible="{Binding CanViewModel.Port0Enabled}" 
 										   Text="CAN Port 0:" Grid.Row="2" Grid.Column="0"/>
 								<StackPanel  IsVisible="{Binding CanViewModel.Port0Enabled}" Orientation="Horizontal" Grid.Row="2" Grid.Column="1">
-									<TextBlock Text="Transmit Node:" Grid.Row="2" Grid.Column="0" />
+									<ComboBox ItemsSource="{Binding TransmitOptions}"
+										  SelectedItem="{Binding TransmitOption_P0}"
+										  Width="200" IsVisible="{Binding !IsJ1939}"/>
+									
+									<TextBlock Text="Transmit Node:" Grid.Row="2" Grid.Column="0" IsVisible="{Binding IsJ1939}"/>
 									<ComboBox ItemsSource="{Binding Nodes_P0}"
 										  SelectedItem="{Binding SelectedTransmitNode_P0}"
-										  Width="200" />
+										  Width="200" IsVisible="{Binding IsJ1939}"/>
 
 									<TextBlock Text="Receive Node:" Grid.Row="2" Grid.Column="0" IsVisible="{Binding IsJ1939}"/>
 									<ComboBox ItemsSource="{Binding Nodes_P0}"
@@ -67,13 +71,17 @@
 								</StackPanel>
 
 
-								<TextBlock IsVisible="{Binding CanViewModel.Port1Enabled}" 
+								<TextBlock IsVisible="{Binding CanViewModel.Port1Enabled}"  
 										   Text="CAN Port 1:" Grid.Row="3" Grid.Column="0"/>
 								<StackPanel  IsVisible="{Binding CanViewModel.Port1Enabled}" Orientation="Horizontal" Grid.Row="3" Grid.Column="1">
-									<TextBlock Text="Transmit Node:" Grid.Row="3" Grid.Column="0"/>
+									<ComboBox ItemsSource="{Binding TransmitOptions}"
+										  SelectedItem="{Binding TransmitOption_P1}"
+										  Width="200" IsVisible="{Binding !IsJ1939}"/>
+									
+									<TextBlock Text="Transmit Node:" Grid.Row="3" Grid.Column="0" IsVisible="{Binding IsJ1939}"/>
 									<ComboBox ItemsSource="{Binding Nodes_P1}"
 										  SelectedItem="{Binding SelectedTransmitNode_P1}"
-										  Width="200" />
+										  Width="200" IsVisible="{Binding IsJ1939}"/>
 
 									<TextBlock Text="Receive Node:" Grid.Row="2" Grid.Column="0" IsVisible="{Binding IsJ1939}"/>
 									<ComboBox ItemsSource="{Binding Nodes_P1}"

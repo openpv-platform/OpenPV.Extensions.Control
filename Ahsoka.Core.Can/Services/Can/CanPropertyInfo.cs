@@ -93,30 +93,30 @@ public class CanPropertyInfo
     /// <param name="data"></param>
     /// <param name="scaleValue"></param>
     /// <returns></returns>
-    internal T GetValue<T>(ulong[] data, bool scaleValue = true) where T : struct
+    internal T GetValue<T>(ulong[] data, bool scaleValue = true, bool getRaw = false) where T : struct
     {
         int startByte = StartBit / 8;
         int messageIndex = startByte / 8;
 
         if (typeof(T) == typeof(int))
         {
-            return (T)(object)Convert.ToInt32(Unpack(data[messageIndex], scaleValue));
+            return (T)(object)Convert.ToInt32(Unpack(data[messageIndex], scaleValue, getRaw));
         }
         else if (typeof(T) == typeof(uint))
         {
-            return (T)(object)Convert.ToUInt32(Unpack(data[messageIndex], scaleValue));
+            return (T)(object)Convert.ToUInt32(Unpack(data[messageIndex], scaleValue, getRaw));
         }
         else if (typeof(T) == typeof(float))
         {
-            return (T)(object)Convert.ToSingle(Unpack(data[messageIndex], scaleValue));
+            return (T)(object)Convert.ToSingle(Unpack(data[messageIndex], scaleValue, getRaw));
         }
         else if (typeof(T) == typeof(double))
         {
-            return (T)(object)(Unpack(data[messageIndex], scaleValue));
+            return (T)(object)(Unpack(data[messageIndex], scaleValue, getRaw));
         }
         else if (typeof(T).IsAssignableTo(typeof(Enum)))
         {
-            return Convert.ToInt32(Unpack(data[messageIndex])).IntToEnum<T>();
+            return Convert.ToInt32(Unpack(data[messageIndex], scaleValue, getRaw)).IntToEnum<T>();
         }
 
         return default;
@@ -211,7 +211,7 @@ public class CanPropertyInfo
             return MirrorMsg(((ulong)iVal & bitMask) << GetStartBitLE());
     }
 
-    private double Unpack(ulong data, bool scaleValue = true)
+    private double Unpack(ulong data, bool scaleValue = true, bool getRaw = false)
     {
         double returnValue = 0;
         long iVal;
@@ -231,7 +231,7 @@ public class CanPropertyInfo
             returnValue = iVal;
 
         // All FF's 
-        if ((ulong)iVal == bitMask)
+        if ((ulong)iVal == bitMask && !getRaw)
             return defaultValue;
 
         // Apply scaling

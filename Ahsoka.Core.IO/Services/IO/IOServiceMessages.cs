@@ -5,8 +5,101 @@ using System.Collections.Generic;
 
 namespace Ahsoka.Services.IO;
 
-internal class IOServiceMessages : AhsokaMessagesBase
+public class IOServiceMessages : AhsokaMessagesBase
 {
+    /// <summary>
+    /// Is the Service Available
+    /// </summary>
+    public const string CurrentIgnitionState = "Available";
+
+    /// <summary>
+    /// Is the Service Available
+    /// </summary>
+    public const string Available = "Available";
+
+    /// <summary>
+    /// Digital Input Value Prefix
+    /// </summary>
+    public const string DigitalInput_ = "DigitalInput_";
+
+    /// <summary>
+    /// Digital Input Value 1
+    /// </summary>
+    public const string DigitalInput_1 = $"{DigitalInput_}1";
+
+    /// <summary>
+    /// Digital Input Value 2
+    /// </summary>
+    public const string DigitalInput_2 = $"{DigitalInput_}2";
+
+    /// <summary>
+    /// Digital Input Value 3
+    /// </summary>
+    public const string DigitalInput_3 = $"{DigitalInput_}3";
+
+    /// <summary>
+    /// Analog Input Value 1
+    /// </summary>
+    public const string AnalogInput_ = "AnalogInput_";
+
+    /// <summary>
+    /// Analog Input Value 1
+    /// </summary>
+    public const string AnalogInput_1 = $"{AnalogInput_}1";
+
+    /// <summary>
+    /// Analog Input Value 1
+    /// </summary>
+    public const string AnalogInput_2 = $"{AnalogInput_}2";
+
+    /// <summary>
+    /// Analog Input Value 2
+    /// </summary>
+    public const string AnalogInput_3 = $"{AnalogInput_}3";
+
+
+    /// <summary>
+    /// Digital Output Value PreFix
+    /// </summary>
+    public const string DigitalOutput_ = "DigitalOutput_";
+
+    /// <summary>
+    /// Digital Output Value 1
+    /// </summary>
+    public const string DigitalOutput_1 = $"{DigitalOutput_}1";
+
+    /// <summary>
+    /// Digital Output Value 2
+    /// </summary>
+    public const string DigitalOutput_2 = $"{DigitalOutput_}2";
+
+    /// <summary>
+    /// Digital Output Value 3
+    /// </summary>
+    public const string DigitalOutput_3 = $"{DigitalOutput_}3";
+
+
+    /// <summary>
+    /// Analog Output Value Prefix
+    /// </summary>
+    public const string AnalogOutput_ = "AnalogOutput_";
+
+    /// <summary>
+    /// Analog Output Value 1
+    /// </summary>
+    public const string AnalogOutput_1 = $"{AnalogOutput_}1";
+
+    /// <summary>
+    /// Analog Output Value 1
+    /// </summary>
+    public const string AnalogOutput_2 = $"{AnalogOutput_}2";
+
+    /// <summary>
+    /// Analog Output Value 2
+    /// </summary>
+    public const string AnalogOutput_3 = $"{AnalogOutput_}3";
+
+
     public IOServiceMessages()
     {
         // Requests to Set Digital / Analog Outputs
@@ -45,9 +138,24 @@ internal class IOServiceMessages : AhsokaMessagesBase
         return result;
     }
 
-    public override KnownDataKeys GetKnownValues()
+  
+    protected override void OnGetParameters(out string service, List<ParameterData> values, PackageInformation packageInfo)
     {
-        return new IOServiceDataKeys();
+        service = IOService.Name;
+
+        values.Add(new() { Name = Available, DefaultValue = false, ValueType = ParameterValueTypes.Boolean });
+        values.Add(new() { Name = DigitalInput_1, ValueType = ParameterValueTypes.Double });
+        values.Add(new() { Name = DigitalInput_2, ValueType = ParameterValueTypes.Double });
+        values.Add(new() { Name = DigitalInput_3, ValueType = ParameterValueTypes.Double });
+        values.Add(new() { Name = DigitalOutput_1, ValueType = ParameterValueTypes.Double });
+        values.Add(new() { Name = DigitalOutput_2, ValueType = ParameterValueTypes.Double });
+        values.Add(new() { Name = DigitalOutput_3, ValueType = ParameterValueTypes.Double });
+        values.Add(new() { Name = AnalogOutput_1, ValueType = ParameterValueTypes.Double });
+        values.Add(new() { Name = AnalogOutput_2, ValueType = ParameterValueTypes.Double });
+        values.Add(new() { Name = AnalogOutput_3, ValueType = ParameterValueTypes.Double });
+        values.Add(new() { Name = AnalogInput_1, ValueType = ParameterValueTypes.Double });
+        values.Add(new() { Name = AnalogInput_2, ValueType = ParameterValueTypes.Double });
+        values.Add(new() { Name = AnalogInput_3, ValueType = ParameterValueTypes.Double });
     }
 }
 

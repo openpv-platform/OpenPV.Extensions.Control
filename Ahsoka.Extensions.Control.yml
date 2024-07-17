@@ -66,14 +66,13 @@ stages:
         command: 'restore'
         restoreSolution: 'Ahsoka.Control.sln'
         feedsToUse: 'config'
-        nugetConfigPath: 'nuget.config'
         externalFeedCredentials: 'Ahsoka.Nuget'
         noCache: true
 
     - task: VSBuild@1
       displayName: 'Build Solution'
       inputs:
-        solution: 'Ahsoka.Control.csproj'
+        solution: 'Ahsoka.Control.sln'
         vsVersion: '17.0'
         platform: '$(buildPlatform)'
         configuration: '$(buildConfiguration)'
@@ -86,8 +85,18 @@ stages:
       inputs:
         command: test
         projects: '**/*Ahsoka.Test.*/*.csproj'
-        arguments: '--configuration $(buildConfiguration) --collect "Code coverage" --blame-hang --blame-hang-timeout 120s -m:1 --logger:"console;verbosity=detailed" --settings: Ahsoka.Core/codecoverage.runsettings'
+        arguments: '--configuration $(buildConfiguration) --collect "Code coverage" --blame-hang --blame-hang-timeout 120s -m:1 --logger:"console;verbosity=detailed"'
 
+    - task: PowerShell@2
+      displayName: Pack Nuget Packages
+      inputs:
+        targetType: 'inline'
+        script: |
+          # Write your PowerShell commands here.
+          dotnet pack Ahsoka.Core.Can/Ahsoka.Core.Can.csproj
+          dotnet pack Ahsoka.Core.Can.Ux/Ahsoka.Core.Can.Ux.csproj
+          dotnet pack Ahsoka.Core.IO/Ahsoka.Core.IO.csproj
+     
     - task: CopyFiles@2
       displayName: 'Moving Nugets to Upload Area'
       inputs:
@@ -98,8 +107,15 @@ stages:
         OverWrite: true
         flattenFolders: true
 
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publishing PC Artifacts'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
 
-- stage: SparkUpload
+
+- stage: Upload
   dependsOn:
     - PCBuild
    
@@ -122,11 +138,6 @@ stages:
         artifactName: 'drop'
         downloadPath: '$(Build.SourcesDirectory)\PublishArea'
      
-    - task: DownloadSecureFile@1
-      displayName: 'Download PowerVision Cert'
-      inputs:
-        secureFile: PowerVisionSigningCert.p12
-
     - task: NuGetCommand@2
       displayName: 'Push to Nuget.org if dev or main'
       condition: and(succeeded(), or(eq(variables.isMain, 'true'), eq(variables.isRelease, 'true'), eq(variables.isDevelop, 'true')))

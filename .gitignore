@@ -394,3 +394,5 @@ FodyWeavers.xsd
 
 Ahsoka.Coprocessor/openview_s/firmware/CM4/Middlewares/Third_Party/proto/*
 Ahsoka.Core.Can/Resources/OpenViewLinux_TargetSupport_firmware_CM4.elf
+DemoOutputs/*
+Demos/PackageOutput/*
