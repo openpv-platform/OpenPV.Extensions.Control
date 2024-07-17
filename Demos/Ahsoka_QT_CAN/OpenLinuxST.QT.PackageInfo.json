@@ -1,5 +1,5 @@
 {
-  "version": "3.0.2.10032",
+  "version": "3.3.1.20005",
   "applicationType": "Cpp",
   "systemOrientation": "DefaultOrientation",
   "execCommand": "Ahsoka.QT.CAN",
@@ -18,8 +18,11 @@
     "runtimeConfiguration": {
       "serviceStartup": "NoAutoStart",
       "releaseOption": "NoAutoStart",
-      "extensions": [
-        "CAN Service Extension"
+      "extensionInfo": [
+        {
+          "extensionName": "CAN Service Extension",
+          "configurationFile": "STDemoPackage.1.cancalibration.json"
+        }
       ],
       "startupDelay": 3,
       "requireChallenge": "NotRequired",
@@ -32,8 +35,7 @@
           "bleServiceUuidBase": "96730000-8f5d-4cef-8289-744c8faa1a66",
           "dataChannel": 5001,
           "isExtension": false,
-          "behaviors": "AutoStart",
-          "configurationFile": ""
+          "behaviors": "AutoStart"
         },
         {
           "socketType": "TcpSocket",
@@ -43,8 +45,7 @@
           "bleServiceUuidBase": "96730000-8f5d-4cef-8289-744c8faa1a66",
           "dataChannel": 5007,
           "isExtension": true,
-          "behaviors": "AutoStart",
-          "configurationFile": "STDemoPackage.1.cancalibration.json"
+          "behaviors": "AutoStart"
         }
       ]
     },

@@ -1,7 +1,14 @@
+using Ahsoka.Installer;
 using Ahsoka.ServiceFramework;
+using Ahsoka.Services.Can;
 using Ahsoka.Services.IO;
 using Ahsoka.System;
+using Ahsoka.Test.Control.Properties;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.IO;
+using System;
+using Ahsoka.Services.System;
+using System.Linq;
 
 namespace Ahsoka.Test;
 
@@ -24,6 +31,14 @@ public class IOServiceTests : LinearTestBase
         AhsokaRuntime.ShutdownAll();
     }
 
+
+
+    [TestMethod]
+    public void TestServiceParameters()
+    {
+        var parameters = AhsokaMessagesBase.GetAllServiceParameters();
+        Assert.IsTrue(parameters[IOService.Name].Any(x => x.Name == IOServiceMessages.AnalogInput_1));
+    }
 
     [TestMethod]
     public void TestBaseServiceComponents()

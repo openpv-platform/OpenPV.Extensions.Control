@@ -44,26 +44,26 @@ internal abstract class IOServiceImplementationBase
         {
             analogInList.AnalogInputs.Add(new() { Pin = pin });
             latestAnalogValues.TryAdd(pin, new());
-            _ioService.UpdateCacheValue(IOServiceDataKeys.AnalogInput_ + pin.ToString(), 0);
+            _ioService.UpdateCacheValue(IOServiceMessages.AnalogInput_ + pin.ToString(), 0);
         }
 
         foreach (int pin in IOInfo.AnalogOutputs)
         {
             analogOutList.AnalogOutputs.Add(new() { Pin = pin });
-            _ioService.UpdateCacheValue(IOServiceDataKeys.AnalogOutput_ + pin.ToString(), 0);
+            _ioService.UpdateCacheValue(IOServiceMessages.AnalogOutput_ + pin.ToString(), 0);
         }
 
         foreach (int pin in IOInfo.DigitalInputs)
         {
             digitalInList.DigitalInputs.Add(new() { Pin = pin });
             latestDigitalValues.TryAdd(pin, new());
-            _ioService.UpdateCacheValue(IOServiceDataKeys.DigitalInput_ + pin.ToString(), 0);
+            _ioService.UpdateCacheValue(IOServiceMessages.DigitalInput_ + pin.ToString(), 0);
         }
 
         foreach (int pin in IOInfo.DigitalOutputs)
         {
             digitalOutList.DigitalOutputs.Add(new() { Pin = pin });
-            _ioService.UpdateCacheValue(IOServiceDataKeys.DigitalOutput_ + pin.ToString(), 0);
+            _ioService.UpdateCacheValue(IOServiceMessages.DigitalOutput_ + pin.ToString(), 0);
         }
 
         OnHandleInit(IOInfo, out analogInputImplementation, out analogOutputImplementation, out digitalInputImplementation, out digitalOutputImplementation);
@@ -85,7 +85,7 @@ internal abstract class IOServiceImplementationBase
                 {
                     var newValue = analogInputImplementation.ReadVolts(item);
                     if (newValue.Ret == ReturnCode.Success)
-                        _ioService.UpdateCacheValue(IOServiceDataKeys.AnalogInput_ + item.ToString(), newValue.Value);
+                        _ioService.UpdateCacheValue(IOServiceMessages.AnalogInput_ + item.ToString(), newValue.Value);
 
                     latestAnalogValues[item] = newValue;
                 }
@@ -94,7 +94,7 @@ internal abstract class IOServiceImplementationBase
                 {
                     var newValue = digitalInputImplementation.ReadVolts(item);
                     if (newValue.Ret == ReturnCode.Success)
-                        _ioService.UpdateCacheValue(IOServiceDataKeys.DigitalInput_ + item.ToString(), newValue.Value);
+                        _ioService.UpdateCacheValue(IOServiceMessages.DigitalInput_ + item.ToString(), newValue.Value);
 
                     latestDigitalValues[item] = newValue;
                 }
@@ -143,7 +143,7 @@ internal abstract class IOServiceImplementationBase
             var returnValue = digitalOutputImplementation.SetOutput(d.Pin, d.State);
 
             // Notify Data Service of New Value.
-            _ioService.UpdateCacheValue(IOServiceDataKeys.DigitalOutput_ + d.Pin.ToString(), (int)d.State);
+            _ioService.UpdateCacheValue(IOServiceMessages.DigitalOutput_ + d.Pin.ToString(), (int)d.State);
 
             return returnValue;
         }
@@ -159,7 +159,7 @@ internal abstract class IOServiceImplementationBase
             var returnValue = analogOutputImplementation.SetOutput(a.Pin, a.MilliVolts);
 
             // Notify Data Service of New Value.
-            _ioService.UpdateCacheValue(IOServiceDataKeys.AnalogOutput_ + a.Pin.ToString(), a.MilliVolts);
+            _ioService.UpdateCacheValue(IOServiceMessages.AnalogOutput_ + a.Pin.ToString(), a.MilliVolts);
 
             return returnValue;
         }
@@ -177,7 +177,7 @@ internal abstract class IOServiceImplementationBase
             if (currentTimerValue == int.MaxValue)
             {
                 var returnValue = analogInputImplementation.ReadVolts(aIn.Pin);
-                _ioService.UpdateCacheValue(IOServiceDataKeys.AnalogInput_ + aIn.Pin.ToString(), returnValue.Value);
+                _ioService.UpdateCacheValue(IOServiceMessages.AnalogInput_ + aIn.Pin.ToString(), returnValue.Value);
                 return returnValue;
             }
             else
@@ -197,7 +197,7 @@ internal abstract class IOServiceImplementationBase
             if (currentTimerValue == int.MaxValue)
             {
                 var returnValue = digitalInputImplementation.ReadVolts(dIn.Pin);
-                _ioService.UpdateCacheValue(IOServiceDataKeys.DigitalInput_ + dIn.Pin.ToString(), returnValue.Value);
+                _ioService.UpdateCacheValue(IOServiceMessages.DigitalInput_ + dIn.Pin.ToString(), returnValue.Value);
                 return returnValue;
             }
             else

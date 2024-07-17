@@ -41,12 +41,21 @@ internal class CanCodeGenerator : IExtensionGenerator
         if (config != null)
         {
             string configFile = Path.Combine(Path.GetDirectoryName(packageInfo.GetPackageInfoPath()), config);
-            if (File.Exists(configFile) && commandtypes.HasFlag(CommandTypes.ModelGenerators))
+            if (File.Exists(configFile))
             {
-                var calibration = JsonUtility.Deserialize<CanClientCalibration>(File.ReadAllText(configFile));
-                commandsToExecute.Add($"--GenerateCANClasses \"{Path.GetFileName(packageInfo.GetPackageInfoPath())}\" \"{calibration.GeneratorOutputFile}\" \"{calibration.GeneratorNamespace}\" \"{calibration.GeneratorBaseClass}\" {packageInfo.ApplicationType}",
-                          GeneratorCommandType.AhsokaCommandLine);
+                if (commandtypes.HasFlag(CommandTypes.ModelGenerators))
+                {
+                    var calibration = JsonUtility.Deserialize<CanClientCalibration>(File.ReadAllText(configFile));
+                    commandsToExecute.Add($"--GenerateCANClasses \"{Path.GetFileName(packageInfo.GetPackageInfoPath())}\" \"{calibration.GeneratorOutputFile}\" \"{calibration.GeneratorNamespace}\" \"{calibration.GeneratorBaseClass}\" {packageInfo.ApplicationType}",
+                              GeneratorCommandType.AhsokaCommandLine);
+                }
+
             }
+            else
+                throw new ApplicationException($"The configuration file {configFile} does't not exist.  Please configure this extension.");
         }
+        else
+            throw new ApplicationException("Could not find a configuration file for the CAN Service Extension.  Please configure this extension.");
+
     }
 }

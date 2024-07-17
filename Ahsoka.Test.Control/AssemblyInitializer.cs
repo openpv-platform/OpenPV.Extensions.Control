@@ -1,4 +1,6 @@
 ﻿
+using Ahsoka.Services.Can;
+using Ahsoka.Services.IO;
 using Ahsoka.System;
 using Ahsoka.System.Hardware;
 using Ahsoka.Test.Control.Properties;
@@ -8,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace Ahsoka.Test;
@@ -18,6 +21,13 @@ public class TestInitializer : LinearTestBase
    [AssemblyInitialize]
     public static void AssemblyInit(TestContext context)
     {
+        // Just forcing Libraries to Load
+        var ioAsm = typeof(IOService).Assembly;
+        var canAsm = typeof(CanService).Assembly;
+
+        ClassLoader.AddAssembly(ioAsm);
+        ClassLoader.AddAssembly(canAsm);
+
         // Fall back to Developer Support Folder if running Standalone.
         if (HardwareInfo.GetHardwareInfoDescriptions().Count == 0)
         {
