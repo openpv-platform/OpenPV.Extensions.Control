@@ -37,14 +37,14 @@ internal class IOController
                 HeightRequest = 50
             };
             fixedPanel.Add(tempLabel);
-            latestValues[IOServiceDataKeys.AnalogInput_ + item.Pin.ToString()] = 0.0f;
+            latestValues[IOServiceMessages.AnalogInput_ + item.Pin.ToString()] = 0.0f;
 
             ioItems.Add(new IOData<AnalogInput, double>()
             {
                 IOConfig = item,
                 TextLabel = tempLabel,
                 Value = -99,
-                GetFunction = (item, oldValue) => { return latestValues[IOServiceDataKeys.AnalogInput_ + item.Pin.ToString()] / 1000; },
+                GetFunction = (item, oldValue) => { return latestValues[IOServiceMessages.AnalogInput_ + item.Pin.ToString()] / 1000; },
                 TextFunction = (newValue) => { return $"\"Analog (0-5v) Input #{item.Pin}: {newValue:F4}V"; }
             });
         }
@@ -61,14 +61,14 @@ internal class IOController
             fixedPanel.Add(tempLabel);
            
             // Init Latest Values
-            latestValues[IOServiceDataKeys.DigitalInput_ + item.Pin.ToString()] = 0.0f;
+            latestValues[IOServiceMessages.DigitalInput_ + item.Pin.ToString()] = 0.0f;
 
             ioItems.Add(new IOData<DigitalInput, double>()
             {
                 IOConfig = item,
                 TextLabel = tempLabel,
                 Value = -99,
-                GetFunction = (item, oldValue) => { return latestValues[IOServiceDataKeys.DigitalInput_ + item.Pin.ToString()] / 1000; },
+                GetFunction = (item, oldValue) => { return latestValues[IOServiceMessages.DigitalInput_ + item.Pin.ToString()] / 1000; },
                 TextFunction = (newValue) => { return $"Digital/Analog (0-36v) Input #{item.Pin}: {newValue:F4}V"; },
             });
         }
