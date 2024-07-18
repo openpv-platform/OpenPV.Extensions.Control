@@ -339,7 +339,9 @@ internal class CanSetupViewModel : ExtensionViewModelBase
         CanClientCalibration = new CanClientCalibration();
         Nodes.Clear();
         Messages.Clear();
-
+        Ports.Clear();
+        RefreshGenerateSettings();
+        AddHardwarePorts();
         OnPropertyChanged(nameof(ConfigurationPath));
         OnPropertyChanged(nameof(Nodes));
         OnPropertyChanged(nameof(Messages));
@@ -366,18 +368,8 @@ internal class CanSetupViewModel : ExtensionViewModelBase
                     foreach (PortDefinition port in CanClientCalibration.Ports.OrderBy(x => x.Port))
                         Ports.Add(new PortViewModel(this, CustomerToolViewModel, port) { IsEnabled = true }) ;
 
-                    foreach (CanPort port in HardwareInfo.GetHardwareInfo(hardwareInfo.PlatformFamily, hardwareInfo.PlatformQualifier).CANInfo.CANPorts)
-                        if (!Ports.Any(x => x.Port == port.Port))
-                            Ports.Add(new PortViewModel(this, CustomerToolViewModel, new PortDefinition()
-                            {
-                                Port = port.Port,
-                                CanInterfacePath = port.SocketCanInterfacePath,
-                                BaudRate = CanBaudRate.Baud250kb,
-                                CanInterface = CanInterface.SocketCan,
-                                PromiscuousTransmit = false,
-                                PromiscuousReceive = false,
-                                UserDefined = true,                    
-                            }) { IsEnabled = false });
+                    AddHardwarePorts();
+                    RefreshGenerateSettings();
 
                     Nodes.Clear();
                     foreach (NodeDefinition node in CanClientCalibration.Nodes.OrderBy(x => x.Id))
@@ -396,10 +388,15 @@ internal class CanSetupViewModel : ExtensionViewModelBase
                 catch
                 {
                     CanClientCalibration = new CanClientCalibration(); // Create Default 
+                    AddHardwarePorts();
                 }
             }
             else
+            {
                 CanClientCalibration = new CanClientCalibration(); // Create Default 
+                AddHardwarePorts();
+            }
+
         }
 
         // Bump Calibration file to Current.
@@ -526,5 +523,29 @@ internal class CanSetupViewModel : ExtensionViewModelBase
         }
     }
 
+    private void AddHardwarePorts()
+    {
+        foreach (CanPort port in HardwareInfo.GetHardwareInfo(hardwareInfo.PlatformFamily, hardwareInfo.PlatformQualifier).CANInfo.CANPorts)
+            if (!Ports.Any(x => x.Port == port.Port))
+                Ports.Add(new PortViewModel(this, CustomerToolViewModel, new PortDefinition()
+                {
+                    Port = port.Port,
+                    CanInterfacePath = port.SocketCanInterfacePath,
+                    BaudRate = CanBaudRate.Baud250kb,
+                    CanInterface = CanInterface.SocketCan,
+                    PromiscuousTransmit = false,
+                    PromiscuousReceive = false,
+                    UserDefined = true,
+                })
+                { IsEnabled = false });
+    }
+
+    private void RefreshGenerateSettings()
+    {
+        OnPropertyChanged(nameof(GeneratorEnabled));
+        OnPropertyChanged(nameof(GeneratorBaseClass));
+        OnPropertyChanged(nameof(GeneratorNamespace));
+        OnPropertyChanged(nameof(GeneratorOutputFile));
+    }
 
 }
