@@ -23,7 +23,7 @@ public class IOServiceClient : AhsokaClientBase<IOMessageTypes.Ids>
     /// Creates a Service for Use with this Client when running Local Services
     /// </summary>
     /// <returns></returns>
-    protected override IAhsokaServiceEndpoint OnCreateDefaultService()
+    protected override IAhsokaServiceEndPoint OnCreateDefaultService()
     {
         return new IOService(this.ServiceConfig);
     }

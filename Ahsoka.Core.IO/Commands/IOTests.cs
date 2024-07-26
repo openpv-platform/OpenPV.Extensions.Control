@@ -18,9 +18,6 @@ internal class IOTests
         // Start client for NetworkService
         var client = new IOServiceClient();
         client.NotificationReceived += Client_NotificationReceived;
-        var clientRuntime = AhsokaRuntime.CreateBuilder()
-                    .AddClients(client)
-                    .StartWithInternalServices();
 
 
         // Testing buzzer
@@ -31,8 +28,7 @@ internal class IOTests
         MonitorIgnitionNotification(client);
 
         // Stop the Runtimes
-        clientRuntime.RequestShutdown();
-        AhsokaRuntime.ShutdownAll();
+        client.Disconnect();
     }
 
     public static void MonitorIgnitionNotification(IOServiceClient client)

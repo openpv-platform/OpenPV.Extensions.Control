@@ -21,9 +21,7 @@ internal class IOTests
 
         // Start client for IO Service
         var client = new IOServiceClient();
-        var clientRuntime = AhsokaRuntime.CreateBuilder()
-                    .AddClients(client)
-                    .StartWithInternalServices();
+        client.Connect();
 
         TestHardwareCapabilities(client);
         TestInputPinDefualtValues(client);
@@ -46,8 +44,7 @@ internal class IOTests
         DisplayCurrentVoltageValues(client);
 
         // Stop the Runtimes
-        clientRuntime.RequestShutdown();
-        AhsokaRuntime.ShutdownAll();
+        client.Disconnect();
 
     }
 

@@ -293,7 +293,7 @@ internal static class CanMetadataTools
             Directory.CreateDirectory(directory);
 
         string canCalibration = package.ServiceInfo.RuntimeConfiguration.ExtensionInfo.FirstOrDefault(x => x.ExtensionName == "CAN Service Extension")?.ConfigurationFile;
-        if (canCalibration.IsNullOrEmpty())
+        if (String.IsNullOrEmpty(canCalibration))
         {
             Console.WriteLine($"Config does not contain a CAN configuration file");
             return;
