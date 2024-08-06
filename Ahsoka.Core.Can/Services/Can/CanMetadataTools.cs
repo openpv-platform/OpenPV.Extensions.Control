@@ -163,7 +163,8 @@ internal static class CanMetadataTools
                 Name = message.Name,
                 UserDefined = true,
                 TransmitNodes = nodeFound ? new int[] {-1, node.Id } : new int[] { -1, -1 },
-                ReceiveNodes = new int[] { -1, -1 }
+                ReceiveNodes = new int[] { -1, -1 },
+                SetAddressOnSend = false
             };
 
             if (message.CycleTime(out int cycleTime))
@@ -175,6 +176,7 @@ internal static class CanMetadataTools
                 if (isJ1939)
                 {
                     messageDef.MessageType = MessageType.J1939ExtendedFrame;
+                    messageDef.SetAddressOnSend = true;
                     messageDef.Id &= ~(0xFFu); // Remove Address
                 }
             }

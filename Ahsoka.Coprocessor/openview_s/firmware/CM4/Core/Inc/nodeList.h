@@ -13,6 +13,7 @@ struct nodeList
 {
     int32_t id;
     uint32_t address;
+    bool staticAddress;
     nodeList_t* next;
 };
 

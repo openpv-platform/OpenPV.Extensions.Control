@@ -8,7 +8,10 @@ using static Ahsoka.Services.Can.CanServiceImplementation;
 
 namespace Ahsoka.Services.Can.Messages;
 internal class J1939ProtocolHandler : BaseProtocolHandler
-{    
+{
+    const int PDU2Threshold = 240;
+
+
     readonly List<object> startupQueue = new();
     internal bool transmittingJ1939 = false;
 
@@ -106,7 +109,7 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
             var j1939id = new J1939Helper.Id(message.Id);
 
             modifiedId |= (CanState.CurrentAddress & 0xFF); 
-            if (j1939id.PDUF < 240)
+            if (j1939id.PDUF < PDU2Threshold)
                 modifiedId |= (CanState.NodeAddresses[messageInfo.Message.ReceiveNodes[Service.Port]] & 0xFF) << 8;
            
             if (Service.PortConfig.MessageConfiguration.Ports.First(x => x.Port == Service.Port).CanInterface == CanInterface.SocketCan)
@@ -124,7 +127,7 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
 
             var j1939Id = new J1939Helper.Id(id);
 
-            var mask = j1939Id.PDUF >= 240 ? 0x1FFFFF00 : 0x1FFF0000;
+            var mask = j1939Id.PDUF >= PDU2Threshold ? 0x1FFFFF00 : 0x1FFF0000;
 
             var messages = Service.AvailableMessages.Values.Where(x => x.Message.MessageType == MessageType.J1939ExtendedFrame && (x.Message.Id & mask) == (id & mask));
             foreach (var message in messages)
@@ -137,7 +140,7 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
                 else if (!received && (j1939Id.PDUS == CanState.NodeAddresses[message.Message.ReceiveNodes[Service.Port]] || !knownDestination) &&
                     (message.Message.TransmitNodes[Service.Port] == Service.Self.Id || message.Message.TransmitNodes[Service.Port] == J1939Helper.BroadcastAddress))
                     return true;
-                else if (j1939Id.PDUF >= 240 && (!received || (j1939Id.SourceAddress == CanState.NodeAddresses[message.Message.TransmitNodes[Service.Port]] || message.Message.TransmitNodes[Service.Port] == J1939Helper.BroadcastAddress)))
+                else if (j1939Id.PDUF >= PDU2Threshold && (!received || (j1939Id.SourceAddress == CanState.NodeAddresses[message.Message.TransmitNodes[Service.Port]] || message.Message.TransmitNodes[Service.Port] == J1939Helper.BroadcastAddress)))
                     return true;
             }
 
@@ -158,7 +161,7 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
 
             var j1939Id = new J1939Helper.Id(id);
 
-            var mask = j1939Id.PDUF >= 240 ? 0x1FFFFF00 : 0x1FFF0000;
+            var mask = j1939Id.PDUF >= PDU2Threshold ? 0x1FFFFF00 : 0x1FFF0000;
 
             var messages = Service.AvailableMessages.Values.Where(x => x.Message.MessageType == MessageType.J1939ExtendedFrame && (x.Message.Id & mask) == (id & mask));
             foreach (var message in messages)
@@ -175,7 +178,7 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
                 else if (!received && (j1939Id.PDUS == CanState.NodeAddresses[message.Message.ReceiveNodes[Service.Port]] || !knownDestination) &&
                     (message.Message.TransmitNodes[Service.Port] == Service.Self.Id || message.Message.TransmitNodes[Service.Port] == J1939Helper.BroadcastAddress))
                     result = message;
-                else if (j1939Id.PDUF >= 240 && (!received || (j1939Id.SourceAddress == CanState.NodeAddresses[message.Message.TransmitNodes[Service.Port]] || message.Message.TransmitNodes[Service.Port] == J1939Helper.BroadcastAddress)))
+                else if (j1939Id.PDUF >= PDU2Threshold && (!received || (j1939Id.SourceAddress == CanState.NodeAddresses[message.Message.TransmitNodes[Service.Port]] || message.Message.TransmitNodes[Service.Port] == J1939Helper.BroadcastAddress)))
                     result = message;
 
                 if (result.Message != null)

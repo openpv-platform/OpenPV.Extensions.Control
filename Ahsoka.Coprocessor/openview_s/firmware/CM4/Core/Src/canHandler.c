@@ -306,17 +306,21 @@ canMessageTimerList_t* findCanTxMessage(uint32_t port, canMessageTimerList_t* li
 	canMessageTimerList_t* foundNode = NULL;
 	while(list != NULL)
 	{
-		if(list->msg->id == id)
+		int32_t mask = (list->msg->id & 0x00FF0000) >= PDU2_THRESHOLD ? 0x1FFFFF00 : 0x1FFF0000;
+		if((list->msg->id & 0x1FFFFFFF) == id)
 			break;
-		else if(list->msg->msgType == AhsokaCAN_MessageType_J1939_EXTENDED_FRAME && (list->msg->id & 0x1FFF0000) == (id & 0x1FFF0000))
+		else if(list->msg->msgType == AhsokaCAN_MessageType_J1939_EXTENDED_FRAME && (list->msg->id & mask) == (id & mask))
 		{
+			bool knownDestination = findNode(port, list->msg->receiverNodeId)->staticAddress;
 			int32_t destination = (id >> 8) & 0xFF;
 
-			if((destination == findNode(port, list->msg->receiverNodeId)->address || destination == 0) &&
+			if((destination == findNode(port, list->msg->receiverNodeId)->address || !knownDestination) &&
 				(list->msg->transmitNodeId == txNode[port]->id || list->msg->transmitNodeId == 255))
 			{
 				break;
 			}
+			else if ((list->msg->id & 0x00FF0000) >= PDU2_THRESHOLD)
+				break;
 		}
 		list = list->nextMsg;
 	}
@@ -371,14 +375,14 @@ canMessage_t* findCanMessage(uint32_t port, uint32_t id, bool isExtended, bool p
 
     while(list != NULL)
     {
-    	int32_t addressMask = 0x1fff0000;
+    	int32_t mask = (list->msg->id & 0x00FF0000) >= PDU2_THRESHOLD ? 0x1FFFFF00 : 0x1FFF0000;
 
     	if(list->msg->id == id)
     	{
     		foundMsg = list->msg;
     		break;
     	}
-    	else if((list->msg->msgType == AhsokaCAN_MessageType_J1939_EXTENDED_FRAME) && (isExtended) && ((list->msg->id & addressMask) == (id&addressMask)))
+    	else if((list->msg->msgType == AhsokaCAN_MessageType_J1939_EXTENDED_FRAME) && (isExtended) && ((list->msg->id & mask) == (id&mask)))
     	{
     		// this is a match.
     		int32_t source = id & 0xFF;
@@ -389,6 +393,11 @@ canMessage_t* findCanMessage(uint32_t port, uint32_t id, bool isExtended, bool p
     			foundMsg = list->msg;
     			break;
     		}
+    		else if ((list->msg->id & 0x00FF0000) >= PDU2_THRESHOLD && (source == findNode(port, list->msg->transmitNodeId)->address || list->msg->transmitNodeId == 255))
+    		{
+				foundMsg = list->msg;
+				break;
+			}
     	}
     	list=list->next;
     }
@@ -440,7 +449,6 @@ void setCoprocessorReady(bool ready)
 
 void sendCan(uint32_t port, canMessage_t* msg)
 {
-	//log_info("sending message: %d for port %d\r\n", msg->id, port);
 	if(msg->msgType == AhsokaCAN_MessageType_J1939_EXTENDED_FRAME && !transmittingJ1939[port])
 		return;
 
@@ -449,7 +457,8 @@ void sendCan(uint32_t port, canMessage_t* msg)
     if(msg->insertAddress == 1)
     {
     	header.Identifier = msg->id | txNode[port]->address;
-    	header.Identifier |= findNode(port, msg->receiverNodeId)->address << 8;
+    	if ((header.Identifier & 0x00FF0000) < PDU2_THRESHOLD)
+    		header.Identifier |= findNode(port, msg->receiverNodeId)->address << 8;
     }
     else
         header.Identifier = msg->id;

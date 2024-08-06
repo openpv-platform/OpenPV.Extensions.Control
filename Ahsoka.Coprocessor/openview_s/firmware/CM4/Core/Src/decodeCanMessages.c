@@ -79,7 +79,7 @@ bool decodeCanMessageCallback(pb_istream_t *stream, const pb_field_iter_t *field
 		if(node)
 		{
 			// update data!
-			memcpy(node->msg->data, data,node->msg->dlc);
+			memcpy(node->msg->data, data, node->msg->dlc);
 			// found a message in the list, send it now!
 			sendCan(port, node->msg);
 

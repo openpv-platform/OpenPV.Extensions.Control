@@ -226,6 +226,7 @@ bool decodeNode(pb_istream_t *stream, const pb_field_iter_t *field, void **arg)
         // create a new node, and set the transmitter node.
         nodeList_t* node = createNodeList();
         node->id = message.id;
+        node->staticAddress = true;
 
         //iterate over ports node is available on
         while(decodeList != NULL)
@@ -234,6 +235,11 @@ bool decodeNode(pb_istream_t *stream, const pb_field_iter_t *field, void **arg)
 			{
 				node->address = message.J1939Info.address_value_one;
 			}
+        	else
+        	{
+        		node->staticAddress = false;
+        	}
+
 			// add node to list of nodes here!
 			if(message.node_type == AhsokaCAN_NodeType_Self)
 			{
