@@ -10,9 +10,9 @@
 	</PropertyGroup>
 
 	<ItemGroup Label="Reference to Ahsoka Nuget Packages">
-		<PackageReference Include="Ahsoka.Core.DataService" Version="3.6.1-zzz-develop.2" />
-		<PackageReference Include="Ahsoka.Core.Drawing" Version="3.4.1-zzz-develop.8" />
-		<PackageReference Include="Ahsoka.Core" Version="3.4.1-zzz-develop.8" />
+		<PackageReference Include="Ahsoka.Core.DataService" Version="3.*-*" />
+		<PackageReference Include="Ahsoka.Core.Drawing" Version="3.*-*" />
+		<PackageReference Include="Ahsoka.Core" Version="3.*-*" />
 		<PackageReference Include="Ahsoka.Core.IO" Version="3.*-*" />
 	</ItemGroup>
 	
@@ -22,8 +22,5 @@
 	  <None Remove="publish\**" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="GtkSharp" Version="3.24.24.117-develop" />
-	</ItemGroup>
 
 </Project>

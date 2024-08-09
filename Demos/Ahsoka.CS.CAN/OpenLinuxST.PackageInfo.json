@@ -1,5 +1,5 @@
 {
-  "version": "3.1.1.20025",
+  "version": "3.4.1.10014",
   "applicationType": "Dotnet",
   "systemOrientation": "DefaultOrientation",
   "execCommand": "Ahsoka.CS.CAN",
@@ -21,8 +21,11 @@
     "runtimeConfiguration": {
       "serviceStartup": "NoAutoStart",
       "releaseOption": "NoAutoStart",
-      "extensions": [
-        "CAN Service Extension"
+      "extensionInfo": [
+        {
+          "extensionName": "CAN Service Extension",
+          "configurationFile": "STDemoPackage.1.cancalibration.json"
+        }
       ],
       "startupDelay": 0,
       "requireChallenge": "NotRequired",
@@ -35,8 +38,7 @@
           "bleServiceUuidBase": "96730000-8f5d-4cef-8289-744c8faa1a66",
           "dataChannel": 5007,
           "isExtension": false,
-          "behaviors": "AutoStart",
-          "configurationFile": "STDemoPackage.1.cancalibration.json"
+          "behaviors": "AutoStart"
         },
         {
           "socketType": "TcpSocket",
@@ -46,8 +48,7 @@
           "bleServiceUuidBase": "96730000-8f5d-4cef-8289-744c8faa1a66",
           "dataChannel": 5001,
           "isExtension": false,
-          "behaviors": "AutoStart",
-          "configurationFile": ""
+          "behaviors": "AutoStart"
         }
       ]
     },
