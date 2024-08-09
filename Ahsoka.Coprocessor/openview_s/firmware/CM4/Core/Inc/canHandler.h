@@ -6,6 +6,8 @@
 
 #define TIMER_RESOLUTION  5
 #define MAX_PORTS 2
+#define PDU2_THRESHOLD 240
+
 typedef void (*crcFunc)(uint32_t, uint8_t*, uint8_t, uint32_t);
 // This structure is used by both transmit and receive messages.
 typedef struct canMessage_type

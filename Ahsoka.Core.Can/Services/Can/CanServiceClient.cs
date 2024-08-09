@@ -39,7 +39,7 @@ public class CanServiceClient : AhsokaClientBase<CanMessageTypes.Ids>
     /// Creates a Service for Use with this Client when running Local Services
     /// </summary>
     /// <returns></returns>
-    protected override IAhsokaServiceEndpoint OnCreateDefaultService()
+    protected override IAhsokaServiceEndPoint OnCreateDefaultService()
     {
         return new CanService(this.ServiceConfig);
     }

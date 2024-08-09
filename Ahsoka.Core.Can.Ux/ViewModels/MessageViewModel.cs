@@ -18,7 +18,9 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>
 {
     #region Fields
     const int extendedFrameBitPosition = 31;
-    const int PDU2Threshold = 239;
+    const int PDU2Threshold = 240;
+    const int BroadcastVal = 255;
+    const int NodeDisabled = -1;
 
     UserControl currentView;
     UserControl currentSignalView;
@@ -34,7 +36,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>
 
     #region ID Handling J1939 <-> RAW
     public bool IsJ1939 { get { return MessageType == MessageType.J1939ExtendedFrame; } }
-    public bool IsPDU2 { get { return PDUF > PDU2Threshold; } }
+    public bool IsPDU2 { get { return PDUF >= PDU2Threshold; } }
 
     public MessageType MessageType
     {
@@ -49,7 +51,10 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>
                 {
                     MessageDefinition.Id = NegateExtendedBit(MessageDefinition.Id);
                     j1939Id.ExtractValues(MessageDefinition.Id);
+                    MessageDefinition.SetAddressOnSend = true;
                 }
+                else
+                    MessageDefinition.SetAddressOnSend = false;
 
                 // Restore Extended Frame Bit
                 if (value != MessageType.RawStandardFrame)
@@ -130,12 +135,12 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>
         get
         {
             NodeViewModel Transmitter, Receiver = null;
-            if (MessageDefinition.TransmitNodes[1] != -1 && MessageDefinition.ReceiveNodes[1] != -1)
+            if (MessageDefinition.TransmitNodes[1] != NodeDisabled && MessageDefinition.ReceiveNodes[1] != NodeDisabled)
             {
                 Transmitter = ParentViewModel.Nodes.First(x => x.NodeDefinition.Id == (MessageDefinition.TransmitNodes[1]));
                 Receiver = ParentViewModel.Nodes.First(x => x.NodeDefinition.Id == (MessageDefinition.ReceiveNodes[1]));
             }
-            else if (MessageDefinition.TransmitNodes[0] != -1 && MessageDefinition.ReceiveNodes[0] != -1)
+            else if (MessageDefinition.TransmitNodes[0] != NodeDisabled && MessageDefinition.ReceiveNodes[0] != NodeDisabled)
             {
                 Transmitter = ParentViewModel.Nodes.First(x => x.NodeDefinition.Id == (MessageDefinition.TransmitNodes[0]));
                 Receiver = ParentViewModel.Nodes.First(x => x.NodeDefinition.Id == (MessageDefinition.ReceiveNodes[0]));
@@ -552,7 +557,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>
 
         if (definition == null)
         {
-            definition = new() { Name = "New Message", Id = 100, TransmitNodes = new int[] {-1, -1}, ReceiveNodes = new int[] { -1, -1 } };
+            definition = new() { Name = "New Message", Id = 100, TransmitNodes = new int[] {NodeDisabled, NodeDisabled }, ReceiveNodes = new int[] { NodeDisabled, NodeDisabled }, SetAddressOnSend = false};
 
             // FindNode Index
             for (uint i = 0; i < UInt32.MaxValue; i++)
@@ -588,7 +593,6 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>
         });
 
         j1939Id = new(MessageDefinition.Id);
-        MessageDefinition.SetAddressOnSend = true;
         SelectedSignal = MessageDefinition.Signals.FirstOrDefault();
 
 
@@ -599,8 +603,8 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>
     {
         Nodes_P0.Clear();
         Nodes_P1.Clear();
-        Nodes_P0.Add(new NodeViewModel(ParentViewModel, viewModelInterface, new NodeDefinition() { Id = -1, Name = "(None)" }));
-        Nodes_P1.Add(new NodeViewModel(ParentViewModel, viewModelInterface, new NodeDefinition() { Id = -1, Name = "(None)" }));
+        Nodes_P0.Add(new NodeViewModel(ParentViewModel, viewModelInterface, new NodeDefinition() { Id = NodeDisabled, Name = "(None)" }));
+        Nodes_P1.Add(new NodeViewModel(ParentViewModel, viewModelInterface, new NodeDefinition() { Id = NodeDisabled, Name = "(None)" }));
         foreach (var node in ParentViewModel.Nodes)
         {
             foreach (var port in node.NodeDefinition.Ports)
@@ -750,10 +754,20 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>
             values.Capacity = port;
         values[port] = node;
 
+        var secondaryVal = node == NodeDisabled ? NodeDisabled : BroadcastVal;
+
         if (transmitter)
-            MessageDefinition.TransmitNodes = values.ToArray();
+        {
+            MessageDefinition.TransmitNodes[port] = node;
+            if(MessageDefinition.MessageType != MessageType.J1939ExtendedFrame)
+                MessageDefinition.ReceiveNodes[port] = secondaryVal;
+        }         
         else
-            MessageDefinition.ReceiveNodes = values.ToArray();
+        {           
+            MessageDefinition.ReceiveNodes[port] = node;
+            if (MessageDefinition.MessageType != MessageType.J1939ExtendedFrame)
+                MessageDefinition.TransmitNodes[port] = secondaryVal;
+        }
 
         OnPropertyChanged(nameof(IdMasked));
         OnPropertyChanged(nameof(Transmitter));

@@ -163,7 +163,8 @@ internal static class CanMetadataTools
                 Name = message.Name,
                 UserDefined = true,
                 TransmitNodes = nodeFound ? new int[] {-1, node.Id } : new int[] { -1, -1 },
-                ReceiveNodes = new int[] { -1, -1 }
+                ReceiveNodes = new int[] { -1, -1 },
+                SetAddressOnSend = false
             };
 
             if (message.CycleTime(out int cycleTime))
@@ -175,6 +176,7 @@ internal static class CanMetadataTools
                 if (isJ1939)
                 {
                     messageDef.MessageType = MessageType.J1939ExtendedFrame;
+                    messageDef.SetAddressOnSend = true;
                     messageDef.Id &= ~(0xFFu); // Remove Address
                 }
             }
@@ -293,7 +295,7 @@ internal static class CanMetadataTools
             Directory.CreateDirectory(directory);
 
         string canCalibration = package.ServiceInfo.RuntimeConfiguration.ExtensionInfo.FirstOrDefault(x => x.ExtensionName == "CAN Service Extension")?.ConfigurationFile;
-        if (canCalibration.IsNullOrEmpty())
+        if (String.IsNullOrEmpty(canCalibration))
         {
             Console.WriteLine($"Config does not contain a CAN configuration file");
             return;

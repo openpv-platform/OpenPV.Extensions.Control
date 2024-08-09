@@ -62,7 +62,9 @@ internal class CanInstallerComponent : InstallEngineComponent
             CanApplicationCalibration canConfig = CanMetadataTools.GenerateApplicationConfig(hardwareDef, config, false);
             var configData = new MemoryStream();
             ProtoBuf.Serializer.Serialize(configData, canConfig);
+            var jsonData = Encoding.UTF8.GetBytes(JsonUtility.Serialize(canConfig));
             AddFileToArchive(archive, applicationConfiguration, configData);
+            AddFileToArchive(archive, applicationConfiguration + ".json", jsonData);
 
             // Determine if we are a CoProcessor App or Not
             bool hasCoProcessor = canConfig.CanPortConfiguration.MessageConfiguration.Ports.Any(x => x.CanInterface == CanInterface.Coprocessor);
@@ -93,7 +95,9 @@ internal class CanInstallerComponent : InstallEngineComponent
                 canConfig = CanMetadataTools.GenerateApplicationConfig(hardwareDef, config, true);
                 var coProcessorConfigData = new MemoryStream();
                 ProtoBuf.Serializer.Serialize(coProcessorConfigData, canConfig);
+                jsonData = Encoding.UTF8.GetBytes(JsonUtility.Serialize(canConfig));
                 AddFileToArchive(archive, coprocessorConfiguration, coProcessorConfigData);
+                AddFileToArchive(archive, coprocessorConfiguration + ".json", jsonData);
 
                 // Fetch Application Binary from Support Folder
                 var appData = new MemoryStream(Properties.CANResources.OpenViewLinux_TargetSupport_firmware_CM4);
@@ -155,10 +159,15 @@ internal class CanInstallerComponent : InstallEngineComponent
 
     private static void AddFileToArchive(ZipArchive archive, string name, MemoryStream configData)
     {
+        AddFileToArchive(archive, name, configData.ToArray());
+    }
+
+    private static void AddFileToArchive(ZipArchive archive, string name, byte[] configData)
+    {
         var entry = archive.CreateEntry(name);
         using var entryStream = entry.Open();
         using var streamWriter = new BinaryWriter(entryStream);
-        streamWriter.Write(configData.ToArray());
+        streamWriter.Write(configData);
     }
 
     protected override void OnCleanup(string buildLocation, PackageComponent componentData, PackageInformation info, IProgress<PackageProgressInfo> progress = null)
