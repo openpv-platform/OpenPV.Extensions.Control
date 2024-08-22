@@ -9,7 +9,7 @@ trigger:
     - develop
 
 variables:
-    solutionname: 'Ahsoka.Control'
+    solutionname: 'Ahsoka.Extensions.Control'
     solutiondir:  $(Build.SourcesDirectory)
     solution: '*.sln'
     buildPlatform: 'Any CPU'
@@ -64,7 +64,7 @@ stages:
       displayName: Restore Platform
       inputs:
         command: 'restore'
-        restoreSolution: 'Ahsoka.Control.sln'
+        restoreSolution: 'Ahsoka.Extensions.Control.sln'
         feedsToUse: 'config'
         externalFeedCredentials: 'Ahsoka.Nuget'
         noCache: true
@@ -72,7 +72,7 @@ stages:
     - task: VSBuild@1
       displayName: 'Build Solution'
       inputs:
-        solution: 'Ahsoka.Control.sln'
+        solution: 'Ahsoka.Extensions.Control.sln'
         vsVersion: '17.0'
         platform: '$(buildPlatform)'
         configuration: '$(buildConfiguration)'

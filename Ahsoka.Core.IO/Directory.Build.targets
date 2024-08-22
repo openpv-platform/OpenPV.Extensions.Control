@@ -37,5 +37,14 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<Visible>true</Visible>
 		</Content>
+		<Content Include="$(DemoRoot)DemoOutputs\Ahsoka.Codesys.IO.zip">
+			<Link>Demos\Ahsoka.Codesys.IO.zip</Link>
+			<PackagePath>demos/Ahsoka.Codesys.IO.zip</PackagePath>
+			<PackageCopyToOutput>true</PackageCopyToOutput>
+			<IncludeInPackage>true</IncludeInPackage>
+			<Pack>true</Pack>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Visible>true</Visible>
+		</Content>
 	</ItemGroup>
 </Project>
