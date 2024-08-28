@@ -1,4 +1,5 @@
 #pragma warning disable CS1591
+using Ahsoka.Core.IO.Hardware;
 using Ahsoka.Installer;
 using Ahsoka.ServiceFramework;
 using Ahsoka.Services.IO.Platform;
@@ -47,7 +48,10 @@ public class IOService : AhsokaServiceBase<IOMessageTypes.Ids>
         using var stopwatch = new AhsokaStopwatch("Create IOService");
 
         _IOImplementationBase = GetInterop();
-        _IOImplementationBase.Init(this, SystemInfo.HardwareInfo.IOInfo);
+
+        var ioInfo = IOHardwareInfoExtension.GetIOInfo(SystemInfo.HardwareInfo.PlatformFamily);
+
+        _IOImplementationBase.Init(this, ioInfo);
 
         // Disable Service if Running Codesys
         string currentAppPath = SystemInfo.HardwareInfo.TargetPathInfo.GetRootPaths(RootPaths.ApplicationRoot);

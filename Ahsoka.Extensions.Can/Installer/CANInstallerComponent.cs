@@ -25,9 +25,7 @@ internal class CanInstallerComponent : InstallEngineComponent
     public static readonly Guid CanApplicationComponentType = new("FB25736F-B9B7-4581-89D4-10238FC1CA71");
 
     public override Guid ComponentType => CanApplicationComponentType;
-
-    public override bool IsRequiredComponent => false;
-
+    
     public override string ComponentName => PackageName;
 
     protected override PackageComponent OnCreatePackageStream(string buildLocation,
@@ -37,7 +35,7 @@ internal class CanInstallerComponent : InstallEngineComponent
     {
         var hardwareDef = HardwareInfo.GetHardwareInfo(info.PlatformFamily, info.PlatformQualifier);
 
-        if (hardwareDef == null || hardwareDef.CANInfo == null || hardwareDef.CANInfo.CANPorts.Count == 0)
+        if (hardwareDef == null)
             return null;
 
         string config = info.ServiceInfo.RuntimeConfiguration.ExtensionInfo.FirstOrDefault(x=>x.ExtensionName == "CAN Service Extension")?.ConfigurationFile;
@@ -179,6 +177,7 @@ internal class CanInstallerComponent : InstallEngineComponent
     {
         try
         {
+
             string pathToStartScript = Path.Combine(SystemInfo.HardwareInfo.FactoryInfo.RootPath, startScriptName);
             if (File.Exists(pathToStartScript))
                 File.Delete(pathToStartScript);
@@ -192,6 +191,8 @@ internal class CanInstallerComponent : InstallEngineComponent
 
             using (var ms = new MemoryStream())
             {
+                var canInfo = CANHardwareInfoExtension.GetCanInfo(SystemInfo.HardwareInfo.PlatformFamily);
+
                 context.InstallEngine.ExtractPackage(this.ComponentType, ms, context.Progress);
 
                 ms.Seek(0, SeekOrigin.Begin);
@@ -200,7 +201,7 @@ internal class CanInstallerComponent : InstallEngineComponent
 
                 // Copy firmware to /lib/firmware
                 string appPath = Path.Combine(coprocessorPath, applicationBinaryName);
-                string firmwarePath = SystemInfo.HardwareInfo.CANInfo.CANPorts.First().CoprocessorFirmwarePath;
+                string firmwarePath = canInfo.CANPorts.First().CoprocessorFirmwarePath;
 
                 context.Log?.Report(new InstallLogInfo() { LogMessageType = LogMessageType.Information, LogMessage = $"Registering Firmware at {appPath}" });
 

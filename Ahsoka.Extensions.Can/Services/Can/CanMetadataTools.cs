@@ -24,6 +24,8 @@ internal static class CanMetadataTools
 
     internal static CanApplicationCalibration GenerateApplicationConfig(HardwareInfo hardwareInfo, string config, bool trimStrings)
     {
+        var canInfo = CANHardwareInfoExtension.GetCanInfo(hardwareInfo.PlatformFamily);
+
         CanApplicationCalibration appConfig = new();
         try
         {
@@ -46,7 +48,7 @@ internal static class CanMetadataTools
             // Set Interface Specific Items (CoProcessor is on an IP Path with TTY Path as the Interface.
             if (clientConfiguration.Ports.First().CanInterface == CanInterface.Coprocessor)
             {
-                portConfiguration.MessageConfiguration.Ports.First().CanInterfacePath = hardwareInfo.CANInfo.CANPorts.First().CoprocessorSerialPath;
+                portConfiguration.MessageConfiguration.Ports.First().CanInterfacePath = canInfo.CANPorts.First().CoprocessorSerialPath;
                 portConfiguration.CommunicationConfiguration.LocalIpAddress = clientConfiguration.LocalIpAddress ?? "192.168.0.2";
                 portConfiguration.CommunicationConfiguration.RemoteIpAddress = clientConfiguration.RemoteIpAddress ?? "192.168.0.1";
             }

@@ -525,7 +525,9 @@ internal class CanSetupViewModel : ExtensionViewModelBase
 
     private void AddHardwarePorts()
     {
-        foreach (CanPort port in HardwareInfo.GetHardwareInfo(hardwareInfo.PlatformFamily, hardwareInfo.PlatformQualifier).CANInfo.CANPorts)
+        var canInfo = CANHardwareInfoExtension.GetCanInfo(hardwareInfo.PlatformFamily);
+
+        foreach (CanPort port in canInfo.CANPorts)
             if (!Ports.Any(x => x.Port == port.Port))
                 Ports.Add(new PortViewModel(this, CustomerToolViewModel, new PortDefinition()
                 {

@@ -320,7 +320,7 @@ public class CanServiceTests : LinearTestBase
         packageInformation.ServiceInfo.RuntimeConfiguration.ExtensionInfo = new List<ExtensionInfo>() { new ExtensionInfo() { ExtensionName = "CAN Service Extension", ConfigurationFile = canConfigFile } };
 
         // Load Test Generator
-        Extensions.AddPrivateExtension(Assembly.GetExecutingAssembly());
+        Ahsoka.System.Extensions.AddPrivateExtension(Assembly.GetExecutingAssembly());
 
         File.WriteAllText(canPackageInfoFile, JsonUtility.Serialize(packageInformation));
 

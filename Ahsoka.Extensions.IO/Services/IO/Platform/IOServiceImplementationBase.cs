@@ -1,7 +1,5 @@
+using Ahsoka.Core.IO.Hardware;
 using Ahsoka.ServiceFramework;
-using Ahsoka.Services.System;
-using Ahsoka.System.Hardware;
-using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
@@ -30,7 +28,7 @@ internal abstract class IOServiceImplementationBase
     ConcurrentDictionary<int, GetInputResponse> latestDigitalValues = new();
     #endregion
 
-    public void Init(IOService service, IOHardwareInfo IOInfo)
+    public void Init(IOService service, IOHardwareInfoExtension IOInfo)
     {
         // Initialize internal members
         _ioService = service;
@@ -106,7 +104,7 @@ internal abstract class IOServiceImplementationBase
         }
     }
 
-    protected abstract void OnHandleInit(IOHardwareInfo IOInfo,
+    protected abstract void OnHandleInit(IOHardwareInfoExtension IOInfo,
         out IAnalogInputImplementation analogInputImplementation, 
         out IAnalogOutputImplementation analogOutputImplementation, 
         out IDigitalInputImplementation digitalInputImplementation, 

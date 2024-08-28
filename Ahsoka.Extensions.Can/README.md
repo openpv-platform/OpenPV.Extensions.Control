@@ -1,6 +1,6 @@
-﻿# OpenPV - Ahsoka.Core.CAN
+﻿# OpenPV - Ahsoka.Extensions.CAN
 
-Ahsoka.Core.CAN contains the Ahsoka Service for interacting 
+Ahsoka.Extensions.CAN contains the Ahsoka Service for interacting 
 with a CAN Networks.
 &nbsp;
 

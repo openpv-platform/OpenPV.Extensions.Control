@@ -1,3 +1,4 @@
+using Ahsoka.Core.IO.Hardware;
 using Ahsoka.System.Hardware;
 
 
@@ -9,7 +10,7 @@ internal class DesktopServiceImplementation : IOServiceImplementationBase
     #endregion
 
     #region Methods
-    protected override void OnHandleInit(IOHardwareInfo IOInfo,
+    protected override void OnHandleInit(IOHardwareInfoExtension IOInfo,
          out IAnalogInputImplementation analogInputImplementation,
          out IAnalogOutputImplementation analogOutputImplementation,
          out IDigitalInputImplementation digitalInputImplementation,
@@ -20,7 +21,6 @@ internal class DesktopServiceImplementation : IOServiceImplementationBase
         digitalInputImplementation = new WinDigitalInput();
         digitalOutputImplementation = new WinDigitalOutput();
     }
-
 
     internal override BuzzerConfig GetBuzzerConfig()
     {

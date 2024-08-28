@@ -1,3 +1,4 @@
+using Ahsoka.Core.IO.Hardware;
 using Ahsoka.Services.IO.RCD;
 using Ahsoka.System.Hardware;
 using System;
@@ -17,7 +18,7 @@ internal class STServiceImplementation : IOServiceImplementationBase
     #endregion
 
     #region Methods
-    protected override void OnHandleInit(IOHardwareInfo IOInfo,
+    protected override void OnHandleInit(IOHardwareInfoExtension IOInfo,
         out IAnalogInputImplementation analogInputImplementation,
         out IAnalogOutputImplementation analogOutputImplementation,
         out IDigitalInputImplementation digitalInputImplementation,

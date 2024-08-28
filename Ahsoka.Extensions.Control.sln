@@ -3,12 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35004.147
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ahsoka.Core.Can", "Ahsoka.Core.Can\Ahsoka.Core.Can.csproj", "{BE0A73D5-B816-4F00-A6E5-084266D304AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ahsoka.Extensions.Can", "Ahsoka.Extensions.Can\Ahsoka.Extensions.Can.csproj", "{BE0A73D5-B816-4F00-A6E5-084266D304AB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DF9C00CF-0F4D-46A5-B1D0-B3D40A35D6F3} = {DF9C00CF-0F4D-46A5-B1D0-B3D40A35D6F3}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ahsoka.Core.Can.UX", "Ahsoka.Core.Can.Ux\Ahsoka.Core.Can.UX.csproj", "{E7B429F4-C2CD-484E-8D16-D7EA8FE0BC8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ahsoka.Extensions.Can.UX", "Ahsoka.Extensions.Can.Ux\Ahsoka.Extensions.Can.UX.csproj", "{E7B429F4-C2CD-484E-8D16-D7EA8FE0BC8B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ahsoka.BuildCoprocessor", "Ahsoka.BuildCoProcessor\Ahsoka.BuildCoprocessor.csproj", "{DF9C00CF-0F4D-46A5-B1D0-B3D40A35D6F3}"
 EndProject
@@ -21,7 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ahsoka.Test.Control", "Ahsoka.Test.Control\Ahsoka.Test.Control.csproj", "{4CFD3CA4-5A2E-47D0-8B71-54ABBF856C03}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ahsoka.Core.IO", "Ahsoka.Core.IO\Ahsoka.Core.IO.csproj", "{C57B11AA-67C0-4010-BA98-294F3ECE44BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ahsoka.Extensions.IO", "Ahsoka.Extensions.IO\Ahsoka.Extensions.IO.csproj", "{C57B11AA-67C0-4010-BA98-294F3ECE44BB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{9D428ED2-954A-4EC1-BD40-83AE3764A10B}"
 EndProject
