@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ahsoka.Utility;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -10,7 +11,7 @@ namespace Ahsoka.Services.Can;
 /// <summary>
 /// Base View Model used in Ahsoka Applications which adds basic INotifyPropertyChanged support.
 /// </summary>
-public abstract class CanViewModelBase : INotifyPropertyChanged, IHasCanData
+public abstract class CanViewModelBase : ViewModelBase, IHasCanData
 {
     readonly CanMessageData message = null;
     ulong[] data = null;
@@ -19,11 +20,6 @@ public abstract class CanViewModelBase : INotifyPropertyChanged, IHasCanData
     /// CAN Id for the Modeled Message
     /// </summary>
     public uint Id { get { return message.Id; } set { message.Id = value; } }
-
-    /// <summary>
-    /// Event Handler raised when a Property has Changed or OnPropertyChanged() is called.
-    /// </summary>
-    public event PropertyChangedEventHandler PropertyChanged;
 
     /// <summary>
     /// Constructor to Allocate Data (Serialize)
@@ -80,15 +76,6 @@ public abstract class CanViewModelBase : INotifyPropertyChanged, IHasCanData
     }
 
     /// <summary>
-    /// Raises the PropertyChanged event for the Member Specified
-    /// </summary>
-    /// <param name="memberName">Member Name which changed [Defaults to Caller Name]</param>
-    protected virtual void OnPropertyChanged([CallerMemberName] string memberName = "")
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(memberName));
-    }
-
-    /// <summary>
     /// Internal SetValue Method used to set a value and call the Property Changed with a Single Line of Code.
     /// </summary>
     /// <typeparam name="T">Type of the Property / Member</typeparam>
@@ -101,6 +88,9 @@ public abstract class CanViewModelBase : INotifyPropertyChanged, IHasCanData
             T baseValue = info.GetValue<T>(data, true, true);
             if (!baseValue.Equals(newValue))
             {
+                // Run any behaviors added to this model.
+                RunSetBehaviors<T>(baseValue, newValue, info.UniqueId, memberName);
+
                 info.SetValue<T>(ref data, newValue);
                 OnPropertyChanged(memberName);
             }

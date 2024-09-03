@@ -36,7 +36,7 @@ public class IOServiceTests : LinearTestBase
     [TestMethod]
     public void TestServiceParameters()
     {
-        var parameters = AhsokaMessagesBase.GetAllServiceParameters();
+        var parameters = AhsokaMessagesBase.GetAllSystemParameters();
         Assert.IsTrue(parameters[IOService.Name].Any(x => x.Name == IOServiceMessages.AnalogInput_1));
     }
 

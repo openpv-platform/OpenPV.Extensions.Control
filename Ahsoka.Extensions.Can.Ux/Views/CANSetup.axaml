@@ -14,8 +14,10 @@
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="250"/>
 			</Grid.ColumnDefinitions>
-			<StackPanel Grid.Column="1" Margin="-15,0,-15,0"
-				HorizontalAlignment="Center">
+		<Border Grid.Column="1" Background="WhiteSmoke" 
+				BorderBrush="Gainsboro" BorderThickness="1,0,0,0">
+			<StackPanel Margin="-15,0,-15,0"
+				HorizontalAlignment="Center"  >
 				<TextBlock FontSize="18"
 				   VerticalAlignment="Top"
 				   HorizontalAlignment="Center"
@@ -54,7 +56,7 @@
 					</StackPanel>
 				</Button>
 			</StackPanel>
-
+		</Border>
 			<DockPanel HorizontalAlignment="Stretch">
 				<TextBlock Text="Configure CAN Services" Margin="10,10,0,0" 
 						   FontSize="25" Foreground="SteelBlue" DockPanel.Dock="Top"/>

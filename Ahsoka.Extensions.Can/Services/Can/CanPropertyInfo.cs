@@ -10,36 +10,44 @@ namespace Ahsoka.Services.Can;
 /// </summary>
 public class CanPropertyInfo
 {
-    int signalId;
     readonly double scale;
     readonly double offset;
     readonly double defaultValue;
     double minValue;
     double maxValue;
-    int startBit;
     int bitLength;
     readonly ByteOrder byteOrder;
     readonly ValueType dataType;
-    string name;
 
     /// <summary>
     ///  Signal ID for Property
     /// </summary>
-    public int SignalId { get => signalId; set => signalId = value; }
+    public int SignalId { get; init; }
+
     /// <summary>
     ///  Start Bit for Property
     /// </summary>
-    public int StartBit { get => startBit; set => startBit = value; }
+    public int StartBit { get; init; }
+
     /// <summary>
     ///  Type for Property
     /// </summary>
-    public ValueType ValueType { get => dataType; }
+    public ValueType ValueType { get; init; }
+
     /// <summary>
     ///  Bit Length for Property
     /// </summary>
-    public int BitLength { get => bitLength; set => bitLength = value; }
+    public int BitLength { get; init; }
 
-    internal string Name { get => name; set => name = value; }
+    /// <summary>
+    /// Name of the Property
+    /// </summary>
+    public string Name { get; init; }
+
+    /// <summary>
+    /// Unique ID Used for Tracking Properties
+    /// </summary>
+    internal uint UniqueId { get; init; }
 
     /// <summary>
     /// Constructor for Properties
@@ -54,16 +62,18 @@ public class CanPropertyInfo
     /// <param name="defaultValue"></param>
     /// <param name="minValue"></param>
     /// <param name="maxValue"></param>
-    public CanPropertyInfo(int startBit, int bitLength, ByteOrder byteOrder, ValueType dataType, double scale, double offset, int signalId = -1, double defaultValue = 0, double minValue = double.MinValue, double maxValue = double.MaxValue )
+    public CanPropertyInfo(int startBit, int bitLength, ByteOrder byteOrder, ValueType dataType, double scale, double offset, int signalId = -1, double defaultValue = 0, double minValue = double.MinValue, double maxValue = double.MaxValue , uint uniqueId = 0)
     {
-        this.signalId = signalId;
+        this.SignalId = signalId;
+        this.StartBit = startBit;
+        this.BitLength = bitLength;
+        this.UniqueId = uniqueId;
         this.scale = scale;
         this.offset = offset;
         this.defaultValue = defaultValue;
-        this.StartBit = startBit;
-        this.BitLength = bitLength;
         this.byteOrder = byteOrder;
         this.dataType = dataType;
+
         SetBounds(dataType, minValue, maxValue);
     }
 

@@ -2,6 +2,9 @@ using Ahsoka.Installer;
 using Ahsoka.Installer.Components;
 using Ahsoka.ServiceFramework;
 using Ahsoka.Services.Can;
+using Ahsoka.Services.IO;
+using Ahsoka.Services.Network;
+using Ahsoka.Services.System;
 using Ahsoka.System;
 using Ahsoka.System.Hardware;
 using Ahsoka.Test.Control.Properties;
@@ -26,6 +29,19 @@ public class CanServiceTests : LinearTestBase
     readonly Semaphore messageReceived = new(0, 100);
     readonly List<CanMessageData> messages = new();
 
+
+    internal static void GetParametersTests(PackageInformation info )
+    {
+        var knownValues = AhsokaMessagesBase.GetAllSystemParameters(info);
+
+        Assert.IsTrue(knownValues.Any(x => x.Key == IOService.Name));
+        var systemKeys = knownValues.FirstOrDefault(x => x.Key == IOService.Name);
+        Assert.IsTrue(systemKeys.Value.Any(x => x.Name == "Available"));
+
+        Assert.IsTrue(knownValues.Any(x => x.Key == CanService.Name));
+        systemKeys = knownValues.FirstOrDefault(x => x.Key == CanService.Name);
+        Assert.IsTrue(systemKeys.Value.Any(x => x.Name == "DRIVER_HEARTBEAT_cmd"));
+    }
 
     [TestMethod]
     public void TestCanGenerator()
@@ -68,7 +84,7 @@ public class CanServiceTests : LinearTestBase
         PackageInformation info = PackageInformation.LoadPackageInformation(projectFile);
         info.ServiceInfo.RuntimeConfiguration.ExtensionInfo.FirstOrDefault(x => x.ExtensionName == "CAN Service Extension").ConfigurationFile = Path.GetFileName(canConfigFile);
 
-        var parameters = AhsokaMessagesBase.GetAllServiceParameters(info);
+        var parameters = AhsokaMessagesBase.GetAllSystemParameters(info);
         Assert.IsTrue(parameters[CanService.Name].Any(x => x.Name == "DRIVER_HEARTBEAT_cmd"));
 
         File.Delete(projectFile);
@@ -299,7 +315,7 @@ public class CanServiceTests : LinearTestBase
         string canPackageInfoFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + "PackageInfo.json");
         PackageInformation packageInformation = new()
         {
-            ServiceInfo = new ServiceInfo()
+            ServiceInfo = new()
             {
                 RuntimeConfiguration = new RuntimeConfiguration()
                 {
@@ -322,7 +338,12 @@ public class CanServiceTests : LinearTestBase
         // Load Test Generator
         Ahsoka.System.Extensions.AddPrivateExtension(Assembly.GetExecutingAssembly());
 
+        
         File.WriteAllText(canPackageInfoFile, JsonUtility.Serialize(packageInformation));
+
+        packageInformation = PackageInformation.LoadPackageInformation(canPackageInfoFile);
+        // Validate Parameter Info
+        GetParametersTests(packageInformation);
 
         string outputFileNameDotNet = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".generated.cs");
         string outputFileNameCPP = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".generated.hpp");
@@ -354,7 +375,7 @@ public class CanServiceTests : LinearTestBase
         Assert.IsTrue(classFileContent.Contains("/*ExtendSetter*/"));
         Assert.IsTrue(classFileContent.Contains("/*ExtendMethods+Impl*/"));
        
-
+        
         // Generate Class File.
         File.Delete(outputFileNameDotNet);
         File.Delete(outputFileNameCPP);
@@ -446,11 +467,11 @@ public static class CanModelMetadata
         // TestCanModel Metadata - 500
         metaData.Add(500, new Dictionary<string, CanPropertyInfo>()
         {
-            { "TestEnum", new(4, 8, ByteOrder.LittleEndian, ValueType.Enum, 1, 0, 1) },
-            { "TestUnsigned", new(12, 8, ByteOrder.LittleEndian, ValueType.Unsigned, 2, 0, 2) },
-            { "TestSigned", new(20, 8, ByteOrder.LittleEndian, ValueType.Signed, 1, 0, 3) },
-            { "TestFloat", new(32, 32, ByteOrder.LittleEndian, ValueType.Float, 1, 0, 4) },
-            { "TestDouble", new(64, 64, ByteOrder.LittleEndian, ValueType.Double, 1, 0, 5) }
+            { "TestEnum", new(4, 8, ByteOrder.LittleEndian, ValueType.Enum, 1, 0, 1,uniqueId: 1) },
+            { "TestUnsigned", new(12, 8, ByteOrder.LittleEndian, ValueType.Unsigned, 2, 0, 2,uniqueId: 2) },
+            { "TestSigned", new(20, 8, ByteOrder.LittleEndian, ValueType.Signed, 1, 0, 3, 3,uniqueId:3 ) },
+            { "TestFloat", new(32, 32, ByteOrder.LittleEndian, ValueType.Float, 1, 0, 4, 4,uniqueId:4 ) },
+            { "TestDouble", new(64, 64, ByteOrder.LittleEndian, ValueType.Double, 1, 0, 5, 5,uniqueId:5 ) }
         });
     }
 }

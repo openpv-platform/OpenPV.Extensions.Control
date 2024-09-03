@@ -65,8 +65,8 @@ internal class CanServiceMessages : AhsokaMessagesBase
                     {
                         values.Add(new()
                         {
-                            Name = $"{signal.Name}",
-                            SystemUniqueID = (int)(item.Id + signal.Id),
+                            ObjectName = item.Name,
+                            Name = signal.Name,
                             DefaultValue = signal.DefaultValue,
                             MinimumValue = signal.Minimum,
                             MaximumValue = signal.Maximum,

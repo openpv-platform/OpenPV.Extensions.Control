@@ -1,4 +1,5 @@
-﻿using Avalonia;
+﻿using Ahsoka.Utility;
+using Avalonia;
 using Avalonia.Svg.Skia;
 using System;
 using System.Threading;
@@ -14,7 +15,17 @@ internal class Program
     [STAThread]
     public static int Main(string[] args)
     {
-        return 0;
+        // Initialing Assembly Resolver
+        AssemblyResolver.Init();
+
+        GC.KeepAlive(typeof(SvgImageExtension).Assembly);
+        GC.KeepAlive(typeof(Avalonia.Svg.Skia.Svg).Assembly);
+        GC.KeepAlive(typeof(SvgImage).Assembly);
+
+        var builder = BuildAvaloniaApp();
+
+        return builder.StartWithClassicDesktopLifetime(args, Avalonia.Controls.ShutdownMode.OnMainWindowClose);
+
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.

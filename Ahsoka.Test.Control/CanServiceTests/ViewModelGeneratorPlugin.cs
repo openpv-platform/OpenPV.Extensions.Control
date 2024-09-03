@@ -28,17 +28,17 @@ public class TestGeneratorDotNetPlugin : IViewModelGenerator
 
     void IViewModelGenerator.ExtendSetter(StringBuilder generatorOutput, string propertyName, string dataType)
     {
-        generatorOutput.Append("/*ExtendSetter*/;");
+        generatorOutput.Append("/*ExtendSetter*/");
     }
 
     void IViewModelGenerator.ExtendAfterClassOutput(StringBuilder generatorOutput, string className)
     {
-        generatorOutput.AppendLine("/*ExtendAfterClassOutput*/;");
+        generatorOutput.AppendLine("/*ExtendAfterClassOutput*/");
     }
 
     void IViewModelGenerator.ExtendMethods(StringBuilder generatorOutput, string className, bool isHeader)
     {
-        generatorOutput.AppendLine("/*ExtendMethods*/;");
+        generatorOutput.AppendLine("/*ExtendMethods*/");
     }
 }
 

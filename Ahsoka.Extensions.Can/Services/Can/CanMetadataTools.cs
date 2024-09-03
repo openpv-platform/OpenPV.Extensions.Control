@@ -1,12 +1,12 @@
 ﻿#pragma warning disable CS0618 // Type or member is obsolete
 using Ahsoka.Installer;
+using Ahsoka.ServiceFramework;
 using Ahsoka.Services.Can.Messages;
 using Ahsoka.System;
 using Ahsoka.System.Hardware;
 using Ahsoka.Utility;
 using DbcParserLib;
 using DbcParserLib.Model;
-using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -754,8 +754,10 @@ internal static class CanMetadataTools
         // Add Property
         mainOutput.AppendLine($"\r\n\tpublic {type} {propName.AsIdentifier()} \r\n\t{{\r\n\t\t{getValue}\r\n\t\t{setBuilder.ToString()} \r\n\t}}");
 
+        var uniqueId = ParameterData.GenerateUniqueID(CanService.Name, className, propName);
+
         // Add Metadata to Static Dictionary.
-        metadataBuilder.AppendLine($"\t\t\t{{nameof({className}.{propName}), new( {definition.StartBit}, {definition.BitLength}, {endianNess}, {canType}, {definition.Scale}, {definition.Offset}, {definition.Id}, {definition.DefaultValue}, {definition.Minimum}, {definition.Maximum})}},");
+        metadataBuilder.AppendLine($"\t\t\t{{nameof({className}.{propName}), new( {definition.StartBit}, {definition.BitLength}, {endianNess}, {canType}, {definition.Scale}, {definition.Offset}, {definition.Id}, {definition.DefaultValue}, {definition.Minimum}, {definition.Maximum}, {uniqueId})}},");
     }
     #endregion
 
