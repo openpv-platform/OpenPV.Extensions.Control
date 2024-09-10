@@ -267,7 +267,7 @@ bool decodeNode(pb_istream_t *stream, const pb_field_iter_t *field, void **arg)
 
 void decodeCANCalibration(void)
 {
-	AhsokaCAN_CanApplicationCalibration msg = AhsokaCAN_CanApplicationCalibration_init_zero;
+	AhsokaCAN_CanApplicationConfiguration msg = AhsokaCAN_CanApplicationConfiguration_init_zero;
 
     // need to decode ports before decoding calibration nodes.
 	msg.CanPortConfiguration.MessageConfiguration.ports.arg = NULL;
@@ -282,7 +282,7 @@ void decodeCANCalibration(void)
 
 	uint8_t* buffer = (uint8_t*)0x800;
 	pb_istream_t stream = pb_istream_from_buffer(buffer, (64*1024)-0x800);
-	pb_decode(&stream, AhsokaCAN_CanApplicationCalibration_fields, &msg);
+	pb_decode(&stream, AhsokaCAN_CanApplicationConfiguration_fields, &msg);
 
 	localIpAddress = msg.CanPortConfiguration.CommunicationConfiguration.local_ip_address.arg;
 	remoteIpAddress = msg.CanPortConfiguration.CommunicationConfiguration.remote_ip_address.arg;
@@ -294,7 +294,7 @@ void decodeCANCalibration(void)
 
 	buffer = (uint8_t*)0x800;
 	stream = pb_istream_from_buffer(buffer, (64*1024)-0x800);
-	pb_decode(&stream, AhsokaCAN_CanApplicationCalibration_fields, &msg);
+	pb_decode(&stream, AhsokaCAN_CanApplicationConfiguration_fields, &msg);
 
 	// status will be false here
 	msg.CanPortConfiguration.MessageConfiguration.nodes.funcs.decode = NULL;
@@ -303,7 +303,7 @@ void decodeCANCalibration(void)
 
 	buffer = (uint8_t*)0x800;
 	stream = pb_istream_from_buffer(buffer, (64*1024)-0x800);
-	pb_decode(&stream, AhsokaCAN_CanApplicationCalibration_fields, &msg);
+	pb_decode(&stream, AhsokaCAN_CanApplicationConfiguration_fields, &msg);
 
 	nodeList_t* list = portList;
 	while(list != NULL)

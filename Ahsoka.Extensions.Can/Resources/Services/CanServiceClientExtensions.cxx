@@ -11,7 +11,7 @@ void CanServiceClient::OpenCommunicationChannel()
     };
 
     endPoint->NotifyMessageReceived(callback);     
-    calibration = endPoint->SendNotificationWithResponse<CanApplicationCalibration>(CanMessageTypes_Ids_OPEN_COMMUNICATION_CHANNEL);
+    calibration = endPoint->SendNotificationWithResponse<CanApplicationConfiguration>(CanMessageTypes_Ids_OPEN_COMMUNICATION_CHANNEL);
 }
 
 void CanServiceClient::CloseCommunicationChannel()

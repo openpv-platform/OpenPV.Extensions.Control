@@ -12,6 +12,6 @@
 
 private:
 	
-    unique_ptr<CanApplicationCalibration> calibration;
+    unique_ptr<CanApplicationConfiguration> calibration;
     CanMessageReceived_t messageReceived;
     CanStateReceived_t stateReceived;
