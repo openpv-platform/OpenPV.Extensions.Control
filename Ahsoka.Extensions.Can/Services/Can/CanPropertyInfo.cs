@@ -15,7 +15,6 @@ public class CanPropertyInfo
     readonly double defaultValue;
     double minValue;
     double maxValue;
-    int bitLength;
     readonly ByteOrder byteOrder;
     readonly ValueType dataType;
 

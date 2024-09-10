@@ -27,7 +27,7 @@
 			<Setter Property="HorizontalContentAlignment" Value="Left"/>
 		</Style>
 		
-		<Style Selector="DataGridCell.gdp">
+		<Style Selector="DataGridCell.Centered">
 			<Setter Property="HorizontalAlignment" Value="Stretch" />
 			<Setter Property="HorizontalContentAlignment" Value="Center"/>
 		</Style>

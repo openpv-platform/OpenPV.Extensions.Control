@@ -39,7 +39,7 @@
     <None Update="Cloud.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="STDemoPackage.1.cancalibration.json">
+    <None Update="CANServiceConfiguration.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

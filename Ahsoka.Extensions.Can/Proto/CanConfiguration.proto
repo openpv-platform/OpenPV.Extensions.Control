@@ -4,9 +4,25 @@
 package AhsokaCAN; // Used for CPP and Proto
 option csharp_namespace = "Ahsoka.Services.Can";
 
-message CanApplicationCalibration
+
+// Customer Can Configuration for Can Services
+// This object is parsed by the Customer Tools at build time to generate 
+message CanClientConfiguration
 {
-    CanPortConfiguration CanPortConfiguration = 3;
+	string name = 1;
+    string local_ip_address = 6; 
+    string remote_ip_address = 7;
+    repeated AhsokaCAN.PortDefinition ports = 9;
+    repeated AhsokaCAN.NodeDefinition nodes = 10;
+    repeated AhsokaCAN.MessageDefinition messages = 11;
+    repeated AhsokaCAN.DiagnosticEventDefinition diagnostic_events = 12;
+
+    bool generator_enabled = 13;
+    string generator_namespace = 14;
+    string generator_output_file = 15;
+    string generator_base_class = 16;
+
+    string version = 20;
 }
 
 // Can Configuration used at Runtime
@@ -91,6 +107,8 @@ message MessageDefinition
     int32 rate = 5;
     string comment = 6;
     
+    uint32 id_mask = 7;
+
     // Transport Configuration
     bool has_roll_count = 8;
     uint32 roll_count_bit = 9;

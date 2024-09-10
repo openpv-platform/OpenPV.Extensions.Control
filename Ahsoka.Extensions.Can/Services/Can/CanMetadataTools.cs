@@ -20,16 +20,16 @@ namespace Ahsoka.Services.Can;
 /// </summary>
 internal static class CanMetadataTools
 {
-    public const string CanCalExtension = ".cancalibration.json";
+    public const string CanConfigurationExtension = "CANServiceConfiguration.json";
 
-    internal static CanApplicationCalibration GenerateApplicationConfig(HardwareInfo hardwareInfo, string config, bool trimStrings)
+    internal static CanApplicationConfiguration GenerateApplicationConfig(HardwareInfo hardwareInfo, string config, bool trimStrings)
     {
         var canInfo = CANHardwareInfoExtension.GetCanInfo(hardwareInfo.PlatformFamily);
 
-        CanApplicationCalibration appConfig = new();
+        CanApplicationConfiguration appConfig = new();
         try
         {
-            var clientConfiguration = ConfigurationFileLoader.LoadFile<CanClientCalibration>(config);
+            var clientConfiguration = ConfigurationFileLoader.LoadFile<CanClientConfiguration>(config);
 
             CanPortConfiguration portConfiguration = new()
             {
@@ -99,8 +99,8 @@ internal static class CanMetadataTools
 
     internal static void GenerateCalibrationFromDBC(string canDBCFile, string canConfigurationOutputPath)
     {
-        CanClientCalibration configuration = CreateFromDBC(canDBCFile);
-        configuration.Name = Path.GetFileName(canConfigurationOutputPath).Replace(CanCalExtension, "");
+        CanClientConfiguration configuration = CreateFromDBC(canDBCFile);
+        configuration.Name = Path.GetFileName(canConfigurationOutputPath).Replace(CanConfigurationExtension, "");
         configuration.Ports.Add(new PortDefinition()
         {
             Port = 1,
@@ -118,9 +118,9 @@ internal static class CanMetadataTools
         File.WriteAllText(canConfigurationOutputPath, JsonUtility.Serialize(configuration));
     }
 
-    private static CanClientCalibration CreateFromDBC(string pathToCanDbc)
+    private static CanClientConfiguration CreateFromDBC(string pathToCanDbc)
     {
-        CanClientCalibration clientCalibration = new()
+        CanClientConfiguration clientCalibration = new()
         {
             Version = VersionUtility.GetAppVersionString()
         };
@@ -362,7 +362,7 @@ internal static class CanMetadataTools
         StringBuilder metadataCreator = new();
 
         
-        var clientCalibration = ConfigurationFileLoader.LoadFile<CanClientCalibration>(pathToCalibration);
+        var clientCalibration = ConfigurationFileLoader.LoadFile<CanClientConfiguration>(pathToCalibration);
         foreach (var item in clientCalibration.Messages)
         {
             // Create Message Class
@@ -584,7 +584,7 @@ internal static class CanMetadataTools
         StringBuilder metadataBuilder = new();
         StringBuilder metadataItems = new();
         
-        var clientCalibration = ConfigurationFileLoader.LoadFile<CanClientCalibration>(pathToCalibration);
+        var clientCalibration = ConfigurationFileLoader.LoadFile<CanClientConfiguration>(pathToCalibration);
 
         foreach (var item in clientCalibration.Messages)
         {

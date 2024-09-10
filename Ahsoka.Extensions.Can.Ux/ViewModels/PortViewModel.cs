@@ -1,34 +1,34 @@
 ﻿using Ahsoka.DeveloperTools.Core;
 using Ahsoka.DeveloperTools.Views;
+using Ahsoka.Extensions.Can.UX.ViewModels.Nodes;
 using Ahsoka.Services.Can;
 using Ahsoka.Utility;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Material.Icons;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Ahsoka.DeveloperTools;
-internal class PortViewModel : ChildViewModelBase<CanSetupViewModel>
+internal class PortViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNode
 {
+    #region Fields
     UserControl currentView;
     private readonly ICustomerToolViewModel viewModelInterface;
-    bool isSelected = false;
     bool isEnabled = false;
     string promiscuousDetails;
+    PortDefinition portDefinition;
+    #endregion
 
-    public PortDefinition PortDefinition { get; set; }
-
-    public override string ToString()
-    {
-        return $"CAN Port {Port}";
-    }
-
+    #region Props
     public uint Port 
     {
-        get { return PortDefinition.Port; }
+        get { return portDefinition.Port; }
         set
         {
-            PortDefinition.Port = value;
+            portDefinition.Port = value;
             OnPropertyChanged();
         }
     }
@@ -37,10 +37,10 @@ internal class PortViewModel : ChildViewModelBase<CanSetupViewModel>
 
     public bool PromiscuousTransmit
     {
-        get { return PortDefinition.PromiscuousTransmit; }
+        get { return portDefinition.PromiscuousTransmit; }
         set
         {
-            PortDefinition.PromiscuousTransmit = value;
+            portDefinition.PromiscuousTransmit = value;
             OnPropertyChanged();
             RefreshPromiscuousDetails();
         }
@@ -48,10 +48,10 @@ internal class PortViewModel : ChildViewModelBase<CanSetupViewModel>
 
     public bool PromiscuousReceive
     {
-        get { return PortDefinition.PromiscuousReceive; }
+        get { return portDefinition.PromiscuousReceive; }
         set
         {
-            PortDefinition.PromiscuousReceive = value;
+            portDefinition.PromiscuousReceive = value;
             OnPropertyChanged();
             RefreshPromiscuousDetails();
         }
@@ -59,10 +59,10 @@ internal class PortViewModel : ChildViewModelBase<CanSetupViewModel>
 
     public CanInterface CanInterface
     {
-        get { return PortDefinition.CanInterface; }
+        get { return portDefinition.CanInterface; }
         set
         {
-            PortDefinition.CanInterface = value;
+            portDefinition.CanInterface = value;
             OnPropertyChanged();
         }
     }
@@ -71,10 +71,10 @@ internal class PortViewModel : ChildViewModelBase<CanSetupViewModel>
 
     public CanBaudRate BaudRate
     {
-        get { return PortDefinition.BaudRate; }
+        get { return portDefinition.BaudRate; }
         set
         {
-            PortDefinition.BaudRate = value;
+            portDefinition.BaudRate = value;
             OnPropertyChanged();
         }
     }
@@ -94,61 +94,38 @@ internal class PortViewModel : ChildViewModelBase<CanSetupViewModel>
         get { return isEnabled; }
         set
         {
+            if (value)
+            {
+                var temp = ParentViewModel.CanConfiguration.Ports.FirstOrDefault(x => x.Port == this.Port);
+                if (temp == null)
+                    ParentViewModel.CanConfiguration.Ports.Add(this.portDefinition);
+            }
+            else
+            {
+                var portDef = ParentViewModel.CanConfiguration.Ports.FirstOrDefault(x => x.Port == this.Port);
+                ParentViewModel.CanConfiguration.Ports.Remove(portDef);
+            }
+
             isEnabled = value;
             OnPropertyChanged();
         }
     }
+    #endregion
 
-    public bool IsSelected
-    {
-        get { return isSelected; }
-        set
-        {
-            isSelected = value; OnPropertyChanged();
-            OnPropertyChanged(nameof(IconColor));
-            OnPropertyChanged(nameof(BackColor));
-        }
-    }
-
-    public IBrush IconColor
-    {
-        get { return IsSelected ? Brushes.SteelBlue : Brushes.Gainsboro; }
-        set { }
-    }
-
-    public IBrush BackColor
-    {
-        get { return IsSelected ? Brushes.WhiteSmoke : Brushes.White; }
-        set { }
-    }
+    #region Methods
 
     public PortViewModel( CanSetupViewModel setupViewModel, ICustomerToolViewModel viewModelRoot, PortDefinition definition)
         : base(setupViewModel)
     {
         viewModelInterface = viewModelRoot;
 
-        PortDefinition = definition;
+        portDefinition = definition;
         RefreshPromiscuousDetails();
     }
-
-    internal void ToggleInterface()
+  
+    public override string ToString()
     {
-        var list = Enum.GetValues(typeof(CanInterface)).Cast<CanInterface>();
-
-        if (this.CanInterface == list.Last())
-            this.CanInterface = list.First();
-        else
-            this.CanInterface = (CanInterface)((int)this.CanInterface + 1);
-    }
-
-    internal void ToggleBaud()
-    {
-        var list = Enum.GetValues(typeof(CanBaudRate)).Cast<CanBaudRate>();
-
-        if (this.BaudRate == list.Last())
-            this.BaudRate = list.First();
-        else
-            this.BaudRate = (CanBaudRate)((int)this.BaudRate + 1);
+        return $"CAN Port {Port}";
     }
     
     public void ShowEditor()
@@ -177,5 +154,41 @@ internal class PortViewModel : ChildViewModelBase<CanSetupViewModel>
             details += "transmit";
 
         this.PromiscuousDetails = details;
-    }  
+    }
+    #endregion
+
+    #region TreeNode
+    public UserControl UserControl
+    {
+        get;
+        init;
+    }
+
+    public bool IsEditable { get; set; } = false;
+
+    public string NodeDescription
+    {
+        get { return $"CAN Port {Port}"; }
+        set { }
+    }
+
+    public MaterialIconKind Icon
+    {
+        get
+        {
+            return MaterialIconKind.Connection;
+        }
+    }
+
+    public UserControl GetUserControl()
+    {
+        var view = ParentViewModel.PortEditView;
+        view.DataContext = null;
+        view.DataContext = this;
+        return view;
+    }
+
+    public IEnumerable<ICanTreeNode> GetChildren() { return Enumerable.Empty<ICanTreeNode>(); }
+
+    #endregion
 }

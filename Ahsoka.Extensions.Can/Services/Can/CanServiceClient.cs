@@ -12,7 +12,7 @@ public class CanServiceClient : AhsokaClientBase<CanMessageTypes.Ids>
     /// <summary>
     /// Get Active Calibrations
     /// </summary>
-    public CanApplicationCalibration Calibrations { get; private set; }
+    public CanApplicationConfiguration Calibrations { get; private set; }
 
     /// <summary>
     /// Default Constructor that uses the System Default Configuration
@@ -49,7 +49,7 @@ public class CanServiceClient : AhsokaClientBase<CanMessageTypes.Ids>
     /// </summary>
     public void OpenCommunicationChannel()
     {
-        Calibrations = SendNotificationWithResponse<CanApplicationCalibration>(CanMessageTypes.Ids.OpenCommunicationChannel);
+        Calibrations = SendNotificationWithResponse<CanApplicationConfiguration>(CanMessageTypes.Ids.OpenCommunicationChannel);
     }
 
     /// <summary>

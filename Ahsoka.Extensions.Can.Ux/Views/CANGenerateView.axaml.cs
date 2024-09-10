@@ -3,9 +3,9 @@ using Avalonia.Markup.Xaml;
 
 namespace Ahsoka.DeveloperTools.Views;
 
-public partial class CANDiagnosticEventView : UserControl
+public partial class CANGenerateView : UserControl
 {
-    public CANDiagnosticEventView()
+    public CANGenerateView()
     {
         InitializeComponent();
     }

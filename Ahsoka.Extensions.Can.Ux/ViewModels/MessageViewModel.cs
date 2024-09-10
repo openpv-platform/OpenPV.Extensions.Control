@@ -1,20 +1,21 @@
 ﻿using Ahsoka.DeveloperTools.Core;
 using Ahsoka.DeveloperTools.Views;
+using Ahsoka.Extensions.Can.UX.ViewModels.Nodes;
 using Ahsoka.Services.Can;
 using Ahsoka.Utility;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Material.Icons;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Xml.Linq;
 
 namespace Ahsoka.DeveloperTools;
 
-internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>
+internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNode
 {
     #region Fields
     const int extendedFrameBitPosition = 31;
@@ -134,7 +135,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>
     {
         get
         {
-            NodeViewModel Transmitter, Receiver = null;
+             NodeViewModel Transmitter, Receiver = null;
             if (MessageDefinition.TransmitNodes[1] != NodeDisabled && MessageDefinition.ReceiveNodes[1] != NodeDisabled)
             {
                 Transmitter = ParentViewModel.Nodes.First(x => x.NodeDefinition.Id == (MessageDefinition.TransmitNodes[1]));
@@ -175,7 +176,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>
             var id = j1939Id.WriteToUint();
 
             MessageDefinition.Id = AddExtendedBit(id);
-
+          
             return id;
         }
     }
@@ -298,6 +299,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>
 
     #region Properties
     internal Ahsoka.Services.Can.ValueType[] ValueTypes { get; init; } = Enum.GetValues<Ahsoka.Services.Can.ValueType>();
+    
     internal ByteOrder[] ByteOrders { get; init; } = Enum.GetValues<ByteOrder>();
 
     internal SignalModel SelectedSignalValue { get; set; }
@@ -566,7 +568,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>
                     definition.Id = i;
                     break;
                 }
-            canViewModel.CanClientCalibration.Messages.Add(definition);
+            canViewModel.CanConfiguration.Messages.Add(definition);
         }
 
 
@@ -772,6 +774,38 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>
         OnPropertyChanged(nameof(IdMasked));
         OnPropertyChanged(nameof(Transmitter));
     }
+    #endregion
+
+    #region TreeNode
+    bool ICanTreeNode.IsEditable { get; } = false;
+    bool ICanTreeNode.IsEnabled { get; set; } = false;
+
+    public string NodeDescription
+    {
+        get
+        {
+            return this.Name;
+        }
+        set { }
+    }
+
+    public MaterialIconKind Icon
+    {
+        get
+        {
+            return MaterialIconKind.FileDocumentOutline;
+        }
+    }
+
+    public UserControl GetUserControl()
+    {
+        var view = ParentViewModel.MessageEditView;
+        view.DataContext = null;
+        view.DataContext = this;
+        return view;
+    }
+
+    public IEnumerable<ICanTreeNode> GetChildren() { return Enumerable.Empty<ICanTreeNode>(); }
 
     #endregion
 }

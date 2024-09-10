@@ -81,15 +81,6 @@
 	  <Compile Update="App.axaml.cs">
 	    <DependentUpon>%(Filename)</DependentUpon>
 	  </Compile>
-	  <Compile Update="Views\CANDiagnosticEventEditView.axaml.cs">
-	    <DependentUpon>CANDiagnosticEventEditView.axaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\CANDiagnosticEventView.axaml.cs">
-	    <DependentUpon>CANDiagnosticEventView.axaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\CANDiagnosticEventView.axaml.cs">
-	    <DependentUpon>CANDiagnosticEventView.axaml</DependentUpon>
-	  </Compile>
 	  <Compile Update="Views\CANMessageMuxView.axaml.cs">
 	    <DependentUpon>CANMessageMuxView.axaml</DependentUpon>
 	  </Compile>
@@ -99,20 +90,8 @@
 	  <Compile Update="Views\CANMessageValueView.axaml.cs">
 	    <DependentUpon>CANMessageValueView.axaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="Views\CANMessageView.axaml.cs">
-	    <DependentUpon>CANMessageView.axaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\CANNodeEditView.axaml.cs">
-	    <DependentUpon>CANNodeEditView.axaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\CANNodeView.axaml.cs">
-	    <DependentUpon>CANNodeView.axaml</DependentUpon>
-	  </Compile>
 	  <Compile Update="Views\CANPortEditView.axaml.cs">
 	    <DependentUpon>CANPortEditView.axaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\CANPortView.axaml.cs">
-	    <DependentUpon>CANPortView.axaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Views\CANSetup.axaml.cs">
 	    <DependentUpon>CANSetup.axaml</DependentUpon>

@@ -46,7 +46,7 @@ public class CanServiceTests : LinearTestBase
     [TestMethod]
     public void TestCanGenerator()
     {
-        string canConfigFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + CanMetadataTools.CanCalExtension);
+        string canConfigFile = Path.Combine(Path.GetTempPath(), CanMetadataTools.CanConfigurationExtension);
         string canDBCFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".dbc");
 
         // Force to Current Directory for Code Coverage
@@ -75,7 +75,7 @@ public class CanServiceTests : LinearTestBase
     public void TestServiceParameters()
     {
         // Create Test Data from CAN Demo
-        string canConfigFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + CanMetadataTools.CanCalExtension);
+        string canConfigFile = Path.Combine(Path.GetTempPath(), CanMetadataTools.CanConfigurationExtension);
         string projectFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".packageinfo.json");
         File.WriteAllText(canConfigFile, CanTestResources.STDemoPackage_1_cancalibration);
         File.WriteAllText(projectFile, CanTestResources.OpenLinuxST_PackageInfo);
@@ -92,9 +92,9 @@ public class CanServiceTests : LinearTestBase
 
     }
 
-    private static CanApplicationCalibration TestAppConfigFile(string canConfigFile)
+    private static CanApplicationConfiguration TestAppConfigFile(string canConfigFile)
     {
-        CanClientCalibration config = ConfigurationFileLoader.LoadFile<CanClientCalibration>(canConfigFile);
+        CanClientConfiguration config = ConfigurationFileLoader.LoadFile<CanClientConfiguration>(canConfigFile);
         config.Nodes.FirstOrDefault(x => x.Name == "IO").NodeType = NodeType.Self;
         config.Nodes.FirstOrDefault(x => x.Name == "IO").TransportProtocol = TransportProtocol.J1939;
         var info = new J1939NodeDefinition()
@@ -107,14 +107,14 @@ public class CanServiceTests : LinearTestBase
         config.Nodes.Add(CanSystemInfo.StandardCanMessages.Nodes.First(x => x.Name == "ANY"));
         File.WriteAllText(canConfigFile, JsonUtility.Serialize(config));
 
-        CanApplicationCalibration appConfig = CanMetadataTools.GenerateApplicationConfig(SystemInfo.HardwareInfo, canConfigFile, false);
+        CanApplicationConfiguration appConfig = CanMetadataTools.GenerateApplicationConfig(SystemInfo.HardwareInfo, canConfigFile, false);
 
         Assert.IsTrue(appConfig.CanPortConfiguration.MessageConfiguration.Nodes.FirstOrDefault(x => x.Name == "SENSOR") != null);
 
         return appConfig;
     }
 
-    private void TestCanService(CanApplicationCalibration appConfig)
+    private void TestCanService(CanApplicationConfiguration appConfig)
     {
         // Write Config to Output Location
         string coprocessorPath = SystemInfo.HardwareInfo.TargetPathInfo.GetInstallerPath(InstallerPaths.CoProcessorApplicationPath);
@@ -428,13 +428,13 @@ public class CanServiceTests : LinearTestBase
     [TestMethod]
     public void GenerateBlankConfigFromDBC()
     {
-        string canConfigFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + CanMetadataTools.CanCalExtension);
+        string canConfigFile = Path.Combine(Path.GetTempPath(), CanMetadataTools.CanConfigurationExtension);
         string canDBCFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".dbc");
         File.WriteAllText(canDBCFile, CanTestResources.TestFile);
 
         CanMetadataTools.GenerateCalibrationFromDBC(canDBCFile, canConfigFile);
 
-        CanClientCalibration config = ConfigurationFileLoader.LoadFile<CanClientCalibration>(canConfigFile);
+        var config = ConfigurationFileLoader.LoadFile<CanClientConfiguration>(canConfigFile);
         Assert.IsTrue(config.Nodes.Count > 0);
         Assert.IsTrue(config.Messages.Count > 0);
 

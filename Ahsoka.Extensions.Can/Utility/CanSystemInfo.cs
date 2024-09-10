@@ -11,12 +11,12 @@ internal class CanSystemInfo
 {
     static object  syncRoot = new object();
 
-    static CanClientCalibration canClientCalibration;
+    static CanClientConfiguration canClientCalibration;
     
     /// <summary>
     /// Contains Definitions for automaitcally includes CAN nodes and messages
     /// </summary>
-    public static CanClientCalibration StandardCanMessages
+    public static CanClientConfiguration StandardCanMessages
     {
         get
         {
@@ -26,9 +26,9 @@ internal class CanSystemInfo
         }
     }
 
-    private static CanClientCalibration LoadCanMessages()
+    private static CanClientConfiguration LoadCanMessages()
     {
-        return JsonUtility.Deserialize<CanClientCalibration>(Properties.CANResources.StandardCanDefinitions);
+        return JsonUtility.Deserialize<CanClientConfiguration>(Properties.CANResources.StandardCanDefinitions);
     }
 
 }

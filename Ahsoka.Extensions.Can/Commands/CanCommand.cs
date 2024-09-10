@@ -14,8 +14,8 @@ namespace Ahsoka.Commands;
 internal static class CanCommands
 {
     [CommandLineMethod(@"     --GenerateCalibrationFromDBC: Generate Configuration File from DBC
-            [PathToDBC] Path to OpenPV CAN Calibration File (.cancalibration.json)
-            [PathToDestinationFile] Path to Output OpenPV CAN Calibration File (.cancalibration.json)")]
+            [PathToDBC] Path to OpenPV CAN Calibration File (CANServiceConfiguration.json)
+            [PathToDestinationFile] Path to Output OpenPV CAN Calibration File (CANServiceConfiguration.json)")]
     private static void GenerateCalibrationFromDBC(string pathToDBC, string pathToDestinationFile)
     {
         CanMetadataTools.GenerateCalibrationFromDBC(pathToDBC, pathToDestinationFile);
@@ -45,7 +45,7 @@ internal class CanCodeGenerator : IExtensionGenerator
             {
                 if (commandtypes.HasFlag(CommandTypes.ModelGenerators))
                 {
-                    var calibration = JsonUtility.Deserialize<CanClientCalibration>(File.ReadAllText(configFile));
+                    var calibration = JsonUtility.Deserialize<CanClientConfiguration>(File.ReadAllText(configFile));
                     commandsToExecute.Add($"--GenerateCANClasses \"{Path.GetFileName(packageInfo.GetPackageInfoPath())}\" \"{calibration.GeneratorOutputFile}\" \"{calibration.GeneratorNamespace}\" \"{calibration.GeneratorBaseClass}\" {packageInfo.ApplicationType}",
                               GeneratorCommandType.AhsokaCommandLine);
                 }

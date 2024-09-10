@@ -4,17 +4,18 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="450"
              xmlns:CustomerTools="clr-namespace:Ahsoka.DeveloperTools.Views"
-             xmlns:material="using:Material.Icons.Avalonia"
+             xmlns:vm="clr-namespace:Ahsoka.Extensions.Can.UX.ViewModels.Nodes" MinWidth="900"
+			 xmlns:material="using:Material.Icons.Avalonia"
              x:Class="Ahsoka.DeveloperTools.Views.CANSetup">
 	<UserControl.Styles>
 		<StyleInclude Source="/Styles/UserInputStyles.axaml" />
 	</UserControl.Styles>
 	<Grid>
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="*"/>
-				<ColumnDefinition Width="250"/>
-			</Grid.ColumnDefinitions>
-		<Border Grid.Column="1" Background="WhiteSmoke" 
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="250"/>
+		</Grid.ColumnDefinitions>
+		<Border Grid.Column="1" Background="WhiteSmoke"
 				BorderBrush="Gainsboro" BorderThickness="1,0,0,0">
 			<StackPanel Margin="-15,0,-15,0"
 				HorizontalAlignment="Center"  >
@@ -57,125 +58,68 @@
 				</Button>
 			</StackPanel>
 		</Border>
-			<DockPanel HorizontalAlignment="Stretch">
-				<TextBlock Text="Configure CAN Services" Margin="10,10,0,0" 
-						   FontSize="25" Foreground="SteelBlue" DockPanel.Dock="Top"/>
-				<Border Margin="20,10,20,0" Padding="3" BorderBrush="WhiteSmoke" BorderThickness="0,0,0,0">
-					<Grid Margin="5" ColumnDefinitions="120,Auto,*"   RowDefinitions="auto,auto,auto,auto,*">
-
-						<TextBlock Text="Calibration File:" Grid.Row="0" Grid.Column="0"/>
-						<TextBox IsReadOnly="True" HorizontalAlignment="Stretch"
-								 Grid.Row="0" Grid.Column="1" Text="{Binding ConfigurationPath}"
-								 MinWidth="300"  />
-
-						<Border BoxShadow="2 2 2 1 Gainsboro" BorderBrush="Gainsboro" BorderThickness="1"
-								Margin="0,020,0,20" Grid.ColumnSpan="3" Grid.Row="4" HorizontalAlignment="Stretch" >
-
-							<Grid>
-								<TabControl SelectedIndex="{Binding SelectedTab}" TabStripPlacement="Top">
-									<TabItem>
-										<TabItem.Header>
-											<TextBlock FontSize="18" Text="Messages  "/>
-										</TabItem.Header>
-										<ListBox ItemsSource="{Binding Messages}"  Background="White"
-												 SelectedItem="{Binding SelectedMessage}"
-												 SelectionMode="AlwaysSelected" Margin="-3,10">
-											<ListBox.ItemTemplate>
-												<DataTemplate>
-													<CustomerTools:CANMessageView Margin="-12" Background="White"/>
-												</DataTemplate>
-											</ListBox.ItemTemplate>
-										</ListBox>
-									</TabItem>
-									<TabItem>
-										<TabItem.Header>
-											<TextBlock FontSize="18" Text="Nodes  "/>
-										</TabItem.Header>
-										<ListBox ItemsSource="{Binding Nodes}"  Background="White"
-												 SelectedItem="{Binding SelectedNode}"
-												 SelectionMode="AlwaysSelected" Margin="-3,10">
-											<ListBox.ItemTemplate>
-												<DataTemplate>
-													<CustomerTools:CANNodeView Margin="-12" Background="White"/>
-												</DataTemplate>
-											</ListBox.ItemTemplate>
-										</ListBox>
-									</TabItem>
-									<TabItem>
-										<TabItem.Header>
-											<TextBlock FontSize="18" Text="Ports  "/>
-										</TabItem.Header>
-										<ListBox ItemsSource="{Binding Ports}"  Background="White"
-												 SelectedItem="{Binding SelectedPort}"
-												 SelectionMode="AlwaysSelected" Margin="-3,10">
-											<ListBox.ItemTemplate>
-												<DataTemplate>
-													<CustomerTools:CANPortView Margin="-12" Background="White"/>
-												</DataTemplate>
-											</ListBox.ItemTemplate>
-										</ListBox>
-									</TabItem>
-									<TabItem IsVisible="False">
-										<TabItem.Header>
-											<TextBlock FontSize="18" Text="Diagnostics "/>
-										</TabItem.Header>
-										<ListBox ItemsSource="{Binding DiagnosticEvents}"  Background="White"
-												 SelectedItem="{Binding SelectedDiagnosticEvent}"
-												 SelectionMode="AlwaysSelected" Margin="-3,10">
-											<ListBox.ItemTemplate>
-												<DataTemplate>
-													<CustomerTools:CANDiagnosticEventView Margin="-12" Background="White"/>
-												</DataTemplate>
-											</ListBox.ItemTemplate>
-										</ListBox>
-									</TabItem>
-									<TabItem >
-										<TabItem.Header>
-											<TextBlock FontSize="18" Text="Code Generator "/>
-										</TabItem.Header>
-										<Grid Margin="15" ColumnDefinitions="140,Auto,*"   RowDefinitions="20,auto,auto,auto,*">
-
-											<TextBlock Text="Generator Enabled:" Grid.Row="0" Grid.Column="0"/>
-											<CheckBox HorizontalAlignment="Stretch" BorderBrush="DimGray"
-													 Grid.Row="0" Margin="3,10" Grid.Column="1" IsChecked="{Binding GeneratorEnabled}" />
-											<TextBlock Text="The CAN Code Generator will generate model objects for your CPP or C# application." 
-													   Grid.Row="0" Grid.Column="1" Margin="30,6,0,0" VerticalAlignment="Center"
-													   TextWrapping="WrapWithOverflow" MaxWidth="300" MinHeight="40"
-													   Foreground="DimGray"/> 
-
-											<TextBlock Text="Model Output File:" Grid.Row="1" Grid.Column="0"/>
-											<TextBox HorizontalAlignment="Stretch"
-													 Grid.Row="1" Grid.Column="1" Text="{Binding GeneratorOutputFile}"
-													 MinWidth="300"  />
-
-											<TextBlock Text="Model Namespace:" Grid.Row="2" Grid.Column="0"/>
-											<TextBox HorizontalAlignment="Stretch"
-													 Grid.Row="2" Grid.Column="1" Text="{Binding GeneratorNamespace}"
-													 MinWidth="300"  />
-
-											<TextBlock Text="Model Base Class:" Grid.Row="3" Grid.Column="0"/>
-											<TextBox HorizontalAlignment="Stretch"
-													 Grid.Row="3" Grid.Column="1" Text="{Binding GeneratorBaseClass}"
-													 MinWidth="300"  />
-
-										</Grid>
-										</TabItem>
-								</TabControl>
-								<StackPanel  IsVisible="{Binding ShowAddRemove}" VerticalAlignment="Top" Orientation="Horizontal" Margin="20,4,0,0" Background="White" HorizontalAlignment="Right" >
-									<Button Command="{Binding AddItem}" Margin="0,0,3,0"
-										 Width="26" Height="26" Background="Transparent"  BorderBrush="Transparent">
-										<material:MaterialIcon Width="20" Height="20" Foreground="SteelBlue" Kind="Plus"></material:MaterialIcon>
-									</Button>
-									<Button Command="{Binding RemoveItem}"
-										Width="26" Height="26" Background="Transparent"  BorderBrush="Transparent">
-										<material:MaterialIcon Width="20" Height="20" Foreground="SteelBlue" Kind="Minus"></material:MaterialIcon>
-									</Button>
-								</StackPanel>
+		<DockPanel HorizontalAlignment="Stretch">
+			<Grid>
+				<Grid Margin="0,20" ColumnDefinitions="300,10,*">
+					<Border Margin="-5,-10" BorderThickness="0" BorderBrush="Gainsboro">
+						<Grid RowDefinitions="auto,*">
+							<StackPanel Grid.Row="0"  IsVisible="{Binding ShowAddRemove}" VerticalAlignment="Top"
+								 Orientation="Horizontal" Margin="0,-4,-4,0" HorizontalAlignment="Right" >
+								<Button Margin="0,0,3,0"
+									 Width="26" Height="26" Background="Transparent"  BorderBrush="Transparent">
+									<material:MaterialIcon Width="20" Height="20" Foreground="SteelBlue" Kind="Plus"></material:MaterialIcon>
+									<Button.Flyout>
+									<MenuFlyout>
+										<MenuItem Header="Add Message" Command="{Binding AddMessage}">
+											<MenuItem.Icon>
+												<material:MaterialIcon Width="24" Height="24" Foreground="SteelBlue" Kind="ApplicationArray"></material:MaterialIcon>
+											</MenuItem.Icon>
+										</MenuItem>
+										<MenuItem Header="Add Node" Command="{Binding AddNode}">
+											<MenuItem.Icon>
+												<material:MaterialIcon Width="24" Height="24" Foreground="SteelBlue" Kind="Devices"></material:MaterialIcon>
+											</MenuItem.Icon>
+										</MenuItem>
+									</MenuFlyout>
+									</Button.Flyout>
+								</Button>
+								<Button Command="{Binding RemoveItem}" IsEnabled="{Binding SelectedDiagnosticEvent.IsEditable}"
+									Width="26" Height="26" Background="Transparent"  BorderBrush="Transparent">
+									<material:MaterialIcon Width="20" Height="20" Foreground="SteelBlue" Kind="Minus"></material:MaterialIcon>
+								</Button>
+							</StackPanel>
+							<Grid Grid.Row="0" ColumnDefinitions="auto,*" Margin="18,0,75,10" >
+								<TextBlock Foreground="SteelBlue" FontSize="16" Margin="3">CAN Configuration</TextBlock>
+								<Border Grid.Column="1" BorderBrush="Gainsboro" Margin="4,10,0,10" BorderThickness="0,1,0,0" Height="2"/>
 							</Grid>
-						</Border>
-					</Grid>
-				</Border>
-			</DockPanel>
-		</Grid>
+							<TreeView Grid.Row="1" Margin="14,0,14,0" VerticalAlignment="Stretch"
+								  ItemsSource="{Binding RootNodes}" 
+								  SelectedItem="{Binding SelectedTreeNode}"
+								  SelectionMode="Single">
+								<TreeView.Styles>
+									<Style Selector="TreeViewItem">
+										<Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+									</Style>
+								</TreeView.Styles>
+								<TreeView.ItemTemplate>
+									<TreeDataTemplate ItemsSource="{Binding Children}">
+										<StackPanel Margin="-6,0,0,0" HorizontalAlignment="Left" Orientation="Horizontal">
+											<material:MaterialIcon Width="24" Height="24" Foreground="SteelBlue" Kind="{Binding Icon}"></material:MaterialIcon>
+											<TextBlock Foreground="DimGray" Text="{Binding NodeDescription}" />
+										</StackPanel>
+									</TreeDataTemplate>
+								</TreeView.ItemTemplate>
+							</TreeView>
+						</Grid>
+					</Border>
+					<Border Margin="0,40,0,0" Grid.Column="2" Padding="10" 
+							Child="" 
+							BorderThickness="1,0,0,0" BorderBrush="WhiteSmoke">
+						<ContentControl Margin="0,-65,0,0" Content="{Binding SelectedUserControl}"/>
+					</Border>
+				</Grid>
+			</Grid>
+		</DockPanel>
+	</Grid>
 </UserControl>
 

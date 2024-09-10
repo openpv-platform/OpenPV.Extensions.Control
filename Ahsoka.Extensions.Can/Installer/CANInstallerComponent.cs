@@ -57,7 +57,7 @@ internal class CanInstallerComponent : InstallEngineComponent
         using (ZipArchive archive = new(component.Data, ZipArchiveMode.Create, true))
         {
             // Generate a Configuration for the Main System
-            CanApplicationCalibration canConfig = CanMetadataTools.GenerateApplicationConfig(hardwareDef, config, false);
+            CanApplicationConfiguration canConfig = CanMetadataTools.GenerateApplicationConfig(hardwareDef, config, false);
             var configData = new MemoryStream();
             ProtoBuf.Serializer.Serialize(configData, canConfig);
             var jsonData = Encoding.UTF8.GetBytes(JsonUtility.Serialize(canConfig));
@@ -245,7 +245,7 @@ internal class CanInstallerComponent : InstallEngineComponent
             // Set Baud Rate of Ports
             using var fs = new FileStream(pathToConfig, FileMode.Open);
             fs.Seek(0, SeekOrigin.Begin);
-            var calibration = ProtoBuf.Serializer.Deserialize<CanApplicationCalibration>(fs);
+            var calibration = ProtoBuf.Serializer.Deserialize<CanApplicationConfiguration>(fs);
             foreach (var port in calibration.CanPortConfiguration.MessageConfiguration.Ports)
             {
                 string rate = "";

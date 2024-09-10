@@ -13,7 +13,7 @@ internal class CanServiceMessages : AhsokaMessagesBase
 {
     public CanServiceMessages()
     {
-        this.RegisterServiceRequest(CanMessageTypes.Ids.OpenCommunicationChannel, typeof(EmptyNotification), typeof(CanApplicationCalibration), false, false);
+        this.RegisterServiceRequest(CanMessageTypes.Ids.OpenCommunicationChannel, typeof(EmptyNotification), typeof(CanApplicationConfiguration), false, false);
         this.RegisterServiceRequest(CanMessageTypes.Ids.CloseCommunicationChannel, typeof(EmptyNotification), typeof(EmptyNotification), false, false);
 
         this.RegisterServiceRequest(CanMessageTypes.Ids.SendCanMessages, typeof(CanMessageDataCollection), typeof(CanMessageResult));
@@ -58,7 +58,7 @@ internal class CanServiceMessages : AhsokaMessagesBase
             string configFile = Path.Combine(Path.GetDirectoryName(info.GetPackageInfoPath()), config);
             if (File.Exists(configFile))
             {
-                CanClientCalibration canConfig = ConfigurationFileLoader.LoadFile<CanClientCalibration>(configFile);
+                CanClientConfiguration canConfig = ConfigurationFileLoader.LoadFile<CanClientConfiguration>(configFile);
                 foreach (var item in canConfig.Messages)
                 {
                     foreach (var signal in item.Signals)

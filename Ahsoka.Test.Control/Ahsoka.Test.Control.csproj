@@ -10,7 +10,7 @@
 	<ItemGroup>
 	  <Content Include="..\Ahsoka.Shared\WindowsHardwareConfiguration.json" Link="WindowsHardwareConfiguration.json" />
 	  <Content Include="..\Demos\Ahsoka.CS.CAN\OpenLinuxST.PackageInfo.json" Link="OpenLinuxST.PackageInfo.json" />
-	  <Content Include="..\Demos\Ahsoka.CS.CAN\STDemoPackage.1.cancalibration.json" Link="STDemoPackage.1.cancalibration.json" />
+	  <Content Include="..\Demos\Ahsoka.CS.CAN\CANServiceConfiguration.json" Link="CANServiceConfiguration.json" />
 	</ItemGroup>
 
 	<ItemGroup>

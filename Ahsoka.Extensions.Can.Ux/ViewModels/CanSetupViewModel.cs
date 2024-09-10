@@ -1,13 +1,16 @@
 ﻿using Ahsoka.DeveloperTools.Core;
 using Ahsoka.DeveloperTools.Views;
+using Ahsoka.Extensions.Can.UX.ViewModels.Nodes;
 using Ahsoka.Services.Can;
 using Ahsoka.System;
 using Ahsoka.System.Hardware;
 using Ahsoka.Utility;
 using Avalonia.Controls;
 using Avalonia.Threading;
+using Material.Icons;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -16,185 +19,111 @@ using System.Threading.Tasks;
 
 namespace Ahsoka.DeveloperTools;
 
-internal class CanSetupViewModel : ExtensionViewModelBase
+internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
 {
-    string originalCANConfigText = string.Empty;
-    private CanClientCalibration canClientCalibration = new();
-    private ObservableCollection<NodeViewModel> nodes = new();
-    private NodeViewModel selectedNode;
-    private ObservableCollection<DiagnosticEventViewModel> diagnosticEvents = new();
-    private DiagnosticEventViewModel selectedDiagnosticEvent;
-    private ObservableCollection<MessageViewModel> messages = new();
-    private MessageViewModel selectedMessage;
-    private ObservableCollection<PortViewModel> ports = new();
-    private PortViewModel selectedPort;
-    private int selectedTabIndex = 0;
-    private bool port0Enabled, port1Enabled = false;
+    #region Fields
+
+    CanGroupNode<MessageViewModel> rootMessageNode = null;
+    CanGroupNode<CanSetupViewModel> rootToolNode = null;
+    CanGroupNode<PortViewModel> rootPortNode = null;
+    CanGroupNode<NodeViewModel> rootNodeNode = null;
+
+    private CanClientConfiguration canConfiguration = new();
     string configurationPath;
+    string originalCANConfigText = string.Empty;
+    ICanTreeNode selectedTreeNode = null;
     string projectFolder;
     HardwareInfo hardwareInfo;
+    #endregion
 
-    internal int SelectedTab { get { return selectedTabIndex; } set { selectedTabIndex = value; OnPropertyChanged(); OnPropertyChanged(nameof(ShowAddRemove)); EvaluatePort(); } }
-
-    public bool ShowAddRemove { get { return SelectedTab != 2; } set { } }
-
-    public bool Port0Enabled
+    #region Properties
+    public ObservableCollection<ICanTreeNode> RootNodes
     {
-        get { return port0Enabled; }
-        set { port0Enabled = value; OnPropertyChanged(); }
-    }
+        get;
+        set;
+    } = new();
 
-    public bool Port1Enabled
+    public ICanTreeNode SelectedTreeNode
     {
-        get { return port1Enabled; }
-        set { port1Enabled = value; OnPropertyChanged(); }
-    }
-
-    public ObservableCollection<MessageViewModel> Messages
-    {
-        get { return messages; }
+        get { return selectedTreeNode; }
         set
         {
-            messages = value;
+            var firstItem = value?.GetChildren().FirstOrDefault();
+            if (firstItem != null)
+                value = firstItem;
+
+            selectedTreeNode = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(SelectedUserControl));
         }
     }
 
-    public MessageViewModel SelectedMessage
+    public UserControl SelectedUserControl
     {
-        get { return selectedMessage; }
-        set
+        get
         {
-            if (selectedMessage != null)
-                selectedMessage.IsSelected = false;
-            selectedMessage = value;
-            if (selectedMessage != null)
-                selectedMessage.IsSelected = true;
-
-            OnPropertyChanged();
+            return selectedTreeNode?.GetUserControl();
         }
-    }
-
-    public ObservableCollection<NodeViewModel> Nodes
-    {
-        get { return nodes; }
         set
         {
-            nodes = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public NodeViewModel SelectedNode
-    {
-        get { return selectedNode; }
-        set
-        {
-            if (selectedNode != null)
-                selectedNode.IsSelected = false;
-
-            selectedNode = value;
-
-            if (selectedNode != null)
-                selectedNode.IsSelected = true;
-
-            OnPropertyChanged();
-        }
-    }
-
-    public ObservableCollection<PortViewModel> Ports
-    {
-        get { return ports; }
-        set
-        {
-            ports = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public PortViewModel SelectedPort
-    {
-        get { return selectedPort; }
-        set
-        {
-            if (selectedPort != null)
-                selectedPort.IsSelected = false;
-
-            selectedPort = value;
-
-            if (selectedPort != null)
-                selectedPort.IsSelected = true;
-
-            OnPropertyChanged();
-        }
-    }
-
-    public ObservableCollection<DiagnosticEventViewModel> DiagnosticEvents
-    {
-        get { return diagnosticEvents; }
-        set
-        {
-            diagnosticEvents = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public DiagnosticEventViewModel SelectedDiagnosticEvent
-    {
-        get { return selectedDiagnosticEvent; }
-        set
-        {
-            if (selectedDiagnosticEvent != null)
-                selectedDiagnosticEvent.IsSelected = false;
-
-            selectedDiagnosticEvent = value;
-
-            if (selectedDiagnosticEvent != null)
-                selectedDiagnosticEvent.IsSelected = true;
-
-            OnPropertyChanged();
-        }
-    }
-
-    public CanClientCalibration CanClientCalibration
-    {
-        get => canClientCalibration;
-        set
-        {
-            canClientCalibration = value;
-            originalCANConfigText = JsonUtility.Serialize(canClientCalibration);
         }
     }
 
     public bool GeneratorEnabled
     {
-        get { return CanClientCalibration.GeneratorEnabled; }
-        set { CanClientCalibration.GeneratorEnabled = value; OnPropertyChanged(); }
+        get { return CanConfiguration.GeneratorEnabled; }
+        set { CanConfiguration.GeneratorEnabled = value; OnPropertyChanged(); }
     }
 
     public string GeneratorBaseClass
     {
-        get { return CanClientCalibration.GeneratorBaseClass; }
-        set { CanClientCalibration.GeneratorBaseClass = value; OnPropertyChanged(); }
+        get { return CanConfiguration.GeneratorBaseClass; }
+        set { CanConfiguration.GeneratorBaseClass = value; OnPropertyChanged(); }
     }
 
     public string GeneratorNamespace
     {
-        get { return CanClientCalibration.GeneratorNamespace; }
-        set { CanClientCalibration.GeneratorNamespace = value; OnPropertyChanged(); }
+        get { return CanConfiguration.GeneratorNamespace; }
+        set { CanConfiguration.GeneratorNamespace = value; OnPropertyChanged(); }
     }
 
     public string GeneratorOutputFile
     {
-        get { return CanClientCalibration.GeneratorOutputFile; }
-        set { CanClientCalibration.GeneratorOutputFile = value; OnPropertyChanged(); }
+        get { return CanConfiguration.GeneratorOutputFile; }
+        set { CanConfiguration.GeneratorOutputFile = value; OnPropertyChanged(); }
     }
 
-    public string ConfigurationPath { get => configurationPath; set { configurationPath = value; OnPropertyChanged(); } }
+    public CanClientConfiguration CanConfiguration
+    {
+        get => canConfiguration;
+        set => canConfiguration = value;
+    }
+
+    public CANPortEditView PortEditView { get; init; } = new();
+
+    public CANNodeEditView NodeEditView { get; init; } = new();
+
+    public CANMessageEditView MessageEditView { get; init; } = new();
+
+    public ObservableCollection<PortViewModel> Ports
+    {
+        get { return rootPortNode.Children; }
+    }
+
+    public ObservableCollection<NodeViewModel> Nodes
+    {
+        get { return rootNodeNode.Children; }
+    }
+
+    public ObservableCollection<MessageViewModel> Messages
+    {
+        get { return rootMessageNode.Children; }
+    }
+    #endregion
 
     public CanSetupViewModel()
     {
-        
+
     }
 
     protected override UserControl OnGetView()
@@ -209,24 +138,23 @@ internal class CanSetupViewModel : ExtensionViewModelBase
         configurationPath = configurationFile;
 
         LoadCANConfiguration();
-
-        EvaluatePort();
     }
 
     protected override string OnSave(string packageInfoFolder)
     {
         /// Generate FileName if We Edited the Data but have no path.
-        if (String.IsNullOrEmpty(configurationPath))
-            if (nodes.Count > 0 || messages.Count > 0 || ports.Count > 0)
-                ConfigurationPath = CreateCalibationName();
+        /// Rename Config if not "Standard Name"
+        if (String.IsNullOrEmpty(configurationPath) || !configurationPath.Contains(CreateConfigurationName()))
+            if (rootNodeNode.Children.Count > 0 || rootMessageNode.Children.Count > 0 || rootPortNode.Children.Count > 0)
+                configurationPath = CreateConfigurationName();
 
         ValidateConfiguration();
 
         if (!String.IsNullOrEmpty(configurationPath))
         {
             string fileName = Path.Combine(packageInfoFolder, configurationPath);
-            string data = JsonUtility.Serialize(CanClientCalibration);
-            
+            string data = JsonUtility.Serialize(CanConfiguration);
+
             bool hasChanges = data != originalCANConfigText;
 
             // Config Changed...may need to regenerate the Models.
@@ -244,7 +172,7 @@ internal class CanSetupViewModel : ExtensionViewModelBase
 
     protected override bool OnHasChanges()
     {
-        string newConfig = JsonUtility.Serialize(CanClientCalibration);
+        string newConfig = JsonUtility.Serialize(CanConfiguration);
         bool hasChanges = newConfig != originalCANConfigText;
 
         // Config Changed...may need to regenerate the Models.
@@ -256,8 +184,10 @@ internal class CanSetupViewModel : ExtensionViewModelBase
 
     protected override void OnClose()
     {
-        CanClientCalibration = null;
+        CanConfiguration = null;
         configurationPath = null;
+        SelectedTreeNode = null;
+        SelectedUserControl = null;
     }
 
     internal async void SetConfigurationDirectory()
@@ -266,10 +196,13 @@ internal class CanSetupViewModel : ExtensionViewModelBase
         if (configurationPath != null)
             currentPath = Path.Combine(projectFolder, configurationPath);
 
-        var path = await CustomerToolViewModel.FileLocatorAsync("Pick CAN Calibration", "cancalibration.json", currentPath);
+        var path = await CustomerToolViewModel.FileLocatorAsync("Pick CAN Calibration", "json", "CAN Configuration", currentPath);
         if (path != null && File.Exists(path))
         {
-            ConfigurationPath = Path.GetRelativePath(projectFolder, path);
+            var targetPath = Path.Combine(projectFolder, CreateConfigurationName());
+            File.Copy(path, targetPath, true);
+
+            configurationPath = CreateConfigurationName();
             LoadCANConfiguration();
         }
     }
@@ -298,7 +231,7 @@ internal class CanSetupViewModel : ExtensionViewModelBase
         await Task.Run(() =>
         {
             string workingDirectory = projectFolder;
-            string pathToOutputFile = Path.Combine(workingDirectory, CreateCalibationName());
+            string pathToOutputFile = Path.Combine(workingDirectory, CreateConfigurationName());
 
             CustomerToolViewModel.RunCommandLineProcess($" --GenerateCalibrationFromDBC \"{pathToDBC}\" \"{pathToOutputFile}\"", workingDirectory, progress, CancellationToken.None);
 
@@ -328,23 +261,21 @@ internal class CanSetupViewModel : ExtensionViewModelBase
         });
     }
 
-    private string CreateCalibationName()
+    private string CreateConfigurationName()
     {
-        return $"CANService.cancalibration.json";
+        return $"CANConfiguration.json";
     }
 
     internal void RemoveConfiguration()
     {
         configurationPath = null;
-        CanClientCalibration = new CanClientCalibration();
-        Nodes.Clear();
-        Messages.Clear();
-        Ports.Clear();
+        CanConfiguration = new();
+        rootPortNode.Children.Clear();
+        rootMessageNode.Children.Clear();
+        rootNodeNode.Children.Clear();
         RefreshGenerateSettings();
         AddHardwarePorts();
         OnPropertyChanged(nameof(ConfigurationPath));
-        OnPropertyChanged(nameof(Nodes));
-        OnPropertyChanged(nameof(Messages));
     }
 
     private void LoadCANConfiguration()
@@ -355,172 +286,116 @@ internal class CanSetupViewModel : ExtensionViewModelBase
             if (File.Exists(pathToConfig))
             {
                 try
-                {  
+                {
                     originalCANConfigText = File.ReadAllText(pathToConfig);
 
-                    CanClientCalibration = ConfigurationFileLoader.LoadFile<CanClientCalibration>(pathToConfig);
+                    CanConfiguration = ConfigurationFileLoader.LoadFile<CanClientConfiguration>(pathToConfig);
 
-                    CanClientCalibration.GeneratorNamespace = String.IsNullOrEmpty(CanClientCalibration.GeneratorNamespace) ? "Ahsoka.CS.CAN" : CanClientCalibration.GeneratorNamespace;
-                    CanClientCalibration.GeneratorOutputFile = String.IsNullOrEmpty(CanClientCalibration.GeneratorOutputFile) ? "obj\\GeneratedObjects.cs" : CanClientCalibration.GeneratorOutputFile;
-                    CanClientCalibration.GeneratorBaseClass = String.IsNullOrEmpty(CanClientCalibration.GeneratorBaseClass) ? "CanViewModelBase" : CanClientCalibration.GeneratorBaseClass;
-
-                    Ports.Clear();
-                    foreach (PortDefinition port in CanClientCalibration.Ports.OrderBy(x => x.Port))
-                        Ports.Add(new PortViewModel(this, CustomerToolViewModel, port) { IsEnabled = true }) ;
-
-                    AddHardwarePorts();
-                    RefreshGenerateSettings();
-
-                    Nodes.Clear();
-                    foreach (NodeDefinition node in CanClientCalibration.Nodes.OrderBy(x => x.Id))
-                        Nodes.Add(new NodeViewModel( this, CustomerToolViewModel, node));
-
-                    Messages.Clear();
-                    foreach (MessageDefinition msg in CanClientCalibration.Messages.OrderBy(x => x.Id))
-                        Messages.Add(new MessageViewModel(this, CustomerToolViewModel, msg));
-
-                    DiagnosticEvents.Clear();
-                    foreach (DiagnosticEventDefinition eventDef in CanClientCalibration.DiagnosticEvents)
-                        DiagnosticEvents.Add(new DiagnosticEventViewModel(this, CustomerToolViewModel, eventDef));
-
-                    OnPropertyChanged(nameof(CanInterface));
+                    CanConfiguration.GeneratorNamespace = String.IsNullOrEmpty(CanConfiguration.GeneratorNamespace) ? "Ahsoka.CS.CAN" : CanConfiguration.GeneratorNamespace;
+                    CanConfiguration.GeneratorOutputFile = String.IsNullOrEmpty(CanConfiguration.GeneratorOutputFile) ? "obj\\GeneratedCanObjects.cs" : CanConfiguration.GeneratorOutputFile;
+                    CanConfiguration.GeneratorBaseClass = String.IsNullOrEmpty(CanConfiguration.GeneratorBaseClass) ? "CanViewModelBase" : CanConfiguration.GeneratorBaseClass;
                 }
                 catch
                 {
-                    CanClientCalibration = new CanClientCalibration(); // Create Default 
-                    AddHardwarePorts();
+                    CanConfiguration = new(); // Create Default 
                 }
             }
             else
             {
-                CanClientCalibration = new CanClientCalibration(); // Create Default 
-                AddHardwarePorts();
+                CanConfiguration = new(); // Create Default 
             }
-
         }
+       
+        RootNodes.Clear();
+        rootMessageNode = new() { NodeDescription = "Messages", Icon = MaterialIconKind.Folder, IsExpanded = true };
+        rootNodeNode = new() { NodeDescription = "Nodes", Icon = MaterialIconKind.Folder, IsExpanded = true };
+        rootPortNode = new() { NodeDescription = "Ports", Icon = MaterialIconKind.Folder, IsExpanded = true };
+        rootToolNode = new() { NodeDescription = "Can Tools",  Icon = MaterialIconKind.Toolbox, IsExpanded = true };
+        
+        // Add Hardware Ports - Do First for DropDowns
+        AddHardwarePorts();
+
+        // Next do Nodes So Messages have Nodes List
+        foreach (var node in CanConfiguration.Nodes)
+            rootNodeNode.Children.Add(new NodeViewModel(this, CustomerToolViewModel, node));
+
+        // Add Messages
+        foreach (var message in CanConfiguration.Messages)
+            rootMessageNode.Children.Add(new MessageViewModel(this, CustomerToolViewModel, message));
+
+        // Setup Tools
+        rootToolNode.Children.Add(this);
+    
+        // Add Nodes to Tree in Order
+        RootNodes.Add(rootMessageNode);
+        RootNodes.Add(rootNodeNode);
+        RootNodes.Add(rootPortNode);
+        RootNodes.Add(rootToolNode);
 
         // Bump Calibration file to Current.
-        CanClientCalibration.Version = VersionUtility.GetAppVersionString();
+        CanConfiguration.Version = VersionUtility.GetAppVersionString();
 
+        SelectedTreeNode = rootMessageNode.Children.Count > 0 ? rootMessageNode.Children.First() : rootPortNode.Children.FirstOrDefault();
     }
 
-    internal void AddItem()
+    internal void AddMessage()
     {
-        if (SelectedTab == 1)
-        {
-            var nodeViewModel = new NodeViewModel(this, CustomerToolViewModel, null);
-            this.Nodes.Add(nodeViewModel);
-        }
-        else if (SelectedTab == 0)
-        {
-            var nodeViewModel = new MessageViewModel(this, CustomerToolViewModel, null);
-            nodeViewModel.MessageDefinition.UserDefined = true;
-            this.Messages.Add(nodeViewModel);
-           
-            EvaluatePort();
-        }
-        else if (SelectedTab == 3)
-        {
-            var vm = new DiagnosticEventViewModel(this, CustomerToolViewModel, null);
-            this.DiagnosticEvents.Add(vm);
-        }
+        rootMessageNode.Children.Add(new MessageViewModel(this, CustomerToolViewModel, null));
     }
 
-    private void EvaluatePort()
+    internal void AddNode()
     {
-        Port0Enabled = this.Ports.Any(x => x.IsEnabled && x.Port == 0);
-        Port1Enabled = this.Ports.Any(x => x.IsEnabled && x.Port == 1);
+        rootNodeNode.Children.Add(new NodeViewModel(this, CustomerToolViewModel, null));
+    }
+
+    internal void AddPort()
+    {
+        rootPortNode.Children.Add(new PortViewModel(this, CustomerToolViewModel, null));
     }
 
     internal async void RemoveItem()
     {
-        if (SelectedTab == 1)
-        {
-            var continueWork = await CustomerToolViewModel.ShowDialog("Remove Node", "Are you sure you wish to remove the Selected Node?", "Yes", "Cancel");
-
-            if (!continueWork)
-                return;
-
-            if (selectedNode != null)
-            {
-                this.CanClientCalibration.Nodes.Remove(selectedNode.NodeDefinition);
-                this.Nodes.Remove(selectedNode);
-                this.selectedNode = this.nodes.FirstOrDefault();
-            }
-        }
-        else if (SelectedTab == 0)
+        if (selectedTreeNode is MessageViewModel messageNode)
         {
             var continueWork = await CustomerToolViewModel.ShowDialog("Remove Message", "Are you sure you wish to remove the Selected Message?", "Yes", "Cancel");
             if (!continueWork)
                 return;
 
-            this.CanClientCalibration.Messages.Remove(SelectedMessage.MessageDefinition);
-            this.Messages.Remove(SelectedMessage);
-            this.SelectedMessage = this.messages.FirstOrDefault();
+            canConfiguration.Messages.Remove(messageNode.MessageDefinition);
+            rootMessageNode.Children.Remove(messageNode);
+            SelectedTreeNode = rootMessageNode.Children.Count > 0 ? rootMessageNode.Children.First() : rootPortNode.Children.FirstOrDefault();
         }
-        else if (SelectedTab == 3)
+        else if (selectedTreeNode is NodeViewModel nodeNode)
         {
-            var continueWork = await CustomerToolViewModel.ShowDialog("Remove Diagnostic Event", "Are you sure you wish to remove the Selected Event?", "Yes", "Cancel");
+            var continueWork = await CustomerToolViewModel.ShowDialog("Remove Node", "Are you sure you wish to remove the Selected Node?", "Yes", "Cancel");
             if (!continueWork)
                 return;
 
-            this.CanClientCalibration.DiagnosticEvents.Remove(SelectedDiagnosticEvent.EventDefinition);
-            this.DiagnosticEvents.Remove(SelectedDiagnosticEvent);
-            this.selectedDiagnosticEvent = this.DiagnosticEvents.FirstOrDefault();
+            canConfiguration.Nodes.Remove(nodeNode.NodeDefinition);
+            rootNodeNode.Children.Remove(nodeNode);
+            SelectedTreeNode = rootNodeNode.Children.Count > 0 ? rootNodeNode.Children.First() : rootPortNode.Children.FirstOrDefault();
         }
     }
 
     private void ValidateConfiguration()
     {
-        canClientCalibration.Ports.Clear();
-        foreach(var port in ports)
-            if (port.IsEnabled)
-                canClientCalibration.Ports.Add(port.PortDefinition);
-
-        foreach (var message in Messages)
-        {
-            if (message.MessageDefinition.Signals.Count() > 0)
+        if (canConfiguration == null)
+            foreach (var message in rootMessageNode.Children)
             {
-                uint maxBits = message.MessageDefinition.Signals.Max(x => x.StartBit + x.BitLength);
-                if (maxBits > 0)
+                if (message is MessageViewModel messageNode)
                 {
-                    uint dlc = (uint)Math.Ceiling(maxBits / 8.0);
-                    if (message.MessageDefinition.Dlc != dlc)
-                        message.MessageDefinition.Dlc = dlc;
+                    if (message.MessageDefinition.Signals.Count() > 0)
+                    {
+                        uint maxBits = message.MessageDefinition.Signals.Max(x => x.StartBit + x.BitLength);
+                        if (maxBits > 0)
+                        {
+                            uint dlc = (uint)Math.Ceiling(maxBits / 8.0);
+                            if (message.MessageDefinition.Dlc != dlc)
+                                message.MessageDefinition.Dlc = dlc;
+                        }
+                    }
                 }
             }
-        }
-    }
-
-    internal void SetStandardNode(bool include, string name)
-    {
-        var standardDefinitions = CanSystemInfo.StandardCanMessages;
-        var standardNode = standardDefinitions.Nodes.First(x => x.Name == name);
-        var nodeViewModel = new NodeViewModel(this,CustomerToolViewModel, standardNode);
-
-        var node = Nodes.FirstOrDefault(x => x.Name == name);
-        var inList = node != null;
-        if (include && !inList)
-        {
-            Nodes.Add(nodeViewModel);
-            CanClientCalibration.Nodes.Add(nodeViewModel.NodeDefinition);
-        }
-        else if (!include && inList)
-        {
-            Nodes.Remove(node);
-            CanClientCalibration.Nodes.Remove(node.NodeDefinition);
-        }
-    }
-
-    internal void UpdateAddressClaim()
-    {
-        var node = Nodes.FirstOrDefault(x => x.IsSelf);
-        if (node != null)
-        {
-            node.NodeDefinition.J1939Info.UseAddressClaim = Nodes.Any(x => x.TransportProtocol == TransportProtocol.J1939 &&
-                                                            x.NodeDefinition.J1939Info.AddressType != NodeAddressType.Static) ||
-                                                            node.ACMax > node.ACMin;
-        }
     }
 
     private void AddHardwarePorts()
@@ -528,8 +403,14 @@ internal class CanSetupViewModel : ExtensionViewModelBase
         var canInfo = CANHardwareInfoExtension.GetCanInfo(hardwareInfo.PlatformFamily);
 
         foreach (CanPort port in canInfo.CANPorts)
-            if (!Ports.Any(x => x.Port == port.Port))
-                Ports.Add(new PortViewModel(this, CustomerToolViewModel, new PortDefinition()
+        {
+            bool isEnabled = true;
+            var portDef = canConfiguration.Ports.FirstOrDefault(x => x.Port == port.Port);
+            if (portDef == null)
+            {
+                // Create Temp Def
+                isEnabled = false;
+                portDef = new PortDefinition()
                 {
                     Port = port.Port,
                     CanInterfacePath = port.SocketCanInterfacePath,
@@ -537,9 +418,16 @@ internal class CanSetupViewModel : ExtensionViewModelBase
                     CanInterface = CanInterface.SocketCan,
                     PromiscuousTransmit = false,
                     PromiscuousReceive = false,
-                    UserDefined = true,
-                })
-                { IsEnabled = false });
+                };
+            }
+
+            rootPortNode.Children.Add(new PortViewModel(this, CustomerToolViewModel, portDef)
+            {
+                IsEnabled = isEnabled
+            });
+
+
+        }
     }
 
     private void RefreshGenerateSettings()
@@ -549,5 +437,34 @@ internal class CanSetupViewModel : ExtensionViewModelBase
         OnPropertyChanged(nameof(GeneratorNamespace));
         OnPropertyChanged(nameof(GeneratorOutputFile));
     }
+
+    #region TreeNode
+    public bool IsEditable { get; set; } = false;
+
+    public bool IsEnabled { get; set; } = false;
+
+    public string NodeDescription
+    {
+        get { return $"Code Generation Setup"; }
+        set { }
+    }
+
+    public MaterialIconKind Icon
+    {
+        get
+        {
+            return MaterialIconKind.Tools;
+        }
+    }
+
+    public UserControl GetUserControl()
+    {
+        var view = new CANGenerateView();
+        view.DataContext = this;
+        return view;
+    }
+
+    public IEnumerable<ICanTreeNode> GetChildren() { return Enumerable.Empty<ICanTreeNode>(); }
+    #endregion
 
 }

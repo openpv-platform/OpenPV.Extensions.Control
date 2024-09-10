@@ -22,7 +22,7 @@ public class CanService : AhsokaServiceBase<CanMessageTypes.Ids>
     /// Configuration Name for the Can Service
     /// </summary>
     public const string Name = "CanService";
-    readonly CanApplicationCalibration calibration;
+    readonly CanApplicationConfiguration calibration;
     readonly Dictionary<uint, CanServiceImplementation> portHandlers = new();
     #endregion
 
@@ -78,13 +78,13 @@ public class CanService : AhsokaServiceBase<CanMessageTypes.Ids>
         {
             AhsokaLogging.LogMessage(AhsokaVerbosity.High, $"CAN Configuration not found at {configPath}");
             AhsokaLogging.LogMessage(AhsokaVerbosity.High, $"Attempting to load JSON Configuration from program output folder");
-            AhsokaLogging.LogMessage(AhsokaVerbosity.High, $"Note: You can include a .cancalibration.json in your program output for use on windows ");
+            AhsokaLogging.LogMessage(AhsokaVerbosity.High, $"Note: You can include a CANServiceConfiguration.json in your program output for use on windows ");
 
             // Attempt to load local .json file if available
             string configInfo = "";
-            foreach (var path in Directory.EnumerateFiles(".", $"*.cancalibration.json"))
+            foreach (var path in Directory.EnumerateFiles(".", $"CANServiceConfiguration.json"))
             {
-                AhsokaLogging.LogMessage(AhsokaVerbosity.High, $"Found / Loading Calibration File @ {path}");
+                AhsokaLogging.LogMessage(AhsokaVerbosity.High, $"Found / Loading Configuration File @ {path}");
                 configInfo = path;
                 break;
             }                
@@ -96,7 +96,7 @@ public class CanService : AhsokaServiceBase<CanMessageTypes.Ids>
             // Load Calibration and Return to Client
             using var fs = new FileStream(configPath, FileMode.Open);
             fs.Seek(0, SeekOrigin.Begin);
-            calibration = ProtoBuf.Serializer.Deserialize<CanApplicationCalibration>(fs);
+            calibration = ProtoBuf.Serializer.Deserialize<CanApplicationConfiguration>(fs);
             AhsokaLogging.LogMessage(AhsokaVerbosity.High, $"CAN Configuration Loaded From {configPath}");
 
         }

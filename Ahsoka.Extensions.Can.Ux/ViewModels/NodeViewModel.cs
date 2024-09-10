@@ -1,11 +1,12 @@
 ﻿using Ahsoka.DeveloperTools.Core;
 using Ahsoka.DeveloperTools.Views;
+using Ahsoka.Extensions.Can.UX.ViewModels.Nodes;
 using Ahsoka.Services.Can;
 using Ahsoka.Utility;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Media;
-using Avalonia.Styling;
-using Microsoft.Extensions.Azure;
+using Material.Icons;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,15 +15,22 @@ using System.Linq;
 
 namespace Ahsoka.DeveloperTools;
 
-internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>
+internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNode
 {
+    #region Fields
     UserControl currentView;
-
     PortViewModel selectedPort;
     bool isSelected = false;
     string labelOne, labelTwo, labelThree = string.Empty;
     string addressDetails = string.Empty;
     private ICustomerToolViewModel viewModelInterface;
+    #endregion
+
+    #region Properties
+    public IEnumerable<PortViewModel> Ports
+    {
+        get { return ParentViewModel.Ports.Where(x=>x.IsEnabled); }
+    }
 
     public NodeDefinition NodeDefinition { get; set; }
 
@@ -35,8 +43,8 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>
         {
             NodeDefinition.TransportProtocol = value;
             IsJ1939 = NodeDefinition.TransportProtocol == TransportProtocol.J1939;
-            ParentViewModel.SetStandardNode(IsJ1939, "ANY");
-            ParentViewModel.UpdateAddressClaim();
+            CheckForAnyNode("ANY");
+            UpdateAddressClaim();
             OnPropertyChanged();
             OnPropertyChanged(nameof(IsJ1939));
         }
@@ -50,25 +58,21 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>
         set
         {
             NodeDefinition.J1939Info.AddressType = value;
-            ParentViewModel.UpdateAddressClaim();
+            UpdateAddressClaim();
             UpdateAddressLabels();
             OnPropertyChanged();
         }
     }
 
-    public ObservableCollection<PortViewModel> Ports
-    {
-        get { return ParentViewModel.Ports;  }
-    }
-
     public PortViewModel SelectedPort
     {
         get { return selectedPort; }
-        set 
-        { 
-            selectedPort = value; 
+        set
+        {
+            selectedPort = value;
             if (value != null)
-                NodeDefinition.Ports = new int[] { (int)value.Port };
+                NodeDefinition.Ports = [(int)value.Port];
+
             OnPropertyChanged();
         }
     }
@@ -92,6 +96,7 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>
         {
             NodeDefinition.Name = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(NodeDescription));
         }
     }
 
@@ -102,7 +107,7 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>
         {
             if (value)
             {
-                ParentViewModel.SetStandardNode(IsJ1939, "ANY");
+                CheckForAnyNode("ANY");
                 foreach (var item in ParentViewModel.Nodes.Where(x => x.NodeDefinition.NodeType != NodeType.Any))
                     if (item != this)
                         item.IsSelf = false;
@@ -114,9 +119,11 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>
                 NodeDefinition.NodeType = NodeType.UserDefined;
             }
 
-            ParentViewModel.UpdateAddressClaim();
+            UpdateAddressClaim();
             RefreshAddressDetails();
             OnPropertyChanged();
+            OnPropertyChanged(nameof(NodeDescription));
+            OnPropertyChanged(nameof(Icon));
         }
     }
 
@@ -124,7 +131,6 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>
     {
         get { return NodeDefinition.NodeType == NodeType.UserDefined || NodeDefinition.NodeType == NodeType.Self; }
     }
-
 
     public bool IsJ1939
     {
@@ -267,7 +273,7 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>
         set
         {
             NodeDefinition.J1939Info.Addresses = $"{value},{ACMax}";
-            ParentViewModel.UpdateAddressClaim();
+            UpdateAddressClaim();
             OnPropertyChanged();
         }
 
@@ -284,7 +290,7 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>
         set
         {
             NodeDefinition.J1939Info.Addresses = $"{ACMin},{value}";
-            ParentViewModel.UpdateAddressClaim();
+            UpdateAddressClaim();
             OnPropertyChanged();
         }
     }
@@ -300,7 +306,9 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>
         get { return IsSelected ? Brushes.WhiteSmoke : Brushes.White; }
         set { }
     }
+    #endregion
 
+    #region Methods
     public NodeViewModel(CanSetupViewModel setupViewModel, ICustomerToolViewModel viewModelRoot, NodeDefinition definition)
         : base(setupViewModel)
     {
@@ -318,13 +326,15 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>
                     break;
                 }
 
-            setupViewModel.CanClientCalibration.Nodes.Add(definition);
+            setupViewModel.CanConfiguration.Nodes.Add(definition);
 
-        }        
+        }
 
         NodeDefinition = definition;
+     
         if (NodeDefinition.J1939Info?.Addresses == "")
             NodeDefinition.J1939Info.Addresses = "0,0";
+
         IsJ1939 = NodeDefinition.TransportProtocol == TransportProtocol.J1939;
 
         // Load the Ports in the List
@@ -346,6 +356,39 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>
 
         RefreshAddressDetails();
 
+    }
+
+    internal void CheckForAnyNode(string name)
+    {
+        bool include = ParentViewModel.Nodes.Any(x => x.IsJ1939 && x.NodeDefinition.NodeType !=  NodeType.Any);
+
+        var standardDefinitions = CanSystemInfo.StandardCanMessages;
+        var standardNode = standardDefinitions.Nodes.First(x => x.Name == name);
+        var nodeViewModel = new NodeViewModel(ParentViewModel, viewModelInterface, standardNode);
+
+        var node = ParentViewModel.Nodes.FirstOrDefault(x => x.Name == name);
+        var inList = node != null;
+        if (include && !inList)
+        {
+            ParentViewModel.Nodes.Add(nodeViewModel);
+            ParentViewModel.CanConfiguration.Nodes.Add(nodeViewModel.NodeDefinition);
+        }
+        else if (!include && inList)
+        {
+            ParentViewModel.Nodes.Remove(node);
+            ParentViewModel.CanConfiguration.Nodes.Remove(node.NodeDefinition);
+        }
+    }
+
+    internal void UpdateAddressClaim()
+    {
+         var node = ParentViewModel.Nodes.FirstOrDefault(x => x.IsSelf);
+         if (node != null)
+         {
+             node.NodeDefinition.J1939Info.UseAddressClaim = ParentViewModel.CanConfiguration.Nodes.Any(x => x.TransportProtocol == TransportProtocol.J1939 &&
+                                                                         x.J1939Info.AddressType != NodeAddressType.Static) ||
+                                                                         node.ACMax > node.ACMin;
+         }
     }
 
     private void RefreshAddressDetails()
@@ -425,7 +468,7 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>
                     break;
             }
         }
-    }   
+    }
 
     public override string ToString()
     {
@@ -436,4 +479,46 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>
             $"{NodeDefinition.Id}: {NodeDefinition.Name} (Self)" :
             $"{NodeDefinition.Id}: {NodeDefinition.Name}";
     }
+    #endregion
+
+    #region TreeNode
+    bool ICanTreeNode.IsEditable { get; } = false;
+
+    bool ICanTreeNode.IsEnabled { get; set; } = false;
+
+    public string NodeDescription
+    {
+        get
+        {
+            if (!this.IsSelf)
+                return this.Name;
+            else
+                return $"{this.Name} (Self)";
+        }
+        set { }
+    }
+
+    public MaterialIconKind Icon
+    {
+        get
+        {
+            if (IsSelf)
+                return MaterialIconKind.Network;
+            else
+                return MaterialIconKind.NetworkOutline;
+
+        }
+    }
+
+    public UserControl GetUserControl()
+    {
+        var view = ParentViewModel.NodeEditView;
+        view.DataContext = null;
+        view.DataContext = this;
+        return view;
+    }
+
+    public IEnumerable<ICanTreeNode> GetChildren() { return Enumerable.Empty<ICanTreeNode>(); }
+
+    #endregion
 }
