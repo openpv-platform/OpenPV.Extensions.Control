@@ -261,9 +261,14 @@ internal class CanInstallerComponent : InstallEngineComponent
                         rate = "250000";
                         break;
                 }
-                ProcessUtility.RunProcessScript($"sed -i -r \"s/(BitRate=[0-9]*)/BitRate={rate}/g\" /etc/systemd/network/80-can{port.Port}.network", null, out stdOut, out stdErr);
-            }
 
+                // Update Baud Rate in Network Setup
+                context.Log?.Report(new InstallLogInfo() { LogMessageType = LogMessageType.Information, LogMessage = $"Setting Baud Rate on can{port.Port}" });
+                ProcessUtility.RunProcessScript($"sed -i -r \"s/(BitRate=[0-9]*)/BitRate={rate}/g\" /etc/systemd/network/80-can{port.Port}.network", null, out stdOut, out stdErr);
+
+                // Add SyncJumpWidth to Network Setup - This (sjw=4) fixes devices who's baud rate clock is not within tolerance of our clock.
+                ProcessUtility.RunProcessScript($"grep -qxF 'SyncJumpWidth=4' /etc/systemd/network/80-can{port.Port}.network || echo 'SyncJumpWidth=4' >> /etc/systemd/network/80-can{port.Port}.network", null, out stdOut, out stdErr);
+            }
         }
         catch (Exception ex)
         {
