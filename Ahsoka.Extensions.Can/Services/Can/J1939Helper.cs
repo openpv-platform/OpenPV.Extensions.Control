@@ -75,23 +75,33 @@ internal class J1939Helper
 
     public class Id
     {
+        private CanPropertyInfo pgnInfo = new(8, 18, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0, 1, 0x3FFFF);
         private CanPropertyInfo sourceInfo = new(0, 8, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0, 1, 0xFF);
         private CanPropertyInfo specificInfo = new(8, 8, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0, 2, 0xFF);
         private CanPropertyInfo formatInfo = new(16, 8, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0, 3, 0xFF);
-        private CanPropertyInfo pageInfo = new(24, 1, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0, 4, 0xFF);
-        private CanPropertyInfo priorityInfo = new(26, 3, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0, 5, 0xFF);
+        private CanPropertyInfo pageInfo = new(24, 1, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0, 4, 0x01);
+        private CanPropertyInfo priorityInfo = new(26, 3, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0, 5, 0x07);
 
         public uint SourceAddress { get; set; }
         public uint PDUS { get; set; }
         public uint PDUF { get; set; }
         public uint DataPage { get; set; }
         public uint Priority { get; set; }
+        public uint PGN { get; set; }
 
         public Id() { }
 
         public Id(uint id)
         {
             ExtractValues(id);
+        }
+
+        public uint WritePGNToUint()
+        {
+            var id = new ulong[] { WriteToUint() };
+            pgnInfo.SetValue(ref id, PGN, false);
+            ExtractValues((uint)id[0]);
+            return (uint)id[0];
         }
 
         public uint WriteToUint()
@@ -103,7 +113,6 @@ internal class J1939Helper
             formatInfo.SetValue(ref id, PDUF, false);
             pageInfo.SetValue(ref id, DataPage, false);
             priorityInfo.SetValue(ref id, Priority, false);
-
             return (uint)id[0];
         }
 
@@ -115,6 +124,7 @@ internal class J1939Helper
             PDUF = formatInfo.GetValue<uint>(input, false);
             DataPage = pageInfo.GetValue<uint>(input, false);
             Priority = priorityInfo.GetValue<uint>(input, false);
+            PGN = pgnInfo.GetValue<uint>(input, false);
         }
     }
 

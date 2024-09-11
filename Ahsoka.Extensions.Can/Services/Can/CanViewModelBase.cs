@@ -1,9 +1,12 @@
 ﻿using Ahsoka.Utility;
+using Newtonsoft.Json;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Ahsoka.Services.Can;
@@ -229,6 +232,12 @@ public partial class NodeDefinition
     {
         get { return Id; }
         set { Id = value; }
+    }
+
+    public int Port
+    {
+        get { return Ports != null ? Ports.FirstOrDefault() : 0; }
+        set { Ports = [value]; }
     }
 }
 

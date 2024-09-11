@@ -18,7 +18,7 @@
 			</Grid>
 			<Border Margin="10" Padding="3" BorderBrush="WhiteSmoke" BorderThickness="0,0,0,0">
 				<StackPanel>
-					<Grid Margin="5" ColumnDefinitions="145,Auto" RowDefinitions="*,*,*,*,*">
+					<Grid Margin="5" ColumnDefinitions="145,Auto" RowDefinitions="38,38,38,38">
 						<TextBlock Text="Port ID:" Grid.Row="0" Grid.Column="0"/>
 						<StackPanel Orientation="Horizontal" Grid.Column="1">
 							<TextBox Text="{Binding Port}" Width="100"  />

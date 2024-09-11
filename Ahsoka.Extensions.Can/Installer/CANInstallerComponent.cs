@@ -78,7 +78,7 @@ internal class CanInstallerComponent : InstallEngineComponent
 
             foreach (var item in canConfig.CanPortConfiguration.MessageConfiguration.Ports)
             {
-                bool hasSelf = canConfig.CanPortConfiguration.MessageConfiguration.Nodes.Any(x => x.Ports.Contains((int)item.Port) && x.NodeType == NodeType.Self);
+                bool hasSelf = canConfig.CanPortConfiguration.MessageConfiguration.Nodes.Any(x => x.Port == item.Port && x.NodeType == NodeType.Self);
                 bool isRaw = item.PromiscuousTransmit && item.PromiscuousReceive;
                 if (!hasSelf && !isRaw)
                 {

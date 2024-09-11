@@ -4,12 +4,10 @@ using Ahsoka.Extensions.Can.UX.ViewModels.Nodes;
 using Ahsoka.Services.Can;
 using Ahsoka.Utility;
 using Avalonia.Controls;
-using Avalonia.Media;
 using Material.Icons;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
@@ -20,24 +18,23 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
     #region Fields
     const int extendedFrameBitPosition = 31;
     const int PDU2Threshold = 240;
-    const int BroadcastVal = 255;
-    const int NodeDisabled = -1;
-
+    public const int BroadcastVal = 255;
+    public const int AnyNodeID = 255;
+    public const int NodeDisabled = -1;
+   
     UserControl currentView;
     UserControl currentSignalView;
 
     MessageSignalDefinition selectedSignal;
-    bool isSelected = false;
     readonly J1939Helper.Id j1939Id = new();
     readonly ObservableCollection<MessageSignalDefinition> signals = new();
     readonly ObservableCollection<SignalModel> signalsModels = new();
-    NodeViewModel port0SelectedTransmitter, port0SelectedReceiver, port1SelectedTransmitter, port1SelectedReceiver;
     private ICustomerToolViewModel viewModelInterface;
     #endregion
 
     #region ID Handling J1939 <-> RAW
     public bool IsJ1939 { get { return MessageType == MessageType.J1939ExtendedFrame; } }
-    public bool IsPDU2 { get { return PDUF >= PDU2Threshold; } }
+    public bool IsPDU2 { get { return PDUF >= PDU2Threshold; } set { } }
 
     public MessageType MessageType
     {
@@ -52,10 +49,10 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
                 {
                     MessageDefinition.Id = NegateExtendedBit(MessageDefinition.Id);
                     j1939Id.ExtractValues(MessageDefinition.Id);
-                    MessageDefinition.SetAddressOnSend = true;
+                    MessageDefinition.OverrideSourceAddress = true;
                 }
                 else
-                    MessageDefinition.SetAddressOnSend = false;
+                    MessageDefinition.OverrideSourceAddress = false;
 
                 // Restore Extended Frame Bit
                 if (value != MessageType.RawStandardFrame)
@@ -66,8 +63,9 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
 
             MessageDefinition.MessageType = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(IdMasked));
             OnPropertyChanged(nameof(IsJ1939));
+
+            ReGenerateMask();
         }
     }
 
@@ -81,9 +79,6 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         {
             j1939Id.Priority = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(J1939Id));
-            OnPropertyChanged(nameof(IdMasked));
-            
         }
     }
 
@@ -97,8 +92,6 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         {
             j1939Id.DataPage = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(J1939Id));
-            OnPropertyChanged(nameof(IdMasked));
         }
     }
 
@@ -117,7 +110,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         }
     }
 
-    public uint Group
+    public uint PDUS
     {
         get
         {
@@ -127,57 +120,52 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         {
             j1939Id.PDUS = value;
             OnPropertyChanged();           
-            OnPropertyChanged(nameof(IdMasked));
         }
     }
 
-    public uint J1939Id
+    public bool OverrideSourceAddress
     {
         get
         {
-             NodeViewModel Transmitter, Receiver = null;
-            if (MessageDefinition.TransmitNodes[1] != NodeDisabled && MessageDefinition.ReceiveNodes[1] != NodeDisabled)
-            {
-                Transmitter = ParentViewModel.Nodes.First(x => x.NodeDefinition.Id == (MessageDefinition.TransmitNodes[1]));
-                Receiver = ParentViewModel.Nodes.First(x => x.NodeDefinition.Id == (MessageDefinition.ReceiveNodes[1]));
-            }
-            else if (MessageDefinition.TransmitNodes[0] != NodeDisabled && MessageDefinition.ReceiveNodes[0] != NodeDisabled)
-            {
-                Transmitter = ParentViewModel.Nodes.First(x => x.NodeDefinition.Id == (MessageDefinition.TransmitNodes[0]));
-                Receiver = ParentViewModel.Nodes.First(x => x.NodeDefinition.Id == (MessageDefinition.ReceiveNodes[0]));
-            }
-            else
-                return j1939Id.WriteToUint();
+            return MessageDefinition.OverrideSourceAddress;
+        }
+        set
+        {
+            MessageDefinition.OverrideSourceAddress = value;
+            OnPropertyChanged();
+            ReGenerateMask();
+        }
+    }
 
-            if (Transmitter.TransportProtocol != TransportProtocol.J1939)
-                j1939Id.SourceAddress = 0;
-            else if (Transmitter.IsSelf && Transmitter.ACMin >= Transmitter.ACMax)
-                j1939Id.SourceAddress = Transmitter.ACMin;
-            else if (Transmitter.IsSelf && Transmitter.ACMin < Transmitter.ACMax)
-                j1939Id.SourceAddress = 0;
-            else if (Transmitter.NodeDefinition.J1939Info.AddressType == NodeAddressType.Static)
-                j1939Id.SourceAddress = (uint)Transmitter.NodeDefinition.J1939Info.AddressValueOne;
-            else
-                j1939Id.SourceAddress = 0;
+    public bool OverrideDestinationAddress
+    {
+        get
+        {
+            return MessageDefinition.OverrideDestinationAddress;
+        }
+        set
+        {
+            MessageDefinition.OverrideDestinationAddress = value;
+            OnPropertyChanged();
+            ReGenerateMask();
+        }
+    }
 
-            if (IsPDU2)
-                j1939Id.PDUS = Group;
-            else if (Receiver.TransportProtocol != TransportProtocol.J1939)
-                j1939Id.PDUS = 0;
-            else if (Receiver.IsSelf && Receiver.ACMin >= Receiver.ACMax)
-                j1939Id.PDUS = Receiver.ACMin;
-            else if (Receiver.IsSelf && Receiver.ACMin < Receiver.ACMax)
-                j1939Id.PDUS = 0;
-            else if (Receiver.NodeDefinition.J1939Info.AddressType == NodeAddressType.Static)
-                j1939Id.PDUS = (uint)Receiver.NodeDefinition.J1939Info.AddressValueOne;
-            else
-                j1939Id.SourceAddress = 0;
+    public uint PGN
+    {
+        get { return j1939Id.PGN; }
+        set 
+        {
+            j1939Id.PGN = value;
+            j1939Id.WritePGNToUint();
 
-            var id = j1939Id.WriteToUint();
+            IdMasked = j1939Id.WriteToUint();
 
-            MessageDefinition.Id = AddExtendedBit(id);
-          
-            return id;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(PDUF));
+            OnPropertyChanged(nameof(PDUS));
+            OnPropertyChanged(nameof(IsPDU2));
+            OnPropertyChanged(nameof(DataPage));
         }
     }
 
@@ -185,11 +173,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
     {
         get
         {
-            uint id;
-            if (IsJ1939)
-                id = J1939Id;
-            else
-                id = this.MessageDefinition.Id;
+            uint id = this.MessageDefinition.Id;
 
             // Remove Extended Frame 
             if (MessageType != MessageType.RawStandardFrame)
@@ -199,19 +183,17 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         }
         set
         {
-            if (MessageType == MessageType.J1939ExtendedFrame)
-            {
-                j1939Id.ExtractValues(value);
-                MessageDefinition.Id = j1939Id.WriteToUint();
-            }
-            else
-                MessageDefinition.Id = value;
-
+            MessageDefinition.Id = value;
             if (MessageType != MessageType.RawStandardFrame)
                 MessageDefinition.Id = AddExtendedBit(MessageDefinition.Id);
 
             OnPropertyChanged();
         }
+    }
+   
+    public string Id
+    {
+        get { return IsJ1939 ? $"PGN: {PGN}" : $"CID: {IdMasked}"; }
     }
     #endregion
 
@@ -319,154 +301,11 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         }
     }
 
-    public enum TransmitOption
-    {
-        No_Node,
-        Sending,
-        Receiving
-    }
-
-    public TransmitOption[] TransmitOptions { get; init; } = Enum.GetValues<TransmitOption>();
-
     public CrcType[] CrcTypes { get; init; } = Enum.GetValues<CrcType>();
 
     public MuxRole[] MuxRoles { get; init; } = Enum.GetValues<MuxRole>();
 
     public MessageType[] MessageTypes { get; init; } = Enum.GetValues<MessageType>();
-
-    public string Transmitter
-    {
-        get
-        {
-            var transmit = "";
-
-            if (IsJ1939)
-            {
-                foreach (var node in MessageDefinition.TransmitNodes)
-                {
-                    var nodeVm = ParentViewModel.Nodes.FirstOrDefault(x => x.NodeDefinition.Id == node);
-                    if (nodeVm != null && (nodeVm.SelectedPort == null || nodeVm.SelectedPort.IsEnabled))
-                        transmit += $"{nodeVm.NodeDefinition.Id}: {nodeVm.Name}";
-                }
-            }              
-            else
-            {
-                if (SelectedTransmitNode_P0?.SelectedPort?.IsEnabled ?? false)
-                    transmit += $"0: {TransmitOption_P0} ";
-                if (SelectedTransmitNode_P1?.SelectedPort?.IsEnabled ?? false)
-                    transmit += $"1: {TransmitOption_P1} ";
-            }
-            return transmit;
-        }
-    }
-
-    public ObservableCollection<NodeViewModel> Nodes_P0
-    {
-        get;
-        set;
-    } = new ObservableCollection<NodeViewModel>();
-
-    public ObservableCollection<NodeViewModel> Nodes_P1
-    {
-        get;
-        set;
-    } = new ObservableCollection<NodeViewModel>();
-
-    public NodeViewModel SelectedTransmitNode_P0
-    {
-        get { return port0SelectedTransmitter; }
-        set
-        {
-            port0SelectedTransmitter = value; OnPropertyChanged();
-            if (value != null)
-                UpdateNodeValues(true, 0, value.NodeDefinition.Id);
-        }
-    }
-
-    public NodeViewModel SelectedReceiveNode_P0
-    {
-        get { return port0SelectedReceiver; }
-        set
-        {
-            port0SelectedReceiver = value; 
-            OnPropertyChanged();
-            if (value != null)
-                UpdateNodeValues(false, 0, value.NodeDefinition.Id);
-        }
-    }
-
-    public TransmitOption TransmitOption_P0
-    {
-        get 
-        {
-            if (port0SelectedTransmitter.NodeDefinition.Id < 0)
-                return TransmitOption.No_Node;
-            else if ((bool)(port0SelectedTransmitter.IsSelf))
-                return TransmitOption.Sending;
-            else
-                return TransmitOption.Receiving;
-        }
-        set
-        {
-            if (value == TransmitOption.No_Node)
-                SelectedTransmitNode_P0 = Nodes_P0.FirstOrDefault(x => !x.IsSelf &&
-                    x.NodeDefinition.NodeType == NodeType.UserDefined && x.NodeDefinition.Id < 0);
-            if (value == TransmitOption.Sending)
-                SelectedTransmitNode_P0 = Nodes_P0.FirstOrDefault(x => x.IsSelf);
-            else
-                SelectedTransmitNode_P0 = Nodes_P0.FirstOrDefault(x => !x.IsSelf && 
-                    x.NodeDefinition.NodeType == NodeType.UserDefined && x.NodeDefinition.Id >= 0);
-            OnPropertyChanged();
-        }
-    }
-
-    public NodeViewModel SelectedTransmitNode_P1
-    {
-        get { return port1SelectedTransmitter; }
-        set
-        {
-            port1SelectedTransmitter = value; OnPropertyChanged();
-            if (value != null)
-                UpdateNodeValues(true, 1, value.NodeDefinition.Id);
-        }
-    }
-    
-    public NodeViewModel SelectedReceiveNode_P1
-    {
-        get { return port1SelectedReceiver; }
-        set
-        {
-            port1SelectedReceiver = value;
-            OnPropertyChanged();
-            if (value != null)
-                UpdateNodeValues(false, 1, value.NodeDefinition.Id);
-        }
-    }
-
-    public TransmitOption TransmitOption_P1
-    {
-        get
-        {
-            if (port1SelectedTransmitter.NodeDefinition.Id < 0)
-                return TransmitOption.No_Node;
-            else if ((bool)(port1SelectedTransmitter.IsSelf))
-                return TransmitOption.Sending;
-            else
-                return TransmitOption.Receiving;
-        }
-        set
-        {
-            if (value == TransmitOption.No_Node)
-                SelectedTransmitNode_P1 = Nodes_P1.FirstOrDefault(x => !x.IsSelf &&
-                    x.NodeDefinition.NodeType == NodeType.UserDefined && x.NodeDefinition.Id < 0);
-            if (value == TransmitOption.Sending)
-                SelectedTransmitNode_P1 = Nodes_P1.FirstOrDefault(x => x.IsSelf);
-            else
-                SelectedTransmitNode_P1 = Nodes_P1.FirstOrDefault(x => !x.IsSelf &&
-                    x.NodeDefinition.NodeType == NodeType.UserDefined && x.NodeDefinition.Id >= 0);
-            OnPropertyChanged();
-        }
-    }
 
     [MaxLength(255)]
     public string Name
@@ -526,28 +365,6 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         get { return MessageDefinition.UserDefined; }
     }
 
-    public bool IsSelected
-    {
-        get { return isSelected; }
-        set
-        {
-            isSelected = value; OnPropertyChanged();
-            OnPropertyChanged(nameof(IconColor));
-            OnPropertyChanged(nameof(BackColor));
-        }
-    }
-
-    public IBrush IconColor
-    {
-        get { return IsSelected ? Brushes.SteelBlue : Brushes.Gainsboro; }
-        set { }
-    }
-
-    public IBrush BackColor
-    {
-        get { return IsSelected ? Brushes.WhiteSmoke : Brushes.White; }
-        set { }
-    }
     #endregion
 
     #region Methods
@@ -559,7 +376,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
 
         if (definition == null)
         {
-            definition = new() { Name = "New Message", Id = 100, TransmitNodes = new int[] {NodeDisabled, NodeDisabled }, ReceiveNodes = new int[] { NodeDisabled, NodeDisabled }, SetAddressOnSend = false};
+            definition = new() { Name = "New Message", Id = 100, TransmitNodes = new int[] { NodeDisabled, NodeDisabled }, ReceiveNodes = new int[] { NodeDisabled, NodeDisabled } , UserDefined = true};
 
             // FindNode Index
             for (uint i = 0; i < UInt32.MaxValue; i++)
@@ -568,52 +385,58 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
                     definition.Id = i;
                     break;
                 }
+
             canViewModel.CanConfiguration.Messages.Add(definition);
         }
 
-
         MessageDefinition = definition;
-
-        RebuildNodeList(this, null);
-        canViewModel.Nodes.CollectionChanged += RebuildNodeList;
-
-        if (definition.TransmitNodes.Length > 0)
-            SelectedTransmitNode_P0 = Nodes_P0.FirstOrDefault(x => x.NodeDefinition.Id == definition.TransmitNodes[0]);
-
-        if (definition.ReceiveNodes.Length > 0)
-            SelectedReceiveNode_P0 = Nodes_P0.FirstOrDefault(x => x.NodeDefinition.Id == definition.ReceiveNodes[0]);
-
-        if (definition.TransmitNodes.Length > 1)
-            SelectedTransmitNode_P1 = Nodes_P1.FirstOrDefault(x => x.NodeDefinition.Id == definition.TransmitNodes[1]);
-
-        if (definition.ReceiveNodes.Length > 1)
-            SelectedReceiveNode_P1 = Nodes_P1.FirstOrDefault(x => x.NodeDefinition.Id == definition.ReceiveNodes[1]);
+       
+        ValidatePorts(canViewModel, definition);
 
         MessageDefinition.Signals.Sort(delegate (MessageSignalDefinition x, MessageSignalDefinition y)
         {
             return x.StartBit.CompareTo(y.StartBit);
         });
 
+
         j1939Id = new(MessageDefinition.Id);
         SelectedSignal = MessageDefinition.Signals.FirstOrDefault();
 
+        if (definition.IdMask == 0)
+            ReGenerateMask();
 
         this.signals = new ObservableCollection<MessageSignalDefinition>(MessageDefinition.Signals);
     }
 
-    private void RebuildNodeList(object sender, NotifyCollectionChangedEventArgs e)
+    private static void ValidatePorts(CanSetupViewModel canViewModel, MessageDefinition definition)
     {
-        Nodes_P0.Clear();
-        Nodes_P1.Clear();
-        Nodes_P0.Add(new NodeViewModel(ParentViewModel, viewModelInterface, new NodeDefinition() { Id = NodeDisabled, Name = "(None)" }));
-        Nodes_P1.Add(new NodeViewModel(ParentViewModel, viewModelInterface, new NodeDefinition() { Id = NodeDisabled, Name = "(None)" }));
-        foreach (var node in ParentViewModel.Nodes)
+        int count = canViewModel.Ports.Count;
+        if (definition.ReceiveNodes.Count() != count)
         {
-            foreach (var port in node.NodeDefinition.Ports)
-                if (port == 0)
-                    Nodes_P0.Add(node);
-                else if (port == 1)
-                    Nodes_P1.Add(node);
+            if (count > definition.ReceiveNodes.Count())
+            {
+                var portValues = Enumerable.Repeat(-1, count).ToArray();
+                definition.ReceiveNodes.CopyTo(portValues, 0);
+                definition.ReceiveNodes = portValues;
+            }
+            else
+            {
+                definition.ReceiveNodes = definition.ReceiveNodes.Take(count).ToArray();
+            }
+        }
+
+        if (definition.TransmitNodes.Count() != count)
+        {
+            if (count > definition.TransmitNodes.Count())
+            {
+                var portValues = Enumerable.Repeat(-1, count).ToArray();
+                definition.TransmitNodes.CopyTo(portValues, 0);
+                definition.TransmitNodes = portValues;
+            }
+            else
+            {
+                definition.TransmitNodes = definition.TransmitNodes.Take(count).ToArray();
+            }
         }
     }
 
@@ -640,6 +463,27 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
     {
         currentSignalView = new CANMessageMuxView() { DataContext = this };
         viewModelInterface.ShowPopup(currentSignalView);
+    }
+
+    private void ReGenerateMask()
+    {
+        if (MessageType == MessageType.J1939ExtendedFrame)
+        {
+            uint mask = 0x1C000000; // Mask Priority Out
+           
+            
+            if (OverrideSourceAddress) // Mask Source Address
+                mask |= 0xFF;
+
+            if (OverrideDestinationAddress && !IsPDU2) // Mask DestinationAddress if PFU1
+                mask |= 0xFF00;
+
+            MessageDefinition.IdMask = mask;
+        }
+        else
+        {
+            MessageDefinition.IdMask = 0xFFFFFFFF;
+        }
     }
 
     public void CloseEditor()
@@ -749,31 +593,6 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
             SelectedSignal.Values[item.Key] = item.Value;
     }
 
-    private void UpdateNodeValues(bool transmitter, int port, int node)
-    {
-        var values = transmitter ? MessageDefinition.TransmitNodes.ToList() : MessageDefinition.ReceiveNodes.ToList();
-        if (values.Count < port)
-            values.Capacity = port;
-        values[port] = node;
-
-        var secondaryVal = node == NodeDisabled ? NodeDisabled : BroadcastVal;
-
-        if (transmitter)
-        {
-            MessageDefinition.TransmitNodes[port] = node;
-            if(MessageDefinition.MessageType != MessageType.J1939ExtendedFrame)
-                MessageDefinition.ReceiveNodes[port] = secondaryVal;
-        }         
-        else
-        {           
-            MessageDefinition.ReceiveNodes[port] = node;
-            if (MessageDefinition.MessageType != MessageType.J1939ExtendedFrame)
-                MessageDefinition.TransmitNodes[port] = secondaryVal;
-        }
-
-        OnPropertyChanged(nameof(IdMasked));
-        OnPropertyChanged(nameof(Transmitter));
-    }
     #endregion
 
     #region TreeNode

@@ -276,6 +276,7 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
         RefreshGenerateSettings();
         AddHardwarePorts();
         OnPropertyChanged(nameof(ConfigurationPath));
+        CheckForAnyNode();
     }
 
     private void LoadCANConfiguration()
@@ -336,21 +337,45 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
         CanConfiguration.Version = VersionUtility.GetAppVersionString();
 
         SelectedTreeNode = rootMessageNode.Children.Count > 0 ? rootMessageNode.Children.First() : rootPortNode.Children.FirstOrDefault();
+
+        CheckForAnyNode();
+    }
+
+    internal void CheckForAnyNode()
+    {
+        bool include = Nodes.Any(x => x.IsJ1939 && x.NodeDefinition.NodeType != NodeType.Any);
+
+        var standardDefinitions = CanSystemInfo.StandardCanMessages;
+        var standardNode = standardDefinitions.Nodes.First(x => x.Name == "ANY");
+        
+        var node = Nodes.FirstOrDefault(x => x.Name == "ANY");
+        var inList = node != null;
+        if (include && !inList)
+        {
+            node = new NodeViewModel(this, CustomerToolViewModel, standardNode);
+            Nodes.Insert(0, node);
+            CanConfiguration.Nodes.Add(node.NodeDefinition);
+        }
+
+        if (Nodes.IndexOf(node) != 0)
+        {
+            Nodes.Remove(node);
+            Nodes.Insert(0, node);
+        }
     }
 
     internal void AddMessage()
     {
-        rootMessageNode.Children.Add(new MessageViewModel(this, CustomerToolViewModel, null));
+        var vm = new MessageViewModel(this, CustomerToolViewModel, null);
+        rootMessageNode.Children.Add(vm);
+        SelectedTreeNode = vm;
     }
 
     internal void AddNode()
     {
-        rootNodeNode.Children.Add(new NodeViewModel(this, CustomerToolViewModel, null));
-    }
-
-    internal void AddPort()
-    {
-        rootPortNode.Children.Add(new PortViewModel(this, CustomerToolViewModel, null));
+        var vm = new NodeViewModel(this, CustomerToolViewModel, null);
+        rootNodeNode.Children.Add(vm);
+        SelectedTreeNode = vm;
     }
 
     internal async void RemoveItem()
@@ -367,13 +392,21 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
         }
         else if (selectedTreeNode is NodeViewModel nodeNode)
         {
-            var continueWork = await CustomerToolViewModel.ShowDialog("Remove Node", "Are you sure you wish to remove the Selected Node?", "Yes", "Cancel");
-            if (!continueWork)
+            if (nodeNode.NodeDefinition.NodeType == NodeType.Any)
+            {
+                await CustomerToolViewModel.ShowDialog("Invalid Function", "The 'Any' node can not be removed.", "OK");
                 return;
+            }
+            else
+            {
+                var continueWork = await CustomerToolViewModel.ShowDialog("Remove Node", "Are you sure you wish to remove the Selected Node?", "Yes", "Cancel");
+                if (!continueWork)
+                    return;
 
-            canConfiguration.Nodes.Remove(nodeNode.NodeDefinition);
-            rootNodeNode.Children.Remove(nodeNode);
-            SelectedTreeNode = rootNodeNode.Children.Count > 0 ? rootNodeNode.Children.First() : rootPortNode.Children.FirstOrDefault();
+                canConfiguration.Nodes.Remove(nodeNode.NodeDefinition);
+                rootNodeNode.Children.Remove(nodeNode);
+                SelectedTreeNode = rootNodeNode.Children.Count > 0 ? rootNodeNode.Children.First() : rootPortNode.Children.FirstOrDefault();
+            }
         }
     }
 

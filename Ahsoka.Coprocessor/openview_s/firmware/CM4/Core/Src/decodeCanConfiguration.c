@@ -135,7 +135,7 @@ bool decodeMessage(pb_istream_t *stream, const pb_field_iter_t *field, void **ar
 				node->msg->transmitNodeId = txNodes[i];
 				node->msg->receiverNodeId = rxNodes[i];
 
-				node->msg->insertAddress = message.set_address_on_send;
+				node->msg->insertAddress = message.override_source_address;
 				if(message.has_roll_count)
 				{
 					node->msg->rollCountLength = message.roll_count_length;

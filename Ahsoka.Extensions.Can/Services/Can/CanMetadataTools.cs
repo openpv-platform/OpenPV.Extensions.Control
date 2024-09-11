@@ -141,7 +141,7 @@ internal static class CanMetadataTools
                 Name = node.Name,
                 Id = nodeID,
                 NodeType = NodeType.UserDefined,
-                Ports = new int[1] { 1 },
+                Port = 1,
                 J1939Info = new J1939NodeDefinition() { AddressType = NodeAddressType.Static, AddressValueOne = 0 }
             };
 
@@ -166,7 +166,7 @@ internal static class CanMetadataTools
                 UserDefined = true,
                 TransmitNodes = nodeFound ? new int[] {-1, node.Id } : new int[] { -1, -1 },
                 ReceiveNodes = new int[] { -1, -1 },
-                SetAddressOnSend = false
+                OverrideSourceAddress = false
             };
 
             if (message.CycleTime(out int cycleTime))
@@ -178,7 +178,7 @@ internal static class CanMetadataTools
                 if (isJ1939)
                 {
                     messageDef.MessageType = MessageType.J1939ExtendedFrame;
-                    messageDef.SetAddressOnSend = true;
+                    messageDef.OverrideSourceAddress = true;
                     messageDef.Id &= ~(0xFFu); // Remove Address
                 }
             }

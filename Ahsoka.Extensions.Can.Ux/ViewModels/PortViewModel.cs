@@ -106,10 +106,13 @@ internal class PortViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNo
                 ParentViewModel.CanConfiguration.Ports.Remove(portDef);
             }
 
+            UpdateMessageValues(value);
+
             isEnabled = value;
             OnPropertyChanged();
         }
     }
+
     #endregion
 
     #region Methods
@@ -127,7 +130,15 @@ internal class PortViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNo
     {
         return $"CAN Port {Port}";
     }
-    
+
+    private void UpdateMessageValues(bool value)
+    {
+        var portId = this.Port;
+
+        foreach (var item in ParentViewModel.Messages)
+            item.MessageDefinition.ReceiveNodes[portId] = item.MessageDefinition.TransmitNodes[portId] = value ? MessageViewModel.AnyNodeID : MessageViewModel.NodeDisabled;
+    }
+
     public void ShowEditor()
     {
         currentView = new CANPortEditView() { DataContext = this };

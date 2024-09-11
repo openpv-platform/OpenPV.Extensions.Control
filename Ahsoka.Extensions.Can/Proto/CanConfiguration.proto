@@ -115,14 +115,16 @@ message MessageDefinition
     uint32 roll_count_length = 10;
     CrcType crc_type = 11;
     uint32 crc_bit = 12;
-    bool set_address_on_send = 13;
     int32 timeout_ms = 14;
     bool filter_receipts = 15;
     bool user_defined = 16;
     repeated int32 transmit_nodes = 18;
     repeated int32 receive_nodes  = 19;
 
-    repeated MessageSignalDefinition signals = 20;
+    bool override_source_address = 20;
+    bool override_destination_address = 21;
+
+    repeated MessageSignalDefinition signals = 22;
 }
 
 // Message / Signal Descriptions, Filters Etc.
