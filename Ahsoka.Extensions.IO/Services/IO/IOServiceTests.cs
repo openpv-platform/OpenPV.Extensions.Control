@@ -19,7 +19,7 @@ internal class IOTests
 
         // Start client for IO Service
         var client = new IOServiceClient();
-        client.Connect();
+        client.Start();
 
         TestHardwareCapabilities(client);
         TestInputPinDefualtValues(client);
@@ -42,7 +42,7 @@ internal class IOTests
         DisplayCurrentVoltageValues(client);
 
         // Stop the Runtimes
-        client.Disconnect();
+        client.Stop();
 
     }
 

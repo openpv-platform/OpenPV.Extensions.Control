@@ -28,7 +28,7 @@ internal class IOTests
         MonitorIgnitionNotification(client);
 
         // Stop the Runtimes
-        client.Disconnect();
+        client.Stop();
     }
 
     public static void MonitorIgnitionNotification(IOServiceClient client)
