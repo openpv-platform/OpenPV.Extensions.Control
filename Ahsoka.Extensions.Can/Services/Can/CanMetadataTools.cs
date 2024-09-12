@@ -582,6 +582,7 @@ internal static class CanMetadataTools
         // Add Header
         outputFileData.AppendLine("using Ahsoka.System;");
         outputFileData.AppendLine("using Ahsoka.Services.Can;");
+        outputFileData.AppendLine("using Ahsoka.Services.Can.Messages;");
         outputFileData.AppendLine("using System.Collections.Generic;");
         outputFileData.AppendLine("using System;");
         outputFileData.AppendLine("using System.Linq;");
