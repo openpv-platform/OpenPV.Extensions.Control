@@ -158,7 +158,6 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         set 
         {
             j1939Id.PGN = value;
-            j1939Id.WritePGNToUint();
 
             IdMasked = j1939Id.WriteToUint();
 
