@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-namespace Ahsoka.Services.Can;
-internal class J1939Helper
+namespace Ahsoka.Services.Can.Messages;
+internal class J1939PropertyDefinitions
 {
     public const UInt32 BroadcastAddress = 255;
     public const UInt32 NullAddress = 254;
@@ -75,19 +75,20 @@ internal class J1939Helper
 
     public class Id
     {
-        private CanPropertyInfo pgnInfo = new(8, 18, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0, 1, 0x3FFFF);
-        private CanPropertyInfo sourceInfo = new(0, 8, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0, 1, 0xFF);
-        private CanPropertyInfo specificInfo = new(8, 8, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0, 2, 0xFF);
-        private CanPropertyInfo formatInfo = new(16, 8, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0, 3, 0xFF);
-        private CanPropertyInfo pageInfo = new(24, 1, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0, 4, 0x01);
-        private CanPropertyInfo priorityInfo = new(26, 3, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0, 5, 0x07);
+        ulong[] id = { 0 };
+        CanPropertyInfo pgnInfo = new(8, 18, ByteOrder.LittleEndian, ValueType.Unsigned, 0, 0, 1, 0x3FFFF);
+        CanPropertyInfo sourceInfo = new(0, 8, ByteOrder.LittleEndian, ValueType.Unsigned, 0, 0, 1, 0xFF);
+        CanPropertyInfo specificInfo = new(8, 8, ByteOrder.LittleEndian, ValueType.Unsigned, 0, 0, 2, 0xFF);
+        CanPropertyInfo formatInfo = new(16, 8, ByteOrder.LittleEndian, ValueType.Unsigned, 0, 0, 3, 0xFF);
+        CanPropertyInfo pageInfo = new(24, 1, ByteOrder.LittleEndian, ValueType.Unsigned, 0, 0, 4, 0x01);
+        CanPropertyInfo priorityInfo = new(26, 3, ByteOrder.LittleEndian, ValueType.Unsigned, 0, 0, 5, 0x07);
 
-        public uint SourceAddress { get; set; }
-        public uint PDUS { get; set; }
-        public uint PDUF { get; set; }
-        public uint DataPage { get; set; }
-        public uint Priority { get; set; }
-        public uint PGN { get; set; }
+        public uint SourceAddress { get { return sourceInfo.GetValue<uint>(id, false); } set { sourceInfo.SetValue(ref id, value, false); } }
+        public uint PDUS { get { return specificInfo.GetValue<uint>(id, false); } set { specificInfo.SetValue(ref id, value, false); } }
+        public uint PDUF { get { return formatInfo.GetValue<uint>(id, false); } set { formatInfo.SetValue(ref id, value, false); } }
+        public uint DataPage { get { return pageInfo.GetValue<uint>(id, false); } set { pageInfo.SetValue(ref id, value, false); } }
+        public uint Priority { get { return priorityInfo.GetValue<uint>(id, false); } set { priorityInfo.SetValue(ref id, value, false); } }
+        public uint PGN { get { return pgnInfo.GetValue<uint>(id, false); } set { pgnInfo.SetValue(ref id, value, false); } }
 
         public Id() { }
 
@@ -96,35 +97,14 @@ internal class J1939Helper
             ExtractValues(id);
         }
 
-        public uint WritePGNToUint()
-        {
-            var id = new ulong[] { WriteToUint() };
-            pgnInfo.SetValue(ref id, PGN, false);
-            ExtractValues((uint)id[0]);
-            return (uint)id[0];
-        }
-
         public uint WriteToUint()
         {
-            var id = new ulong[] { 0 };
-
-            sourceInfo.SetValue(ref id, SourceAddress, false);
-            specificInfo.SetValue(ref id, PDUS, false);
-            formatInfo.SetValue(ref id, PDUF, false);
-            pageInfo.SetValue(ref id, DataPage, false);
-            priorityInfo.SetValue(ref id, Priority, false);
             return (uint)id[0];
         }
 
-        public void ExtractValues(uint id)
+        public void ExtractValues(uint newId)
         {
-            var input = new ulong[] { id };
-            SourceAddress = sourceInfo.GetValue<uint>(input, false);
-            PDUS = specificInfo.GetValue<uint>(input, false);
-            PDUF = formatInfo.GetValue<uint>(input, false);
-            DataPage = pageInfo.GetValue<uint>(input, false);
-            Priority = priorityInfo.GetValue<uint>(input, false);
-            PGN = pgnInfo.GetValue<uint>(input, false);
+            id[0] =  newId;
         }
     }
 

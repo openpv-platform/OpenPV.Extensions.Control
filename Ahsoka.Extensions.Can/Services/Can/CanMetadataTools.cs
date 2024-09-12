@@ -326,6 +326,8 @@ internal static class CanMetadataTools
             var path = Path.GetDirectoryName(pathToDestinationFile);
             File.WriteAllText(Path.Combine(path, "CanPropertyInfo.h"), Properties.CANResources.CanPropertyInfo);
             File.WriteAllText(Path.Combine(path, "CanViewModelBase.h"), Properties.CANResources.CanViewModelBase);
+            File.WriteAllText(Path.Combine(path, "CANProtocolHelper.h"), Properties.CANResources.CANProtocolHelper);
+            File.WriteAllText(Path.Combine(path, "J1939Helper.h"), Properties.CANResources.J1939Helper);
         }
 
         File.WriteAllText(pathToDestinationFile, outputFileData.ToString());
@@ -411,6 +413,11 @@ internal static class CanMetadataTools
 
         outputFileDataCPP.AppendLine();
         outputFileDataCPP.AppendLine($"\t//Start of Class Implmentation for {className}");
+        if(definition.MessageType == MessageType.J1939ExtendedFrame)
+        {
+            outputFileDataCPP.AppendLine();
+            outputFileDataCPP.AppendLine($"\tJ1939Helper& TestMessage::GetProtocol() {{ return protocol; }}");
+        }
 
         metadataBuilder.AppendLine($"\t\t//Add Props for {className} - CANID: {definition.Id}");
         metadataBuilder.AppendLine($"\t\tstd::map<int, CanPropertyInfo> {className}Props;");
@@ -453,6 +460,11 @@ internal static class CanMetadataTools
         fileOutputBuilder.AppendLine();
         fileOutputBuilder.AppendLine($"\t\t\t{className}(); // CANID: 0x{definition.Id.ToString("x")}");
         fileOutputBuilder.AppendLine($"\t\t\t{className}(CanMessageData message); // CANID: 0x{definition.Id.ToString("x")}");
+        if (definition.MessageType == MessageType.J1939ExtendedFrame)
+        {
+            fileOutputBuilder.AppendLine();
+            fileOutputBuilder.AppendLine($"\t\t\tJ1939Helper& GetProtocol();");
+        }
         
         // Extend Header Methods
         generatorExtensions.ExtendMethods(fileOutputBuilder, className, true);
@@ -481,7 +493,8 @@ internal static class CanMetadataTools
         metadataAccessors.AppendLine($"\tstd::map<int, CanPropertyInfo>& {className}::GetMetadata() {{ return CanModelMetadata::CanMetadata()->GetMetadata({definition.Id}); }}");
 
         fileOutputBuilder.AppendLine("\t\tprotected:");
-        fileOutputBuilder.AppendLine("\r\n\t\t\tstd::map<int, CanPropertyInfo>& GetMetadata();");
+        fileOutputBuilder.AppendLine("\r\n\t\t\tJ1939Helper protocol = J1939Helper(message);");
+        fileOutputBuilder.AppendLine("\t\t\tstd::map<int, CanPropertyInfo>& GetMetadata();");
 
         // Finish Main
         fileOutputBuilder.AppendLine("\t};"); // End Class
@@ -628,6 +641,20 @@ internal static class CanMetadataTools
         fileOutputBuilder.AppendLine($"\tpublic const int Dlc = {byteLength};");
 
         fileOutputBuilder.AppendLine("\t#region Auto Generated Properties");
+        if (definition.MessageType == MessageType.J1939ExtendedFrame)
+        {
+            fileOutputBuilder.AppendLine("\tJ1939Helper protocol;");
+            fileOutputBuilder.AppendLine("\tpublic J1939Helper Protocol");
+            fileOutputBuilder.AppendLine("\t{");
+            fileOutputBuilder.AppendLine("\t\tget");
+            fileOutputBuilder.AppendLine("\t\t{");
+            fileOutputBuilder.AppendLine("\t\t\tif (protocol == null)");
+            fileOutputBuilder.AppendLine("\t\t\t\tprotocol = new J1939Helper(message);");
+            fileOutputBuilder.AppendLine("\t\t\treturn protocol;");
+            fileOutputBuilder.AppendLine("\t\t}");
+            fileOutputBuilder.AppendLine("\t}");
+            fileOutputBuilder.AppendLine();
+        }
 
         // Method Header
         StringBuilder methodBuilder = new();

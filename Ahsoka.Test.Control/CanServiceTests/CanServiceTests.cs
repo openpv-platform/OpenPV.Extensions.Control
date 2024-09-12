@@ -2,6 +2,7 @@ using Ahsoka.Installer;
 using Ahsoka.Installer.Components;
 using Ahsoka.ServiceFramework;
 using Ahsoka.Services.Can;
+using Ahsoka.Services.Can.Messages;
 using Ahsoka.Services.IO;
 using Ahsoka.Services.Network;
 using Ahsoka.Services.System;
@@ -194,11 +195,12 @@ public class CanServiceTests : LinearTestBase
 
         // Test Send Recurring Messages
         // We use "other id" since its not filtered.
-        canMessage.Id = otherId;
+        var data = canMessage.CreateCanMessageData();
+        data.Id = otherId;
         status = client.SendRecurringCanMessage(new RecurringCanMessage()
         {
             CanPort = 1,
-            Message = canMessage.CreateCanMessageData(),
+            Message = data,
             TimeoutBeforeUpdateInMs = 1000,
             TransmitIntervalInMs = 5
         });
@@ -208,7 +210,7 @@ public class CanServiceTests : LinearTestBase
         status = client.SendRecurringCanMessage(new RecurringCanMessage()
         {
             CanPort = 1,
-            Message = canMessage.CreateCanMessageData(),
+            Message = data,
             TimeoutBeforeUpdateInMs = 1000,
             TransmitIntervalInMs = 5
         });
@@ -238,11 +240,12 @@ public class CanServiceTests : LinearTestBase
         // Cover TSC1 and Error Conditions
         var canMessage2 = CreateTestViewModel();
 
-        canMessage2.Id = secondMessage.Id + 1;
-        status = client.SendCanMessages(1, canMessage2); // Send Error Message
+        data = canMessage2.CreateCanMessageData();
+        data.Id = secondMessage.Id + 1;
+        status = client.SendCanMessages(1, data); // Send Error Message
 
-        canMessage2.Id = tsc1.Id;
-        status = client.SendCanMessages(1, canMessage2); // Send Roll Count / TSC1
+        data.Id = tsc1.Id;
+        status = client.SendCanMessages(1, data); // Send Roll Count / TSC1
 
 
         // Sleep to Recurring message Expires (Expires at 500ms)
@@ -263,7 +266,8 @@ public class CanServiceTests : LinearTestBase
         client.SendCanMessages(1, returnMsg);
 
         // Mutate Message to Pass Filter
-        returnMsg.Id = otherId;
+        data = returnMsg.CreateCanMessageData();
+        data.Id = otherId;
         client.SendCanMessages(1, returnMsg);
 
         // We should get ONE message and it shoudl match the filter 

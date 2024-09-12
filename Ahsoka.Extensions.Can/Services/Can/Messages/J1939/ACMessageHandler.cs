@@ -62,7 +62,7 @@ internal class ACMessageHandler : J1939MessageHandlerBase
         if (!Enabled)
             return false;
 
-        var j1939Id = new J1939Helper.Id(messageData.Id);
+        var j1939Id = new J1939PropertyDefinitions.Id(messageData.Id);
         var messageCollection = new CanMessageDataCollection
         {
             CanPort = Service.Port
@@ -86,14 +86,14 @@ internal class ACMessageHandler : J1939MessageHandlerBase
                     var acName = BitConverter.ToUInt64(messageData.Data);
                     if (acName > Service.Self.J1939Info.Name)
                     {
-                        response.Id = CreateMessageId(protocol.CanState.CurrentAddress, J1939Helper.BroadcastAddress);
+                        response.Id = CreateMessageId(protocol.CanState.CurrentAddress, J1939PropertyDefinitions.BroadcastAddress);
                         messageCollection.Messages.Add(response);
                     }
                     else
                     {
-                        protocol.CanState.CurrentAddress = J1939Helper.NullAddress;
+                        protocol.CanState.CurrentAddress = J1939PropertyDefinitions.NullAddress;
                         protocol.CanState.NodeAddresses[Service.Self.Id] = protocol.CanState.CurrentAddress;
-                        response.Id = CreateMessageId(J1939Helper.NullAddress, J1939Helper.BroadcastAddress);
+                        response.Id = CreateMessageId(J1939PropertyDefinitions.NullAddress, J1939PropertyDefinitions.BroadcastAddress);
                         if (protocol.transmittingJ1939 == false)
                             ACEvent.Set();
                         else
@@ -102,7 +102,7 @@ internal class ACMessageHandler : J1939MessageHandlerBase
                             messageCollection.Messages.Add(response);
                             Service.SendCanMessages(messageCollection);
                             lock (protocol.CanState)
-                                protocol.CanState.CurrentAddress = J1939Helper.NullAddress;
+                                protocol.CanState.CurrentAddress = J1939PropertyDefinitions.NullAddress;
                             protocol.CancelRecurringJ1939();
                             protocol.PropagateCanState();
                             return true;
@@ -111,7 +111,7 @@ internal class ACMessageHandler : J1939MessageHandlerBase
                 }
                 else
                 {
-                    var claimedName = new J1939Helper.Name(BitConverter.ToUInt64(messageData.Data));
+                    var claimedName = new J1939PropertyDefinitions.Name(BitConverter.ToUInt64(messageData.Data));
 
                     foreach (var node in Service.PortConfig.MessageConfiguration.Nodes.Where(x => x.TransportProtocol == TransportProtocol.J1939))
                         if ((node.J1939Info.AddressType == NodeAddressType.Static && node.J1939Info.AddressValueOne == j1939Id.SourceAddress) ||
@@ -162,10 +162,10 @@ internal class ACMessageHandler : J1939MessageHandlerBase
             var bytes = MD5.Create().ComputeHash(stream);
             identity = BitConverter.ToUInt32(bytes);
         }
-        var name = new J1939Helper.Name(Service.Self.J1939Info);
+        var name = new J1939PropertyDefinitions.Name(Service.Self.J1939Info);
         Service.Self.J1939Info.Name = name.WriteToUlong(identity);
 
-        J1939Helper.ParseAddresses(Service.Self.J1939Info.Addresses, out var minAddress, out var maxAddress);
+        J1939PropertyDefinitions.ParseAddresses(Service.Self.J1939Info.Addresses, out var minAddress, out var maxAddress);
 
         bool addressClaimed = false;
         protocol.transmittingJ1939 = false;
@@ -181,23 +181,23 @@ internal class ACMessageHandler : J1939MessageHandlerBase
             response.Data = BitConverter.GetBytes(Service.Self.J1939Info.Name);
             if (minAddress > maxAddress)
             {
-                response.Id = CreateMessageId(J1939Helper.NullAddress, J1939Helper.BroadcastAddress);
+                response.Id = CreateMessageId(J1939PropertyDefinitions.NullAddress, J1939PropertyDefinitions.BroadcastAddress);
                 messageCollection.Messages.Add(response);
                 Service.SendCanMessages(messageCollection);
                 lock (protocol.CanState)
-                    protocol.CanState.CurrentAddress = J1939Helper.NullAddress;
+                    protocol.CanState.CurrentAddress = J1939PropertyDefinitions.NullAddress;
                 protocol.CancelRecurringJ1939();
                 addressClaimed = true;
             }
             else
             {
-                response.Id = CreateMessageId(minAddress, J1939Helper.BroadcastAddress);
+                response.Id = CreateMessageId(minAddress, J1939PropertyDefinitions.BroadcastAddress);
                 messageCollection.Messages.Add(response);
                 Service.SendCanMessages(messageCollection);
                 ACEvent.Wait(250);
 
                 lock (protocol.CanState)
-                    if (protocol.CanState.CurrentAddress != J1939Helper.NullAddress || protocol.CanState.CurrentAddress != J1939Helper.BroadcastAddress)
+                    if (protocol.CanState.CurrentAddress != J1939PropertyDefinitions.NullAddress || protocol.CanState.CurrentAddress != J1939PropertyDefinitions.BroadcastAddress)
                     {
                         protocol.CanState.CurrentAddress = minAddress;
                         protocol.transmittingJ1939 = true;

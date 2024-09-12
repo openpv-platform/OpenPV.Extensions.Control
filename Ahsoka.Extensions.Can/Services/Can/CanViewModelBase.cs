@@ -1,28 +1,25 @@
-﻿using Ahsoka.Utility;
-using Newtonsoft.Json;
-using ProtoBuf;
+﻿using Ahsoka.Services.Can.Messages;
+using Ahsoka.Utility;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Ahsoka.Services.Can;
-
 /// <summary>
 /// Base View Model used in Ahsoka Applications which adds basic INotifyPropertyChanged support.
 /// </summary>
 public abstract class CanViewModelBase : ViewModelBase, IHasCanData
 {
-    readonly CanMessageData message = null;
+    protected readonly CanMessageData message = null;
     ulong[] data = null;
 
     /// <summary>
     /// CAN Id for the Modeled Message
     /// </summary>
-    public uint Id { get { return message.Id; } set { message.Id = value; } }
+    public uint Id { get { return message.Id; } }
 
     /// <summary>
     /// Constructor to Allocate Data (Serialize)
@@ -163,7 +160,6 @@ public interface IHasCanData
     /// <returns></returns>
     CanMessageData CreateCanMessageData();
 }
-
 
 /// <summary>
 /// Message Definition for CAN Configuration Files

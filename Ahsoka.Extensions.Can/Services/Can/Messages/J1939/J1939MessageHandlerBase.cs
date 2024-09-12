@@ -23,7 +23,7 @@ internal abstract class J1939MessageHandlerBase : BaseMessageHandler
 
     internal uint CreateMessageId(uint sourceAddress, uint destinationAddress)
     {
-        var id = new J1939Helper.Id
+        var id = new J1939PropertyDefinitions.Id
         {
             Priority = Priority,
             DataPage = DataPage,

@@ -2,6 +2,7 @@
 using Ahsoka.DeveloperTools.Views;
 using Ahsoka.Extensions.Can.UX.ViewModels.Nodes;
 using Ahsoka.Services.Can;
+using Ahsoka.Services.Can.Messages;
 using Ahsoka.Utility;
 using Avalonia.Controls;
 using Material.Icons;
@@ -26,7 +27,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
     UserControl currentSignalView;
 
     MessageSignalDefinition selectedSignal;
-    readonly J1939Helper.Id j1939Id = new();
+    readonly J1939PropertyDefinitions.Id j1939Id = new();
     readonly ObservableCollection<MessageSignalDefinition> signals = new();
     readonly ObservableCollection<SignalModel> signalsModels = new();
     private ICustomerToolViewModel viewModelInterface;

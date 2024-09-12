@@ -32,9 +32,9 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
                     CanState.NodeAddresses[node.Id] = (uint)node.J1939Info.AddressValueOne;
             }
 
-            J1939Helper.ParseAddresses(Service.Self.J1939Info.Addresses, out var minAddress, out var maxAddress);
+            J1939PropertyDefinitions.ParseAddresses(Service.Self.J1939Info.Addresses, out var minAddress, out var maxAddress);
             if (Service.Self.J1939Info.UseAddressClaim)
-                CanState.CurrentAddress = J1939Helper.BroadcastAddress;
+                CanState.CurrentAddress = J1939PropertyDefinitions.BroadcastAddress;
             else
                 CanState.CurrentAddress = minAddress;
 
@@ -86,7 +86,7 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
             return false;
 
         if (!transmittingJ1939)
-            if (CanState.CurrentAddress == J1939Helper.BroadcastAddress)
+            if (CanState.CurrentAddress == J1939PropertyDefinitions.BroadcastAddress)
             {
                 startupQueue.Add(info);
                 result = new CanMessageResult() { Status = MessageStatus.Success };
@@ -106,7 +106,7 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
 
         if (GetAvailableMessage(message.Id, out AvailableMessage messageInfo))
         {
-            var j1939id = new J1939Helper.Id(message.Id);
+            var j1939id = new J1939PropertyDefinitions.Id(message.Id);
 
             modifiedId |= (CanState.CurrentAddress & 0xFF); 
             if (j1939id.PDUF < PDU2Threshold)
@@ -120,37 +120,11 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
 
     internal override bool InAvailableMessages(uint id, bool received = false)
     {
-        try
-        {
-            if (Service.AvailableMessages.ContainsKey(id))
-                return true;
+        if (Service.AvailableMessages.ContainsKey(id))
+            return true;
 
-            var j1939Id = new J1939Helper.Id(id);
-
-            var mask = j1939Id.PDUF >= PDU2Threshold ? 0x1FFFFF00 : 0x1FFF0000;
-
-            var messages = Service.AvailableMessages.Values.Where(x => x.Message.MessageType == MessageType.J1939ExtendedFrame && (x.Message.Id & mask) == (id & mask));
-            foreach (var message in messages)
-            {
-                var knownDestination = Service.GetNode(message.Message.ReceiveNodes[Service.Port]).J1939Info.AddressType == NodeAddressType.Static;
-
-                if (received && (j1939Id.PDUS == CanState.CurrentAddress || message.Message.ReceiveNodes[Service.Port] == J1939Helper.BroadcastAddress) &&
-                    (j1939Id.SourceAddress == CanState.NodeAddresses[message.Message.TransmitNodes[Service.Port]] || message.Message.TransmitNodes[Service.Port] == J1939Helper.BroadcastAddress))
-                    return true;
-                else if (!received && (j1939Id.PDUS == CanState.NodeAddresses[message.Message.ReceiveNodes[Service.Port]] || !knownDestination) &&
-                    (message.Message.TransmitNodes[Service.Port] == Service.Self.Id || message.Message.TransmitNodes[Service.Port] == J1939Helper.BroadcastAddress))
-                    return true;
-                else if (j1939Id.PDUF >= PDU2Threshold && (!received || (j1939Id.SourceAddress == CanState.NodeAddresses[message.Message.TransmitNodes[Service.Port]] || message.Message.TransmitNodes[Service.Port] == J1939Helper.BroadcastAddress)))
-                    return true;
-            }
-
-            return false;
-        }
-        catch
-        {
-            return false;
-        }
-        
+        AvailableMessage message;
+        return GetAvailableMessage(id, out message, received);           
     }
 
     internal override bool GetAvailableMessage(uint id, out AvailableMessage result, bool received = false)
@@ -158,31 +132,40 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
         try
         {
             result = new();
+            var j1939Id = new J1939PropertyDefinitions.Id(id);
 
-            var j1939Id = new J1939Helper.Id(id);
-
-            var mask = j1939Id.PDUF >= PDU2Threshold ? 0x1FFFFF00 : 0x1FFF0000;
-
-            var messages = Service.AvailableMessages.Values.Where(x => x.Message.MessageType == MessageType.J1939ExtendedFrame && (x.Message.Id & mask) == (id & mask));
+            var messages = Service.AvailableMessages.Values.Where(x => x.Message.MessageType == MessageType.J1939ExtendedFrame);
             foreach (var message in messages)
             {
-                bool knownDestination;
-                if (message.Message.ReceiveNodes[Service.Port] == -1)
-                    knownDestination = false;
-                else
-                    knownDestination = Service.GetNode(message.Message.ReceiveNodes[Service.Port]).J1939Info.AddressType == NodeAddressType.Static;
+                if (message.Message.Id != (id & message.Message.IdMask))
+                    continue;
 
-                if (received && (j1939Id.PDUS == CanState.CurrentAddress || message.Message.ReceiveNodes[Service.Port] == J1939Helper.BroadcastAddress) &&
-                    (j1939Id.SourceAddress == CanState.NodeAddresses[message.Message.TransmitNodes[Service.Port]] || message.Message.TransmitNodes[Service.Port] == J1939Helper.BroadcastAddress))
-                    result = message;
-                else if (!received && (j1939Id.PDUS == CanState.NodeAddresses[message.Message.ReceiveNodes[Service.Port]] || !knownDestination) &&
-                    (message.Message.TransmitNodes[Service.Port] == Service.Self.Id || message.Message.TransmitNodes[Service.Port] == J1939Helper.BroadcastAddress))
-                    result = message;
-                else if (j1939Id.PDUF >= PDU2Threshold && (!received || (j1939Id.SourceAddress == CanState.NodeAddresses[message.Message.TransmitNodes[Service.Port]] || message.Message.TransmitNodes[Service.Port] == J1939Helper.BroadcastAddress)))
-                    result = message;
+                var available = true;
+                if (!message.Message.OverrideDestinationAddress)
+                {
+                    bool knownDestination;
+                    if (message.Message.ReceiveNodes[Service.Port] == -1)
+                        knownDestination = false;
+                    else
+                        knownDestination = Service.GetNode(message.Message.ReceiveNodes[Service.Port]).J1939Info.AddressType == NodeAddressType.Static;
 
-                if (result.Message != null)
+                    if ( (j1939Id.PDUF < PDU2Threshold) && !((received && (j1939Id.PDUS == CanState.CurrentAddress || message.Message.ReceiveNodes[Service.Port] == J1939PropertyDefinitions.BroadcastAddress))
+                            && (!received && (j1939Id.PDUS == CanState.NodeAddresses[message.Message.ReceiveNodes[Service.Port]] || !knownDestination))))
+                        available &= false;
+                }
+
+                if(!message.Message.OverrideSourceAddress)
+                {
+                    if (!((received && (j1939Id.SourceAddress == CanState.NodeAddresses[message.Message.TransmitNodes[Service.Port]] || message.Message.TransmitNodes[Service.Port] == J1939PropertyDefinitions.BroadcastAddress))
+                            || (!received && (message.Message.TransmitNodes[Service.Port] == Service.Self.Id || message.Message.TransmitNodes[Service.Port] == J1939PropertyDefinitions.BroadcastAddress))))
+                        available &= false;
+                }
+
+                if (available)
+                {
+                    result = message;
                     return true;
+                }                 
             }
 
             return false;

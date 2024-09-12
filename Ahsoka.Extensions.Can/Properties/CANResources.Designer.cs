@@ -126,6 +126,34 @@ namespace Ahsoka.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to #pragma once
+        ///
+        ///#include &lt;string&gt;
+        ///#include &lt;functional&gt;
+        ///#include &quot;AhsokaServices.h&quot;
+        ///
+        ///namespace AhsokaCAN
+        ///{
+        ///    class CANProtocolHelper
+        ///    {
+        ///    public:
+        ///        CANProtocolHelper(CanMessageData data)
+        ///        {
+        ///            messageData = data;
+        ///        }
+        ///
+        ///    protected:
+        ///        CanMessageData messageData;
+        ///    };
+        ///}.
+        /// </summary>
+        internal static string CANProtocolHelper {
+            get {
+                return ResourceManager.GetString("CANProtocolHelper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
         internal static byte[] CanService {
@@ -280,6 +308,37 @@ namespace Ahsoka.Properties {
             get {
                 object obj = ResourceManager.GetObject("IHasCanData", resourceCulture);
                 return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #pragma once
+        ///
+        ///#include &lt;string&gt;
+        ///#include &lt;functional&gt;
+        ///#include &quot;AhsokaServices.h&quot;
+        ///#include &quot;CANProtocolHelper.h&quot;
+        ///
+        ///namespace AhsokaCAN
+        ///{
+        ///    class J1939Id
+        ///    {
+        ///    public:
+        ///        J1939Id() {}
+        ///
+        ///        J1939Id(uint id)
+        ///        {
+        ///            ExtractValues(id);
+        ///        }
+        ///
+        ///        uint GetSourceAddress() { return sourceInfo.GetValue&lt;uint&gt;(id, false); }
+        ///        void SetSourceAddress(uint value) { sourceInfo.SetValue&lt;uint&gt;(id, value, false); }
+        ///
+        ///        uint GetPDUS() { return specificInfo.G [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string J1939Helper {
+            get {
+                return ResourceManager.GetString("J1939Helper", resourceCulture);
             }
         }
         

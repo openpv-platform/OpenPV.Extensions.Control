@@ -52,7 +52,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
         if (!Enabled)
             return false;
 
-        var j1939Id = new J1939Helper.Id(messageData.Id);
+        var j1939Id = new J1939PropertyDefinitions.Id(messageData.Id);
         if (j1939Id.PDUF != PDUF && j1939Id.PDUF != childPDUF)
             return false;
 
@@ -64,10 +64,10 @@ internal class TPMessageHandler : J1939MessageHandlerBase
 
         if (j1939Id.PDUF == PDUF)
         {
-            var RTS = new J1939Helper.TPCM(BitConverter.ToUInt64(messageData.Data));
+            var RTS = new J1939PropertyDefinitions.TPCM(BitConverter.ToUInt64(messageData.Data));
 
             if (sessions.Where(x => !x.Transmitting).Count() < 2 &&
-            sessions.Where(x => !x.Transmitting && x.DestinationAddress == J1939Helper.BroadcastAddress).Any() &&
+            sessions.Where(x => !x.Transmitting && x.DestinationAddress == J1939PropertyDefinitions.BroadcastAddress).Any() &&
             sessions.Where(x => !x.Transmitting && x.DestinationAddress == j1939Id.PDUS).Any() &&
             Protocol.InAvailableMessages(RTS.PGN))
             {
@@ -81,7 +81,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                     Dlc = 8,
                     Id = CreateMessageId(Protocol.CanState.CurrentAddress, j1939Id.SourceAddress)
                 };
-                var abort = new J1939Helper.TPCM() { ControlByte = J1939Helper.CMControl.Abort, AbortReason = 1, AbortRole = 1, PGN = (messageData.Id >> 8) & 0x3FFFF };
+                var abort = new J1939PropertyDefinitions.TPCM() { ControlByte = J1939PropertyDefinitions.CMControl.Abort, AbortReason = 1, AbortRole = 1, PGN = (messageData.Id >> 8) & 0x3FFFF };
                 response.Data = BitConverter.GetBytes(RTS.WriteToUint());
 
                 var messageCollection = new CanMessageDataCollection
@@ -104,10 +104,10 @@ internal class TPMessageHandler : J1939MessageHandlerBase
 
         AhsokaLogging.LogMessage(AhsokaVerbosity.High, "TP Send");
 
-        var j1939Id = new J1939Helper.Id(sendInfo.messageData.Id);
+        var j1939Id = new J1939PropertyDefinitions.Id(sendInfo.messageData.Id);
         if (sessions.Where(x => x.Transmitting).Count() == 2)
             result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"No space for additional Multi-packet sessions" };
-        else if (sessions.Where(x => x.Transmitting && x.DestinationAddress == J1939Helper.BroadcastAddress).Count() == 1)
+        else if (sessions.Where(x => x.Transmitting && x.DestinationAddress == J1939PropertyDefinitions.BroadcastAddress).Count() == 1)
             result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"Can only send one broadcast message at a time" };
         else if (sessions.Where(x => x.Transmitting && x.DestinationAddress == j1939Id.PDUS).Count() == 1)
             result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"Message to this address already in progress" };
@@ -163,7 +163,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
 
         internal bool HandleMessageReceive(CanMessageData messageData)
         {
-            var j1939Id = new J1939Helper.Id(messageData.Id);
+            var j1939Id = new J1939PropertyDefinitions.Id(messageData.Id);
             if ((Transmitting && j1939Id.PDUS == SourceAddress && j1939Id.SourceAddress == DestinationAddress) ||
                 (!Transmitting && j1939Id.PDUS == DestinationAddress && j1939Id.SourceAddress == SourceAddress))
             {
@@ -184,18 +184,18 @@ internal class TPMessageHandler : J1939MessageHandlerBase
             {
                 numberOfPackets = (int)(messageData.Dlc / 7 + (messageData.Dlc % 7 > 0 ? 1 : 0));
 
-                var j1939Id = new J1939Helper.Id(messageData.Id);
+                var j1939Id = new J1939PropertyDefinitions.Id(messageData.Id);
                 var PGN = (messageData.Id >> 8) & 0x3FFFF;
                 DestinationAddress = j1939Id.PDUS;
                 SourceAddress = protocol.CanState.CurrentAddress;
                 Transmitting = true;
-                if (j1939Id.PDUS == J1939Helper.BroadcastAddress)
+                if (j1939Id.PDUS == J1939PropertyDefinitions.BroadcastAddress)
                 {
                     var response = new CanMessageData
                     {
-                        Id = handler.CreateMessageId(SourceAddress, J1939Helper.BroadcastAddress)
+                        Id = handler.CreateMessageId(SourceAddress, J1939PropertyDefinitions.BroadcastAddress)
                     };
-                    var TPCM = new J1939Helper.TPCM() { ControlByte = J1939Helper.CMControl.BAM, MessageSize = messageData.Dlc, NumPackets = (uint)numberOfPackets, PGN = PGN };
+                    var TPCM = new J1939PropertyDefinitions.TPCM() { ControlByte = J1939PropertyDefinitions.CMControl.BAM, MessageSize = messageData.Dlc, NumPackets = (uint)numberOfPackets, PGN = PGN };
                     response.Dlc = 8;
                     response.Data = BitConverter.GetBytes(TPCM.WriteToUint());
                     messageCollection.Messages.Add(response);
@@ -203,7 +203,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
 
                     TPEvent.Wait(Tr / 2);
 
-                    response.Id = (handler.CreateMessageId(SourceAddress, J1939Helper.BroadcastAddress) & 0xFF00FFFF) | TPMessageHandler.childPDUF << 16;
+                    response.Id = (handler.CreateMessageId(SourceAddress, J1939PropertyDefinitions.BroadcastAddress) & 0xFF00FFFF) | TPMessageHandler.childPDUF << 16;
                     SendPackets(messageData, response, 1, (uint)numberOfPackets);
                 }
                 else
@@ -212,7 +212,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                     {
                         Id = handler.CreateMessageId(SourceAddress, DestinationAddress)
                     };
-                    var RTS = new J1939Helper.TPCM() { ControlByte = J1939Helper.CMControl.RTS, MessageSize = messageData.Dlc, NumPackets = (uint)numberOfPackets, PacketsPerCTS = 0xFF, PGN = PGN };
+                    var RTS = new J1939PropertyDefinitions.TPCM() { ControlByte = J1939PropertyDefinitions.CMControl.RTS, MessageSize = messageData.Dlc, NumPackets = (uint)numberOfPackets, PacketsPerCTS = 0xFF, PGN = PGN };
                     response.Dlc = 8;
                     response.Data = BitConverter.GetBytes(RTS.WriteToUint());
                     messageCollection.Messages.Add(response);
@@ -224,7 +224,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                     {
                         if (recievedEvent.Wait(delay))
                         {
-                            var CTS = new J1939Helper.TPCM();
+                            var CTS = new J1939PropertyDefinitions.TPCM();
                             lock (receivedMessages)
                             {
                                 CTS.ExtractValues(BitConverter.ToUInt64(receivedMessages.First().Data));
@@ -232,7 +232,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                                 recievedEvent.Reset();
                             }
 
-                            if (CTS.ControlByte == J1939Helper.CMControl.CTS)
+                            if (CTS.ControlByte == J1939PropertyDefinitions.CMControl.CTS)
                             {
                                 if (CTS.PacketsRequested == 0)
                                 {
@@ -248,7 +248,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                                 SendPackets(messageData, response, CTS.PacketStart, CTS.PacketsRequested);
                                 delay = T3;
                             }
-                            else if (CTS.ControlByte is J1939Helper.CMControl.EndOfMsgACK or J1939Helper.CMControl.Abort)
+                            else if (CTS.ControlByte is J1939PropertyDefinitions.CMControl.EndOfMsgACK or J1939PropertyDefinitions.CMControl.Abort)
                             {
                                 transmissionFinished = true;
                             }
@@ -256,7 +256,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                         else
                         {
                             response.Id = handler.CreateMessageId(SourceAddress, DestinationAddress);
-                            var abort = new J1939Helper.TPCM() { ControlByte = J1939Helper.CMControl.Abort, AbortReason = 3, AbortRole = 0, PGN = PGN };
+                            var abort = new J1939PropertyDefinitions.TPCM() { ControlByte = J1939PropertyDefinitions.CMControl.Abort, AbortReason = 3, AbortRole = 0, PGN = PGN };
                             response.Data = BitConverter.GetBytes(abort.WriteToUint());
                             messageCollection.Messages.Clear();
                             messageCollection.Messages.Add(response);
@@ -275,18 +275,18 @@ internal class TPMessageHandler : J1939MessageHandlerBase
         {
             Task.Run(() =>
             {
-                var j1939Id = new J1939Helper.Id(messageData.Id);
+                var j1939Id = new J1939PropertyDefinitions.Id(messageData.Id);
                 var PGN = (messageData.Id >> 8) & 0x3FFFF;
                 DestinationAddress = j1939Id.PDUS;
                 SourceAddress = j1939Id.SourceAddress;
                 Transmitting = false;
                 var sequenceNumber = 1;
-                if (j1939Id.PDUS == J1939Helper.BroadcastAddress)
+                if (j1939Id.PDUS == J1939PropertyDefinitions.BroadcastAddress)
                 {
-                    var BAM = new J1939Helper.TPCM(BitConverter.ToUInt64(messageData.Data));
+                    var BAM = new J1939PropertyDefinitions.TPCM(BitConverter.ToUInt64(messageData.Data));
 
                     var message = new CanMessageData();
-                    var messageId = new J1939Helper.Id(BAM.PGN << 8)
+                    var messageId = new J1939PropertyDefinitions.Id(BAM.PGN << 8)
                     {
                         SourceAddress = SourceAddress,
                         Priority = 3
@@ -324,12 +324,12 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                 }
                 else if (j1939Id.PDUS == protocol.CanState.CurrentAddress)
                 {
-                    var RTS = new J1939Helper.TPCM(BitConverter.ToUInt64(messageData.Data));
+                    var RTS = new J1939PropertyDefinitions.TPCM(BitConverter.ToUInt64(messageData.Data));
                     if (RTS.PacketsPerCTS > RTS.NumPackets)
                         RTS.PacketsPerCTS = RTS.NumPackets;
 
                     var message = new CanMessageData();
-                    var messageId = new J1939Helper.Id(RTS.PGN << 8)
+                    var messageId = new J1939PropertyDefinitions.Id(RTS.PGN << 8)
                     {
                         SourceAddress = SourceAddress,
                         Priority = 3
@@ -351,7 +351,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                     {
                         if (sequenceNumber > RTS.NumPackets)
                         {
-                            var endACK = new J1939Helper.TPCM() { ControlByte = J1939Helper.CMControl.EndOfMsgACK, MessageSize = RTS.MessageSize, NumPackets = RTS.NumPackets, PGN = PGN };
+                            var endACK = new J1939PropertyDefinitions.TPCM() { ControlByte = J1939PropertyDefinitions.CMControl.EndOfMsgACK, MessageSize = RTS.MessageSize, NumPackets = RTS.NumPackets, PGN = PGN };
                             response.Data = BitConverter.GetBytes(endACK.WriteToUint());
                             messageCollection.Messages.Clear();
                             messageCollection.Messages.Add(response);
@@ -366,7 +366,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                         {
                             var packetsRequested = errorOccured ? 1 : RTS.PacketsPerCTS;
                             nextPacket = (int)(Math.Min(sequenceNumber + packetsRequested, RTS.NumPackets + 1));
-                            var CTS = new J1939Helper.TPCM() { ControlByte = J1939Helper.CMControl.CTS, PacketsRequested = packetsRequested, PacketStart = (uint)sequenceNumber, PGN = PGN };
+                            var CTS = new J1939PropertyDefinitions.TPCM() { ControlByte = J1939PropertyDefinitions.CMControl.CTS, PacketsRequested = packetsRequested, PacketStart = (uint)sequenceNumber, PGN = PGN };
                             response.Data = BitConverter.GetBytes(CTS.WriteToUint());
                             messageCollection.Messages.Clear();
                             messageCollection.Messages.Add(response);
@@ -407,7 +407,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                                 if (errorOccured)
                                     if (++numRetransmits > 2)
                                     {
-                                        var abort = new J1939Helper.TPCM() { ControlByte = J1939Helper.CMControl.Abort, AbortReason = 5, AbortRole = 1, PGN = PGN };
+                                        var abort = new J1939PropertyDefinitions.TPCM() { ControlByte = J1939PropertyDefinitions.CMControl.Abort, AbortReason = 5, AbortRole = 1, PGN = PGN };
                                         response.Data = BitConverter.GetBytes(abort.WriteToUint());
                                         messageCollection.Messages.Clear();
                                         messageCollection.Messages.Add(response);

@@ -43,18 +43,18 @@ internal class RQSTMessageHandler : J1939MessageHandlerBase
         if (!Enabled)
             return false;
 
-        var j1939Id = new J1939Helper.Id(messageData.Id);
+        var j1939Id = new J1939PropertyDefinitions.Id(messageData.Id);
 
         lock (Protocol.CanState)
         {
             if (j1939Id.PDUF == PDUF && BitConverter.ToUInt32(new byte[] { messageData.Data[0], messageData.Data[1], messageData.Data[2], 0 }) == 0x00EE00)
             {
-                if (j1939Id.PDUS != Protocol.CanState.CurrentAddress && j1939Id.PDUS != J1939Helper.BroadcastAddress)
+                if (j1939Id.PDUS != Protocol.CanState.CurrentAddress && j1939Id.PDUS != J1939PropertyDefinitions.BroadcastAddress)
                     return true;
 
-                var sendInfo = new SendInformation() { name = "AC", destinationAddress = J1939Helper.BroadcastAddress };
-                if (Protocol.CanState.CurrentAddress == J1939Helper.NullAddress)
-                    sendInfo.sourceAddress = J1939Helper.NullAddress;
+                var sendInfo = new SendInformation() { name = "AC", destinationAddress = J1939PropertyDefinitions.BroadcastAddress };
+                if (Protocol.CanState.CurrentAddress == J1939PropertyDefinitions.NullAddress)
+                    sendInfo.sourceAddress = J1939PropertyDefinitions.NullAddress;
                 else
                     sendInfo.sourceAddress = Protocol.CanState.CurrentAddress;
 

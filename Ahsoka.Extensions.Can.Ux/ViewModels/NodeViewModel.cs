@@ -2,6 +2,7 @@
 using Ahsoka.DeveloperTools.Views;
 using Ahsoka.Extensions.Can.UX.ViewModels.Nodes;
 using Ahsoka.Services.Can;
+using Ahsoka.Services.Can.Messages;
 using Ahsoka.Utility;
 using Avalonia.Controls;
 using Avalonia.Media;
@@ -394,7 +395,7 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNo
                 this.AddressDetails = "No Address Information";
                 break;
             case TransportProtocol.J1939:
-                this.AddressDetails = IsSelf ? $"J1939 Name: 0x{new J1939Helper.Name(NodeDefinition.J1939Info).WriteToUlong(0):X16}" : $"{NodeDefinition.J1939Info.AddressType.ToString().SplitCamelCase()} ({GetAddressDetail()})";
+                this.AddressDetails = IsSelf ? $"J1939 Name: 0x{new J1939PropertyDefinitions.Name(NodeDefinition.J1939Info).WriteToUlong(0):X16}" : $"{NodeDefinition.J1939Info.AddressType.ToString().SplitCamelCase()} ({GetAddressDetail()})";
                 break;
             case TransportProtocol.IsoTp:
                 this.AddressDetails = "Not Supported";

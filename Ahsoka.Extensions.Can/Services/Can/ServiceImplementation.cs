@@ -117,12 +117,17 @@ internal abstract class CanServiceImplementation
 
     internal uint ProcessMessage(CanMessageData messageData)
     {
-        return canHandler.ProcessMessage(messageData);
+        if (!promiscuousTransmit)
+            return canHandler.ProcessMessage(messageData);
+        return messageData.Id;
     }
 
     internal void FilterIncomingMessage(CanMessageData messageData, out bool shouldSend)
     {
         shouldSend = true;
+
+        if (promiscuousReceive)
+            return;
 
         if (canHandler == null)
         {
@@ -137,10 +142,7 @@ internal abstract class CanServiceImplementation
             Array.Copy(oldData, messageData.Data = new byte[oldData.Length + (8 - extraBytes)], oldData.Length);
         }
 
-        if (!promiscuousReceive)
-        {
-            shouldSend = canHandler.Receive(messageData);           
-        }
+        shouldSend = canHandler.Receive(messageData);
 
         if (shouldSend && canHandler.MatchId(messageData.Id, out var configId, true))
         {
