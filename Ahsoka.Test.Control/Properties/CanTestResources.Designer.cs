@@ -62,7 +62,7 @@ namespace Ahsoka.Test.Control.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to {
-        ///  &quot;version&quot;: &quot;3.1.1.20025&quot;,
+        ///  &quot;version&quot;: &quot;3.4.1.10014&quot;,
         ///  &quot;applicationType&quot;: &quot;Dotnet&quot;,
         ///  &quot;systemOrientation&quot;: &quot;DefaultOrientation&quot;,
         ///  &quot;execCommand&quot;: &quot;Ahsoka.CS.CAN&quot;,

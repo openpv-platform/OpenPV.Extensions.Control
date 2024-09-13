@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:material="using:Material.Icons.Avalonia"
+			 xmlns:progRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="Ahsoka.DeveloperTools.Views.CANGenerateView" >
+
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/UserInputStyles.axaml" />
+	</UserControl.Styles>
+	<Border Margin="5" >
+		<StackPanel>
+			<Grid ColumnDefinitions="auto,*" Margin="0,0,0,0" >
+				<TextBlock Foreground="SteelBlue" FontSize="16" Margin="3">Code Generation Setup</TextBlock>
+				<Border Grid.Column="1" BorderBrush="Gainsboro" Margin="4,10,0,10" BorderThickness="0,1,0,0" Height="2"/>
+			</Grid>
+			<Grid Margin="10" ColumnDefinitions="140,Auto,*"   RowDefinitions="20,auto,auto,auto,*">
+
+				<TextBlock Text="Generator Enabled:" Grid.Row="0" Grid.Column="0"/>
+				<CheckBox HorizontalAlignment="Stretch" BorderBrush="DimGray"
+						 Grid.Row="0" Margin="3,10" Grid.Column="1" IsChecked="{Binding GeneratorEnabled}" />
+				<TextBlock Text="The CAN Code Generator will generate model objects for your CPP or C# application."
+						   Grid.Row="0" Grid.Column="1" Margin="30,6,0,0" VerticalAlignment="Center"
+						   TextWrapping="WrapWithOverflow" MaxWidth="300" MinHeight="40"
+						   Foreground="DimGray"/>
+
+				<TextBlock Text="Model Output File:" Grid.Row="1" Grid.Column="0"/>
+				<TextBox HorizontalAlignment="Stretch"
+						 Grid.Row="1" Grid.Column="1" Text="{Binding GeneratorOutputFile}"
+						 MinWidth="300"  />
+
+				<TextBlock Text="Model Namespace:" Grid.Row="2" Grid.Column="0"/>
+				<TextBox HorizontalAlignment="Stretch"
+						 Grid.Row="2" Grid.Column="1" Text="{Binding GeneratorNamespace}"
+						 MinWidth="300"  />
+
+				<TextBlock Text="Model Base Class:" Grid.Row="3" Grid.Column="0"/>
+				<TextBox HorizontalAlignment="Stretch"
+						 Grid.Row="3" Grid.Column="1" Text="{Binding GeneratorBaseClass}"
+						 MinWidth="300"  />
+			</Grid>
+		</StackPanel>
+	</Border>
+
+</UserControl>

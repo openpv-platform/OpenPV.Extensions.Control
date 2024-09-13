@@ -1,0 +1,50 @@
+﻿<Project TreatAsLocalProperty="IGNORE_PREREQS">
+
+
+	<PropertyGroup>
+		<DemoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\'))</DemoRoot>
+	</PropertyGroup>
+
+
+	<Target Name="CreateDemo" BeforeTargets="PreBuildEvent">
+
+		<!-- Create Demo Packages -->
+		<ItemGroup>
+			<DEMO_GTK Include="$(DemoRoot)Demos\Ahsoka.CS.GTK\**" />
+		</ItemGroup>
+	
+		<Message Text ="Preparing demos at $(DemoRoot)" Importance ="high"/>
+	
+		<!--GTK Demo-->
+		<Copy SourceFiles="@(DEMO_GTK)" DestinationFolder="$(DemoRoot)\DemoOutputs\Ahsoka.CS.GTK\%(RecursiveDir)" />
+		<RemoveDir ContinueOnError="true" Directories="$(DemoRoot)\DemoOutputs\Ahsoka.CS.GTK\bin\" />
+		<RemoveDir ContinueOnError="true" Directories="$(DemoRoot)\DemoOutputs\Ahsoka.CS.GTK\publish\" />
+		<RemoveDir ContinueOnError="true" Directories="$(DemoRoot)\DemoOutputs\Ahsoka.CS.GTK\obj\" />
+		<RemoveDir ContinueOnError="true" Directories="$(DemoRoot)\DemoOutputs\Ahsoka.CS.GTK\.vs\" />
+		<ZipDirectory Overwrite="true" SourceDirectory="$(DemoRoot)\DemoOutputs\Ahsoka.CS.GTK\" DestinationFile="$(DemoRoot)\DemoOutputs\Ahsoka.CS.GTK.zip" />
+		
+		<ZipDirectory Overwrite="true" SourceDirectory="$(DemoRoot)\Demos\Ahsoka.Codesys.IO\" DestinationFile="$(DemoRoot)\DemoOutputs\Ahsoka.Codesys.IO.zip" />
+
+	</Target>
+
+	<ItemGroup Label="IO Demos" >
+		<Content Include="$(DemoRoot)DemoOutputs\Ahsoka.CS.GTK.zip">
+			<Link>Demos\Ahsoka.CS.GTK.zip</Link>
+			<PackagePath>demos/Ahsoka.CS.GTK.zip</PackagePath>
+			<PackageCopyToOutput>true</PackageCopyToOutput>
+			<IncludeInPackage>true</IncludeInPackage>
+			<Pack>true</Pack>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Visible>true</Visible>
+		</Content>
+		<Content Include="$(DemoRoot)DemoOutputs\Ahsoka.Codesys.IO.zip">
+			<Link>Demos\Ahsoka.Codesys.IO.zip</Link>
+			<PackagePath>demos/Ahsoka.Codesys.IO.zip</PackagePath>
+			<PackageCopyToOutput>true</PackageCopyToOutput>
+			<IncludeInPackage>true</IncludeInPackage>
+			<Pack>true</Pack>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Visible>true</Visible>
+		</Content>
+	</ItemGroup>
+</Project>

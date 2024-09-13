@@ -22,9 +22,11 @@ typedef struct canMessage_type
     crcFunc crc;              // set to NULL if there is no checksum
     uint8_t crcPos;         // set to 0 if there is no checksum.
     uint8_t msgType;
-    uint8_t insertAddress;
+    uint8_t overrideSource;
+    uint8_t overrideDestination;
     uint8_t dlc;
     uint8_t rollCountBitPos;  // set to 0 if there is no roll count
+    uint32_t idMask;
     uint32_t transmitNodeId;
     uint32_t receiverNodeId;
 }canMessage_t;

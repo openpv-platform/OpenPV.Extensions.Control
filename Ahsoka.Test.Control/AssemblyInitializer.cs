@@ -35,7 +35,7 @@ public class TestInitializer : LinearTestBase
             HardwareInfo.AddHardwareInfo(hd);
         }
 
-        Extensions.LoadExtensions();
+        Ahsoka.System.Extensions.LoadExtensions();
 
         /// Prep Windows for Tests
         var progress = new Progress<string>(Console.WriteLine);

@@ -10,7 +10,7 @@
 	<ItemGroup>
 	  <Content Include="..\Ahsoka.Shared\WindowsHardwareConfiguration.json" Link="WindowsHardwareConfiguration.json" />
 	  <Content Include="..\Demos\Ahsoka.CS.CAN\OpenLinuxST.PackageInfo.json" Link="OpenLinuxST.PackageInfo.json" />
-	  <Content Include="..\Demos\Ahsoka.CS.CAN\STDemoPackage.1.cancalibration.json" Link="STDemoPackage.1.cancalibration.json" />
+	  <Content Include="..\Demos\Ahsoka.CS.CAN\CANServiceConfiguration.json" Link="CANServiceConfiguration.json" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -22,8 +22,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Ahsoka.Core.CAN\Ahsoka.Core.Can.csproj" />
-		<ProjectReference Include="..\Ahsoka.Core.IO\Ahsoka.Core.IO.csproj" />
+		<ProjectReference Include="..\Ahsoka.Extensions.Can\Ahsoka.Extensions.Can.csproj" />
+		<ProjectReference Include="..\Ahsoka.Extensions.IO\Ahsoka.Extensions.IO.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

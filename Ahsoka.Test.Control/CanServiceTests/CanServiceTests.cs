@@ -2,6 +2,10 @@ using Ahsoka.Installer;
 using Ahsoka.Installer.Components;
 using Ahsoka.ServiceFramework;
 using Ahsoka.Services.Can;
+using Ahsoka.Services.Can.Messages;
+using Ahsoka.Services.IO;
+using Ahsoka.Services.Network;
+using Ahsoka.Services.System;
 using Ahsoka.System;
 using Ahsoka.System.Hardware;
 using Ahsoka.Test.Control.Properties;
@@ -27,10 +31,23 @@ public class CanServiceTests : LinearTestBase
     readonly List<CanMessageData> messages = new();
 
 
+    internal static void GetParametersTests(PackageInformation info )
+    {
+        var knownValues = AhsokaMessagesBase.GetAllSystemParameters(info);
+
+        Assert.IsTrue(knownValues.Any(x => x.Key == IOService.Name));
+        var systemKeys = knownValues.FirstOrDefault(x => x.Key == IOService.Name);
+        Assert.IsTrue(systemKeys.Value.Any(x => x.Name == "Available"));
+
+        Assert.IsTrue(knownValues.Any(x => x.Key == CanService.Name));
+        systemKeys = knownValues.FirstOrDefault(x => x.Key == CanService.Name);
+        Assert.IsTrue(systemKeys.Value.Any(x => x.Name == "DRIVER_HEARTBEAT_cmd"));
+    }
+
     [TestMethod]
     public void TestCanGenerator()
     {
-        string canConfigFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + CanMetadataTools.CanCalExtension);
+        string canConfigFile = Path.Combine(Path.GetTempPath(), CanMetadataTools.CanConfigurationExtension);
         string canDBCFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".dbc");
 
         // Force to Current Directory for Code Coverage
@@ -59,7 +76,7 @@ public class CanServiceTests : LinearTestBase
     public void TestServiceParameters()
     {
         // Create Test Data from CAN Demo
-        string canConfigFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + CanMetadataTools.CanCalExtension);
+        string canConfigFile = Path.Combine(Path.GetTempPath(), CanMetadataTools.CanConfigurationExtension);
         string projectFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".packageinfo.json");
         File.WriteAllText(canConfigFile, CanTestResources.STDemoPackage_1_cancalibration);
         File.WriteAllText(projectFile, CanTestResources.OpenLinuxST_PackageInfo);
@@ -68,7 +85,7 @@ public class CanServiceTests : LinearTestBase
         PackageInformation info = PackageInformation.LoadPackageInformation(projectFile);
         info.ServiceInfo.RuntimeConfiguration.ExtensionInfo.FirstOrDefault(x => x.ExtensionName == "CAN Service Extension").ConfigurationFile = Path.GetFileName(canConfigFile);
 
-        var parameters = AhsokaMessagesBase.GetAllServiceParameters(info);
+        var parameters = AhsokaMessagesBase.GetAllSystemParameters(info);
         Assert.IsTrue(parameters[CanService.Name].Any(x => x.Name == "DRIVER_HEARTBEAT_cmd"));
 
         File.Delete(projectFile);
@@ -76,9 +93,9 @@ public class CanServiceTests : LinearTestBase
 
     }
 
-    private static CanApplicationCalibration TestAppConfigFile(string canConfigFile)
+    private static CanApplicationConfiguration TestAppConfigFile(string canConfigFile)
     {
-        CanClientCalibration config = ConfigurationFileLoader.LoadFile<CanClientCalibration>(canConfigFile);
+        CanClientConfiguration config = ConfigurationFileLoader.LoadFile<CanClientConfiguration>(canConfigFile);
         config.Nodes.FirstOrDefault(x => x.Name == "IO").NodeType = NodeType.Self;
         config.Nodes.FirstOrDefault(x => x.Name == "IO").TransportProtocol = TransportProtocol.J1939;
         var info = new J1939NodeDefinition()
@@ -91,14 +108,14 @@ public class CanServiceTests : LinearTestBase
         config.Nodes.Add(CanSystemInfo.StandardCanMessages.Nodes.First(x => x.Name == "ANY"));
         File.WriteAllText(canConfigFile, JsonUtility.Serialize(config));
 
-        CanApplicationCalibration appConfig = CanMetadataTools.GenerateApplicationConfig(SystemInfo.HardwareInfo, canConfigFile, false);
+        CanApplicationConfiguration appConfig = CanMetadataTools.GenerateApplicationConfig(SystemInfo.HardwareInfo, canConfigFile, false);
 
         Assert.IsTrue(appConfig.CanPortConfiguration.MessageConfiguration.Nodes.FirstOrDefault(x => x.Name == "SENSOR") != null);
 
         return appConfig;
     }
 
-    private void TestCanService(CanApplicationCalibration appConfig)
+    private void TestCanService(CanApplicationConfiguration appConfig)
     {
         // Write Config to Output Location
         string coprocessorPath = SystemInfo.HardwareInfo.TargetPathInfo.GetInstallerPath(InstallerPaths.CoProcessorApplicationPath);
@@ -178,11 +195,12 @@ public class CanServiceTests : LinearTestBase
 
         // Test Send Recurring Messages
         // We use "other id" since its not filtered.
-        canMessage.Id = otherId;
+        var data = canMessage.CreateCanMessageData();
+        data.Id = otherId;
         status = client.SendRecurringCanMessage(new RecurringCanMessage()
         {
             CanPort = 1,
-            Message = canMessage.CreateCanMessageData(),
+            Message = data,
             TimeoutBeforeUpdateInMs = 1000,
             TransmitIntervalInMs = 5
         });
@@ -192,7 +210,7 @@ public class CanServiceTests : LinearTestBase
         status = client.SendRecurringCanMessage(new RecurringCanMessage()
         {
             CanPort = 1,
-            Message = canMessage.CreateCanMessageData(),
+            Message = data,
             TimeoutBeforeUpdateInMs = 1000,
             TransmitIntervalInMs = 5
         });
@@ -222,11 +240,12 @@ public class CanServiceTests : LinearTestBase
         // Cover TSC1 and Error Conditions
         var canMessage2 = CreateTestViewModel();
 
-        canMessage2.Id = secondMessage.Id + 1;
-        status = client.SendCanMessages(1, canMessage2); // Send Error Message
+        data = canMessage2.CreateCanMessageData();
+        data.Id = secondMessage.Id + 1;
+        status = client.SendCanMessages(1, data); // Send Error Message
 
-        canMessage2.Id = tsc1.Id;
-        status = client.SendCanMessages(1, canMessage2); // Send Roll Count / TSC1
+        data.Id = tsc1.Id;
+        status = client.SendCanMessages(1, data); // Send Roll Count / TSC1
 
 
         // Sleep to Recurring message Expires (Expires at 500ms)
@@ -247,7 +266,8 @@ public class CanServiceTests : LinearTestBase
         client.SendCanMessages(1, returnMsg);
 
         // Mutate Message to Pass Filter
-        returnMsg.Id = otherId;
+        data = returnMsg.CreateCanMessageData();
+        data.Id = otherId;
         client.SendCanMessages(1, returnMsg);
 
         // We should get ONE message and it shoudl match the filter 
@@ -299,7 +319,7 @@ public class CanServiceTests : LinearTestBase
         string canPackageInfoFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + "PackageInfo.json");
         PackageInformation packageInformation = new()
         {
-            ServiceInfo = new ServiceInfo()
+            ServiceInfo = new()
             {
                 RuntimeConfiguration = new RuntimeConfiguration()
                 {
@@ -320,9 +340,14 @@ public class CanServiceTests : LinearTestBase
         packageInformation.ServiceInfo.RuntimeConfiguration.ExtensionInfo = new List<ExtensionInfo>() { new ExtensionInfo() { ExtensionName = "CAN Service Extension", ConfigurationFile = canConfigFile } };
 
         // Load Test Generator
-        Extensions.AddPrivateExtension(Assembly.GetExecutingAssembly());
+        Ahsoka.System.Extensions.AddPrivateExtension(Assembly.GetExecutingAssembly());
 
+        
         File.WriteAllText(canPackageInfoFile, JsonUtility.Serialize(packageInformation));
+
+        packageInformation = PackageInformation.LoadPackageInformation(canPackageInfoFile);
+        // Validate Parameter Info
+        GetParametersTests(packageInformation);
 
         string outputFileNameDotNet = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".generated.cs");
         string outputFileNameCPP = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".generated.hpp");
@@ -354,7 +379,7 @@ public class CanServiceTests : LinearTestBase
         Assert.IsTrue(classFileContent.Contains("/*ExtendSetter*/"));
         Assert.IsTrue(classFileContent.Contains("/*ExtendMethods+Impl*/"));
        
-
+        
         // Generate Class File.
         File.Delete(outputFileNameDotNet);
         File.Delete(outputFileNameCPP);
@@ -407,13 +432,13 @@ public class CanServiceTests : LinearTestBase
     [TestMethod]
     public void GenerateBlankConfigFromDBC()
     {
-        string canConfigFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + CanMetadataTools.CanCalExtension);
+        string canConfigFile = Path.Combine(Path.GetTempPath(), CanMetadataTools.CanConfigurationExtension);
         string canDBCFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".dbc");
         File.WriteAllText(canDBCFile, CanTestResources.TestFile);
 
         CanMetadataTools.GenerateCalibrationFromDBC(canDBCFile, canConfigFile);
 
-        CanClientCalibration config = ConfigurationFileLoader.LoadFile<CanClientCalibration>(canConfigFile);
+        var config = ConfigurationFileLoader.LoadFile<CanClientConfiguration>(canConfigFile);
         Assert.IsTrue(config.Nodes.Count > 0);
         Assert.IsTrue(config.Messages.Count > 0);
 
@@ -446,11 +471,11 @@ public static class CanModelMetadata
         // TestCanModel Metadata - 500
         metaData.Add(500, new Dictionary<string, CanPropertyInfo>()
         {
-            { "TestEnum", new(4, 8, ByteOrder.LittleEndian, ValueType.Enum, 1, 0, 1) },
-            { "TestUnsigned", new(12, 8, ByteOrder.LittleEndian, ValueType.Unsigned, 2, 0, 2) },
-            { "TestSigned", new(20, 8, ByteOrder.LittleEndian, ValueType.Signed, 1, 0, 3) },
-            { "TestFloat", new(32, 32, ByteOrder.LittleEndian, ValueType.Float, 1, 0, 4) },
-            { "TestDouble", new(64, 64, ByteOrder.LittleEndian, ValueType.Double, 1, 0, 5) }
+            { "TestEnum", new(4, 8, ByteOrder.LittleEndian, ValueType.Enum, 1, 0, 1,uniqueId: 1) },
+            { "TestUnsigned", new(12, 8, ByteOrder.LittleEndian, ValueType.Unsigned, 2, 0, 2,uniqueId: 2) },
+            { "TestSigned", new(20, 8, ByteOrder.LittleEndian, ValueType.Signed, 1, 0, 3, 3,uniqueId:3 ) },
+            { "TestFloat", new(32, 32, ByteOrder.LittleEndian, ValueType.Float, 1, 0, 4, 4,uniqueId:4 ) },
+            { "TestDouble", new(64, 64, ByteOrder.LittleEndian, ValueType.Double, 1, 0, 5, 5,uniqueId:5 ) }
         });
     }
 }

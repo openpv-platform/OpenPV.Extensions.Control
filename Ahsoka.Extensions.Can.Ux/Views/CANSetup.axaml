@@ -1,0 +1,125 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="450"
+             xmlns:CustomerTools="clr-namespace:Ahsoka.DeveloperTools.Views"
+             xmlns:vm="clr-namespace:Ahsoka.Extensions.Can.UX.ViewModels.Nodes" MinWidth="900"
+			 xmlns:material="using:Material.Icons.Avalonia"
+             x:Class="Ahsoka.DeveloperTools.Views.CANSetup">
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/UserInputStyles.axaml" />
+	</UserControl.Styles>
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="250"/>
+		</Grid.ColumnDefinitions>
+		<Border Grid.Column="1" Background="WhiteSmoke"
+				BorderBrush="Gainsboro" BorderThickness="1,0,0,0">
+			<StackPanel Margin="-15,0,-15,0"
+				HorizontalAlignment="Center"  >
+				<TextBlock FontSize="18"
+				   VerticalAlignment="Top"
+				   HorizontalAlignment="Center"
+				   Margin="12"
+				   Foreground="DimGray"
+				   Text="CAN Actions "/>
+				<Button Margin="3,3,5,3"
+						HorizontalAlignment="Stretch"
+						Height="38"
+						VerticalContentAlignment="Center"
+						Command="{Binding CreateFromDBC}">
+					<StackPanel Orientation="Horizontal">
+						<material:MaterialIcon Width="24" Height="24" Foreground="SteelBlue" Kind="Create"></material:MaterialIcon>
+						<TextBlock Margin="6,0" VerticalAlignment="Center" FontSize="13" ToolTip.Tip="Create a CAB Calibration file from an existing DBC file." Text="Create from DBC..."/>
+					</StackPanel>
+				</Button>
+				<Button Margin="3,3,5,3"
+						HorizontalAlignment="Stretch"
+						Height="38"
+						VerticalContentAlignment="Center"
+						Command="{Binding SetConfigurationDirectory}">
+					<StackPanel Orientation="Horizontal">
+						<material:MaterialIcon Width="24" Height="24" Foreground="SteelBlue" Kind="Import"></material:MaterialIcon>
+						<TextBlock Margin="6,0" VerticalAlignment="Center" FontSize="13" ToolTip.Tip="Import an existing CAN Calibration." Text="Import Existing..."/>
+					</StackPanel>
+				</Button>
+
+				<Button Margin="3,13,5,23"
+					HorizontalAlignment="Stretch"
+					Height="38"
+					VerticalContentAlignment="Center"
+					Command="{Binding RemoveConfiguration}">
+					<StackPanel Orientation="Horizontal">
+						<material:MaterialIcon Width="24" Height="24" Foreground="SteelBlue" Kind="Refresh"></material:MaterialIcon>
+						<TextBlock Margin="6,0" VerticalAlignment="Center" FontSize="13"  Text="Clear Calibration"/>
+					</StackPanel>
+				</Button>
+			</StackPanel>
+		</Border>
+		<DockPanel HorizontalAlignment="Stretch">
+			<Grid>
+				<Grid Margin="0,20" ColumnDefinitions="300,10,*">
+					<Border Margin="-5,-10" BorderThickness="0" BorderBrush="Gainsboro">
+						<Grid RowDefinitions="auto,*">
+							<StackPanel Grid.Row="0"  IsVisible="{Binding ShowAddRemove}" VerticalAlignment="Top"
+								 Orientation="Horizontal" Margin="0,-4,-4,0" HorizontalAlignment="Right" >
+								<Button Margin="0,0,3,0"
+									 Width="26" Height="26" Background="Transparent"  BorderBrush="Transparent">
+									<material:MaterialIcon Width="20" Height="20" Foreground="SteelBlue" Kind="Plus"></material:MaterialIcon>
+									<Button.Flyout>
+									<MenuFlyout>
+										<MenuItem Header="Add Message" Command="{Binding AddMessage}">
+											<MenuItem.Icon>
+												<material:MaterialIcon Width="24" Height="24" Foreground="SteelBlue" Kind="ApplicationArray"></material:MaterialIcon>
+											</MenuItem.Icon>
+										</MenuItem>
+										<MenuItem Header="Add Node" Command="{Binding AddNode}">
+											<MenuItem.Icon>
+												<material:MaterialIcon Width="24" Height="24" Foreground="SteelBlue" Kind="Devices"></material:MaterialIcon>
+											</MenuItem.Icon>
+										</MenuItem>
+									</MenuFlyout>
+									</Button.Flyout>
+								</Button>
+								<Button Command="{Binding RemoveItem}" IsEnabled="{Binding SelectedDiagnosticEvent.IsEditable}"
+									Width="26" Height="26" Background="Transparent"  BorderBrush="Transparent">
+									<material:MaterialIcon Width="20" Height="20" Foreground="SteelBlue" Kind="Minus"></material:MaterialIcon>
+								</Button>
+							</StackPanel>
+							<Grid Grid.Row="0" ColumnDefinitions="auto,*" Margin="18,0,75,10" >
+								<TextBlock Foreground="SteelBlue" FontSize="16" Margin="3">CAN Configuration</TextBlock>
+								<Border Grid.Column="1" BorderBrush="Gainsboro" Margin="4,10,0,10" BorderThickness="0,1,0,0" Height="2"/>
+							</Grid>
+							<TreeView Grid.Row="1" Margin="14,0,14,0" VerticalAlignment="Stretch"
+								  ItemsSource="{Binding RootNodes}" 
+								  SelectedItem="{Binding SelectedTreeNode}"
+								  SelectionMode="Single">
+								<TreeView.Styles>
+									<Style Selector="TreeViewItem">
+										<Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+									</Style>
+								</TreeView.Styles>
+								<TreeView.ItemTemplate>
+									<TreeDataTemplate ItemsSource="{Binding Children}">
+										<StackPanel Margin="-6,0,0,0" HorizontalAlignment="Left" Orientation="Horizontal">
+											<material:MaterialIcon Width="24" Height="24" Foreground="SteelBlue" Kind="{Binding Icon}"></material:MaterialIcon>
+											<TextBlock Foreground="DimGray" Text="{Binding NodeDescription}" />
+										</StackPanel>
+									</TreeDataTemplate>
+								</TreeView.ItemTemplate>
+							</TreeView>
+						</Grid>
+					</Border>
+					<Border Margin="0,40,0,0" Grid.Column="2" Padding="10" 
+							Child="" 
+							BorderThickness="1,0,0,0" BorderBrush="WhiteSmoke">
+						<ContentControl Margin="0,-65,0,0" Content="{Binding SelectedUserControl}"/>
+					</Border>
+				</Grid>
+			</Grid>
+		</DockPanel>
+	</Grid>
+</UserControl>
+

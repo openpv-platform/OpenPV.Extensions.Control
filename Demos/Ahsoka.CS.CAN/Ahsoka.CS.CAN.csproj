@@ -11,7 +11,7 @@
 	<ItemGroup Label="Reference to Ahsoka Nuget Packages">
 		<PackageReference Include="Ahsoka.Core.Drawing" Version="3.*-*" />
 		<PackageReference Include="Ahsoka.Core" Version="3.*-*" />
-		<PackageReference Include="Ahsoka.Core.CAN" Version="3.*-*" />
+		<PackageReference Include="Ahsoka.Extensions.CAN" Version="3.*-*" />
 	</ItemGroup>
   <!--Beginning in OpenPV 3.0, Command Line Code Generators have been simplified and now execute as part of the 
 	SDK Installation so Targets (ExportCanClasses) & Properties (Can Generator Properties) below are no 
@@ -39,7 +39,7 @@
     <None Update="Cloud.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="STDemoPackage.1.cancalibration.json">
+    <None Update="CANServiceConfiguration.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

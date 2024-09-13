@@ -1,0 +1,144 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:material="using:Material.Icons.Avalonia"
+			 xmlns:progRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="Ahsoka.DeveloperTools.Views.CANNodeEditView" >
+
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/UserInputStyles.axaml" />
+	</UserControl.Styles>
+	<Border Margin="5"  >
+		<Grid RowDefinitions="auto,auto,*">
+			<Grid ColumnDefinitions="auto,*" Margin="0,0,0,0" >
+				<TextBlock Foreground="SteelBlue" FontSize="16" Text="{Binding Name, StringFormat='Node: {0}', FallbackValue='Node: 0'}" Margin="3"/>
+				<Border Grid.Column="1" BorderBrush="Gainsboro" Margin="4,10,0,10" BorderThickness="0,1,0,0" Height="2"/>
+			</Grid>
+			<Border Margin="5,0" Grid.Row="1" Padding="3" BorderBrush="WhiteSmoke" BorderThickness="0,0,0,0">
+				<Grid RowDefinitions="auto,auto,auto,auto,*">
+					<Grid Margin="5" ColumnDefinitions="145,Auto" RowDefinitions="*,*,*,*,*" IsEnabled="{Binding IsEditable}">
+						<TextBlock Text="Node ID:" Grid.Row="0" Grid.Column="0"/>
+						<StackPanel Orientation="Horizontal" Grid.Column="1">
+							<TextBox  Background="WhiteSmoke" Text="{Binding NodeDefinition.IdValid}" Grid.Row="0" Width="100" IsReadOnly="True"  />
+							<TextBlock Text="Is Self:" Grid.Row="0" Grid.Column="0"/>
+							<CheckBox  Margin="3" IsChecked="{Binding IsSelf}"    />
+						</StackPanel>
+						<TextBlock Text="Node Name:" Grid.Row="1" Grid.Column="0"/>
+						<TextBox Text="{Binding Name}" Grid.Row="1" Width="300"  TextWrapping="NoWrap" Grid.Column="1" />
+
+						<TextBlock Text="Transport Protocol:" Grid.Row="2" Grid.Column="0"/>
+						<ComboBox ItemsSource="{Binding TransportProtocols}"
+								  SelectedItem="{Binding TransportProtocol}"
+								  Width="300" Grid.Row="2"
+								  Grid.Column="1" />
+						<TextBlock Text="CAN Port:" Grid.Row="3" Grid.Column="0"/>
+						<ComboBox ItemsSource="{Binding Ports}"
+								  SelectedItem="{Binding SelectedPort}"
+								  Width="300" Grid.Row="3"
+								  Grid.Column="1"/>
+						<TextBlock Text="Comment:" Grid.Row="5" Grid.Column="0"/>
+						<TextBox  Text="{Binding Comment}" Grid.Row="5" Width="300"  TextWrapping="NoWrap" Grid.Column="1" />
+
+					</Grid>
+
+					<StackPanel  Grid.Row="1">
+						<Border IsVisible="{Binding IsJ1939}" BorderBrush="Gainsboro"  BorderThickness="0,1,0,0" Margin="20,20,0,20" Height="2"/>
+						<TextBlock IsVisible="{Binding IsJ1939}" Margin="-10,-34,0,10"  FontSize="16"  Text="Transport Information " Foreground="SteelBlue" HorizontalAlignment="Left" Background="White"  />
+					</StackPanel>
+					<StackPanel  Grid.Row="2" IsVisible="{Binding !IsSelf, FallbackValue=true}">
+						<Grid IsVisible="{Binding IsJ1939}" Margin="5" ColumnDefinitions="145,Auto" RowDefinitions="38,38" IsEnabled="{Binding IsEditable}">
+							<TextBlock Text="Address Type: " Grid.Row="0" Grid.Column="0"/>
+							<ComboBox ItemsSource="{Binding NodeAddressTypes}"  SelectedItem="{Binding NodeAddressType}" Width="300" Grid.Row="0" Grid.Column="1" />
+
+							<TextBlock Text="{Binding LabelOne}"  Grid.Row="1" Grid.Column="0"/>
+							<StackPanel Orientation="Horizontal" Grid.Row="1"  Grid.Column="2">
+								<TextBox IsVisible="{Binding LabelOne, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+									 Text="{Binding NodeDefinition.J1939Info.AddressOneValid}" Grid.Row="1" Width="100" Grid.Column="1" />
+
+								<TextBlock Text="{Binding LabelTwo}" Grid.Row="2" Grid.Column="0"/>
+								<TextBox  IsVisible="{Binding LabelTwo, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+										 Text="{Binding NodeDefinition.J1939Info.AddressTwoValid}" Grid.Row="2" Width="100"  Grid.Column="1" />
+
+								<TextBlock Text="{Binding LabelThree}" Grid.Row="3" Grid.Column="0"/>
+								<TextBox IsVisible="{Binding LabelThree, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+										 Text="{Binding NodeDefinition.J1939Info.AddressThreeValid}" Grid.Row="3" Width="100" Grid.Column="1" />
+							</StackPanel>
+						</Grid>
+					</StackPanel>
+
+					<StackPanel Grid.Row="2" IsVisible="{Binding IsSelf , FallbackValue=false}">
+						<Grid IsVisible="{Binding IsJ1939}" Margin="5" ColumnDefinitions="145,Auto,145,Auto" RowDefinitions="*,*,*,*,*" IsEnabled="{Binding IsEditable}">
+							<TextBlock Text="Address Claim Min:"  Grid.Row="0" Grid.Column="0"/>
+							<TextBox Text="{Binding ACMin}" Grid.Row="0" Width="100" Grid.Column="1" />
+							<TextBlock Text="Max:"  Grid.Row="0" Grid.Column="2"/>
+							<TextBox Text="{Binding ACMax}" Grid.Row="0" Width="100" Grid.Column="3" />
+
+							<TextBlock Text="Industry Group:"  Grid.Row="1" Grid.Column="0"/>
+							<TextBox Text="{Binding IndustryGroup}" Grid.Row="1" Width="100" Grid.Column="1" />
+							<TextBlock Text="ECU Instance:"  Grid.Row="1" Grid.Column="2"/>
+							<TextBox Text="{Binding ECUInstance}" Grid.Row="1" Width="100" Grid.Column="3" />
+
+							<TextBlock Text="Vehicle System:"  Grid.Row="2" Grid.Column="0"/>
+							<TextBox Text="{Binding VehicleSystem}" Grid.Row="2" Width="100" Grid.Column="1" />
+							<TextBlock Text="Vehicle Instance:"  Grid.Row="2" Grid.Column="2"/>
+							<TextBox Text="{Binding VehicleSystemInstance}" Grid.Row="2" Width="100" Grid.Column="3" />
+
+							<TextBlock Text="Function:"  Grid.Row="3" Grid.Column="0"/>
+							<TextBox Text="{Binding Function}" Grid.Row="3" Width="100" Grid.Column="1" />
+							<TextBlock Text="Function Instance:"  Grid.Row="3" Grid.Column="2"/>
+							<TextBox Text="{Binding FunctionInstance}" Grid.Row="3" Width="100" Grid.Column="3" />
+
+							<TextBlock Text="Manufacturer Code:"  Grid.Row="4" Grid.Column="0"/>
+							<TextBox Text="{Binding ManufacturerCode}" Grid.Row="4" Width="100" Grid.Column="1" />
+
+						</Grid>
+					</StackPanel>
+
+					<StackPanel  Grid.Row="3"  >
+						<Border BorderBrush="Gainsboro" BorderThickness="0,1,0,0" Margin="20,20,0,20" Height="2"/>
+						<TextBlock Margin="-10,-34,0,10"  FontSize="16"  Text="Messages Setup " Foreground="SteelBlue" HorizontalAlignment="Left" Background="White"  />
+					</StackPanel>
+
+					<DataGrid Grid.Row="4"  IsEnabled="{Binding IsEditable}" Name="Releases"
+						 SelectionMode="Single"
+						 ItemsSource="{Binding Messages}"
+						 Margin="10,10,20,0" AutoGenerateColumns="False" >
+						<DataGrid.Styles>
+							<Style Selector="DataGridCell">
+								<Setter Property="HorizontalContentAlignment" Value="Left"/>
+							</Style>
+						</DataGrid.Styles>
+						<DataGrid.Columns>
+							<DataGridTextColumn Header="Message ID"  IsReadOnly="true" Width="130" CellStyleClasses="Centered"  Binding="{Binding MessageID}" />
+							<DataGridTextColumn Header="Message Name" IsReadOnly="true"  Width="150" Binding="{Binding MessageName}"/>
+							<DataGridTemplateColumn Header="Received?" Width="190" >
+								<DataGridTemplateColumn.CellTemplate>
+									<DataTemplate >
+										<StackPanel Orientation="Horizontal">
+											<CheckBox  Margin="8,3" IsChecked="{Binding CanReceive}"/>
+											<TextBlock Margin="-8,3" IsVisible="{Binding CanReceive}"  FontSize="10"  Text="Recieved only by this Node" Foreground="SteelBlue" HorizontalAlignment="Left"   />
+											<TextBlock  Margin="-8,3" IsVisible="{Binding !CanReceive}"  FontSize="10"  Text="Recieved by any Node" Foreground="DimGray" HorizontalAlignment="Left"/>
+										</StackPanel>
+									</DataTemplate>
+								</DataGridTemplateColumn.CellTemplate>
+							</DataGridTemplateColumn>
+							<DataGridTemplateColumn Header="Transmitted?" Width="190" >
+								<DataGridTemplateColumn.CellTemplate>
+									<DataTemplate >
+										<StackPanel Orientation="Horizontal">
+											<CheckBox  Margin="8,3" IsChecked="{Binding CanTransmit}"/>
+											<TextBlock Margin="-8,3" IsVisible="{Binding CanTransmit}"  FontSize="10"  Text="Sent only by this Node" Foreground="SteelBlue" HorizontalAlignment="Left"   />
+											<TextBlock  Margin="-8,3" IsVisible="{Binding !CanTransmit}"  FontSize="10"  Text="Sent by any Node" Foreground="DimGray" HorizontalAlignment="Left"/>
+										</StackPanel>
+									</DataTemplate>
+								</DataGridTemplateColumn.CellTemplate>
+							</DataGridTemplateColumn>
+						</DataGrid.Columns>
+					</DataGrid>
+				</Grid>
+			</Border>
+		</Grid>
+	</Border>
+</UserControl>
