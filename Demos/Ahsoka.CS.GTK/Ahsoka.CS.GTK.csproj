@@ -13,9 +13,14 @@
 		<PackageReference Include="Ahsoka.Extensions.DataService" Version="3.*-*" />
 		<PackageReference Include="Ahsoka.Core.Drawing" Version="3.*-*" />
 		<PackageReference Include="Ahsoka.Core" Version="3.*-*" />
+	</ItemGroup>
+
+	<Import Label="Ahsoka Local Build Properties" Condition="Exists('../Demo.Build.props')" Project="../Demo.Build.props" />
+
+	<ItemGroup Label="" Condition="!Exists('../Demo.Build.props')">
 		<PackageReference Include="Ahsoka.Extensions.IO" Version="3.*-*" />
 	</ItemGroup>
-	
+
 	<ItemGroup>
 	  <Compile Remove="publish\**" />
 	  <EmbeddedResource Remove="publish\**" />

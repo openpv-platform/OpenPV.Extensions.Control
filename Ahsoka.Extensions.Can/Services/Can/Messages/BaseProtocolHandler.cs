@@ -148,7 +148,8 @@ internal abstract class BaseProtocolHandler
 
     internal virtual bool InAvailableMessages(uint id, bool received = false)
     {
-        return Service.AvailableMessages.ContainsKey(id);
+        AvailableMessage message;
+        return GetAvailableMessage(id, out message, received);
     }
 
     internal virtual bool GetAvailableMessage(uint id, out AvailableMessage message, bool received = false)

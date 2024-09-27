@@ -21,7 +21,7 @@
       "extensionInfo": [
         {
           "extensionName": "CAN Service Extension",
-          "configurationFile": "STDemoPackage.1.cancalibration.json"
+          "configurationFile": "CANServiceConfiguration.json"
         }
       ],
       "startupDelay": 3,

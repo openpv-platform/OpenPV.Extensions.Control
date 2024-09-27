@@ -11,147 +11,149 @@
 		<StyleInclude Source="/Styles/UserInputStyles.axaml" />
 	</UserControl.Styles>
 	<Border Margin="5"  >
-		<Grid RowDefinitions="auto,auto,auto,auto,auto,auto,auto,*">
-			<Grid ColumnDefinitions="auto,*" Margin="0,0,0,0" >
-				<TextBlock Foreground="SteelBlue" FontSize="16" Text="{Binding Name, StringFormat='Message: {0}', FallbackValue='Message'}" Margin="3"/>
-				<Border Grid.Column="1" BorderBrush="Gainsboro" Margin="4,10,0,10" BorderThickness="0,1,0,0" Height="2"/>
-			</Grid>
+		<ScrollViewer>
+			<StackPanel>
+				<Grid ColumnDefinitions="auto,*" Margin="0,0,0,0" >
+					<TextBlock Foreground="SteelBlue" FontSize="16" Text="{Binding Name, StringFormat='Message: {0}', FallbackValue='Message'}" Margin="3"/>
+					<Border Grid.Column="1" BorderBrush="Gainsboro" Margin="4,10,0,10" BorderThickness="0,1,0,0" Height="2"/>
+				</Grid>
 
-			<Grid Grid.Row="1" Margin="8,5" ColumnDefinitions="120,Auto" RowDefinitions="*,*,*,*,*" IsEnabled="{Binding IsEditable}">
-				<TextBlock Text="Name:" Grid.Row="0" Grid.Column="0"/>
-				<TextBox Text="{Binding Name}" Grid.Row="0" Width="300"  TextWrapping="NoWrap" Grid.Column="1" />
-			
-				<TextBlock Text="Comment:" Grid.Row="4" Grid.Column="0"/>
-				<TextBox  Text="{Binding Comment}" Grid.Row="4" Width="450"  TextWrapping="NoWrap" Grid.Column="1" />
-			</Grid>
+				<Grid Grid.Row="1" Margin="8,5" ColumnDefinitions="120,Auto" RowDefinitions="*,*,*,*,*" IsEnabled="{Binding IsEditable}">
+					<TextBlock Text="Name:" Grid.Row="0" Grid.Column="0"/>
+					<TextBox Text="{Binding Name}" Grid.Row="0" Width="300"  TextWrapping="NoWrap" Grid.Column="1" />
 
-			<Grid Grid.Row="2" ColumnDefinitions="auto,*" Margin="0,8,0,0" >
-				<TextBlock Foreground="SteelBlue" FontSize="16" Text="Message Setup" Margin="3"/>
-				<Border Grid.Column="1" BorderBrush="Gainsboro" Margin="4,10,0,10" BorderThickness="0,1,0,0" Height="2"/>
-			</Grid>
-			<Grid  Grid.Row="3" Margin="8,5" ColumnDefinitions="120,Auto,Auto,Auto" RowDefinitions="*,*,*,*" IsEnabled="{Binding IsEditable}">
-				<TextBlock Text="Message Type:"  Grid.Row="0" Grid.Column="0"/>
-				<ComboBox  Grid.Row="0" Grid.Column="1" ItemsSource="{Binding MessageTypes}"   SelectedItem="{Binding MessageType}" Width="200"  />
-			</Grid>
-			<Grid Grid.Row="4" Margin="8,-3,8,8" ColumnDefinitions="120,Auto,Auto,Auto" 
-					IsEnabled="{Binding IsEditable}" IsVisible="{Binding !IsJ1939, FallbackValue=false}">
+					<TextBlock Text="Comment:" Grid.Row="4" Grid.Column="0"/>
+					<TextBox  Text="{Binding Comment}" Grid.Row="4" Width="450"  TextWrapping="NoWrap" Grid.Column="1" />
+				</Grid>
 
-				<TextBlock Text="CAN ID:"   ToolTip.Tip="CanID as Dec"/>
-				<TextBox Text="{Binding IdMasked}" HorizontalContentAlignment="Center" Width="120" Grid.Column="1" />
-				<TextBlock Text="{Binding IdMasked, StringFormat='0x{0:x8}', FallbackValue=0x00FF00FF}}" ToolTip.Tip="CanID as Hex" 
-						   HorizontalAlignment="Center"  Grid.Column="2" VerticalAlignment="Center" Padding="8" Background="WhiteSmoke" />
-			</Grid>
+				<Grid Grid.Row="2" ColumnDefinitions="auto,*" Margin="0,8,0,0" >
+					<TextBlock Foreground="SteelBlue" FontSize="16" Text="Message Setup" Margin="3"/>
+					<Border Grid.Column="1" BorderBrush="Gainsboro" Margin="4,10,0,10" BorderThickness="0,1,0,0" Height="2"/>
+				</Grid>
+				<Grid  Grid.Row="3" Margin="8,5" ColumnDefinitions="120,Auto,Auto,Auto" RowDefinitions="*,*,*,*" IsEnabled="{Binding IsEditable}">
+					<TextBlock Text="Message Type:"  Grid.Row="0" Grid.Column="0"/>
+					<ComboBox  Grid.Row="0" Grid.Column="1" ItemsSource="{Binding MessageTypes}"   SelectedItem="{Binding MessageType}" Width="200"  />
+				</Grid>
+				<Grid Grid.Row="4" Margin="8,-3,8,8" ColumnDefinitions="120,Auto,Auto,Auto"
+						IsEnabled="{Binding IsEditable}" IsVisible="{Binding !IsJ1939, FallbackValue=false}">
 
-			<Grid Grid.Row="4" Margin="8,-3,8,8" ColumnDefinitions="120,Auto,Auto,Auto" RowDefinitions="*,*,*,*"
-				  IsEnabled="{Binding IsEditable}" IsVisible="{Binding IsJ1939, FallbackValue=true}">
-
-				<TextBlock Text="PGN:"   ToolTip.Tip="PGN as Dec"/>
-				<StackPanel Orientation="Horizontal" Grid.Column="1" Grid.ColumnSpan="2">
-					<TextBox Text="{Binding PGN}" HorizontalContentAlignment="Center" Width="120" Grid.Column="1" />
-					<TextBlock Text="{Binding PGN, StringFormat='0x{0:x8}', FallbackValue=0x00FF00FF}}" ToolTip.Tip="CanID as Hex"
+					<TextBlock Text="CAN ID:"   ToolTip.Tip="CanID as Dec"/>
+					<TextBox Text="{Binding IdMasked}" HorizontalContentAlignment="Center" Width="120" Grid.Column="1" />
+					<TextBlock Text="{Binding IdMasked, StringFormat='0x{0:x8}', FallbackValue=0x00FF00FF}}" ToolTip.Tip="CanID as Hex"
 							   HorizontalAlignment="Center"  Grid.Column="2" VerticalAlignment="Center" Padding="8" Background="WhiteSmoke" />
-					<TextBlock Text="Priority:"  Grid.Row="1" Grid.Column="0"/>
-					<TextBox Text="{Binding Priority}"  Width="50" HorizontalContentAlignment="Center" Grid.Column="1"/>
-				</StackPanel>
-				<TextBlock Text="DP/PDUF/PDUS:" Grid.Row="1"  ToolTip.Tip="PGN Components as Dec"/>
-				<StackPanel Orientation="Horizontal" Margin="0,2" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2">
-					<TextBox IsReadOnly="true" Background="WhiteSmoke"  HorizontalContentAlignment="Center" Text="{Binding DataPage}"  Width="30" />
-					<TextBox IsReadOnly="true" Background="WhiteSmoke"  HorizontalContentAlignment="Center" Text="{Binding PDUF}"  Width="50" />
-					<TextBox IsReadOnly="true" Background="WhiteSmoke"  HorizontalContentAlignment="Center" Text="{Binding PDUS}"   Width="50"  />
-				</StackPanel>
-			
-			</Grid>
+				</Grid>
 
-			<Grid Grid.Row="5" ColumnDefinitions="auto,*" Margin="0,8,0,8" >
-				<TextBlock Foreground="SteelBlue" FontSize="16" Text="Message Options" Margin="3"/>
-				<Border Grid.Column="1" BorderBrush="Gainsboro" Margin="4,10,0,10" BorderThickness="0,1,0,0" Height="2"/>
-			</Grid>
+				<Grid Grid.Row="4" Margin="8,-3,8,8" ColumnDefinitions="120,Auto,Auto,Auto" RowDefinitions="*,*,*,*"
+					  IsEnabled="{Binding IsEditable}" IsVisible="{Binding IsJ1939, FallbackValue=true}">
 
-			<Grid Grid.Row="6" Margin="8,-3,8,8" ColumnDefinitions="120,Auto,Auto,Auto" RowDefinitions="38,38,38,*"
-			  IsEnabled="{Binding IsEditable}" >
-
-
-				<TextBlock Text="CRC Signal" Grid.Row="0" Grid.Column="0"/>
-				<StackPanel  Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
-					<ComboBox ItemsSource="{Binding CrcTypes}"  SelectedItem="{Binding CrcType}" Width="150" Grid.Row="2" Grid.Column="1" />
-					<TextBlock Text="Signal:" Grid.Row="2" Grid.Column="0"/>
-					<ComboBox ItemsSource="{Binding Signals}"  SelectedItem="{Binding CrcSignal}" IsEnabled="{Binding HasCrc}" Width="350" Grid.Row="2" Grid.Column="1" />
-				</StackPanel>
-
-				<TextBlock Text="Roll Count:" Grid.Row="1" Grid.Column="0"/>
-				<StackPanel  Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
-					<CheckBox  Margin="3" IsChecked="{Binding HasRollCount}"    />
-					<TextBlock Text="Signal:" Grid.Row="3" Grid.Column="0"/>
-					<ComboBox ItemsSource="{Binding Signals}" IsEnabled="{Binding HasRollCount}" SelectedItem="{Binding RollCountSignal}" Width="350" Grid.Row="3" Grid.Column="1" />
-				</StackPanel>
-				
-				<TextBlock Text="Timeout (ms)" Grid.Row="2" Grid.Column="0" ToolTip.Tip="Notify the client if no message is received in this timeout value. (leave 0 for no notification)."/>
-				<StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
-					<TextBox   HorizontalContentAlignment="Center"
-							 Text="{Binding Timeout}" Grid.Row="1" Width="100"  Grid.Column="1"/>
-					<TextBlock Text="Filter Duplicates:" ToolTip.Tip="Duplicated messages are not sent to the client."/>
-					<CheckBox  Margin="3" IsChecked="{Binding FilterReceipt}"/>
-				</StackPanel>
-
-				<TextBlock Text="J1939 Options:" Grid.Row="3" IsVisible="{Binding IsJ1939, FallbackValue=true}" ToolTip.Tip="PGN Components as Dec"/>
-				<StackPanel MinHeight="35" IsVisible="{Binding IsJ1939, FallbackValue=true}" Orientation="Horizontal" Margin="0,2" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2">
-					<CheckBox  Margin="3,0,-10,0" IsChecked="{Binding OverrideSourceAddress}"/>
-					<TextBlock Text="Override Source Address" ToolTip.Tip="Override / Ignore the Source Address When Sending / Receiving Messages."/>
-					<CheckBox  Margin="18,0,-10,0" IsEnabled="{Binding !IsPDU2}"  IsChecked="{Binding OverrideDestinationAddress}"/>
-					<TextBlock IsEnabled="{Binding !IsPDU2}" Text="Override Destination Address" ToolTip.Tip="Override / Ignore the Destination Address When Sending / Receiving Messages. (for PDU-1 Messages)."/>
-				</StackPanel>
-
-			</Grid>
-
-
-			<Border Grid.Row="7" Margin="20,0,20,0"  BorderBrush="WhiteSmoke" BorderThickness="0,0,0,0">
-				<DockPanel  LastChildFill="True">
-					<Border DockPanel.Dock="Top" BorderBrush="Gainsboro"  BorderThickness="0,1,0,0" Margin="20,20,0,20" Height="2"/>
-					<TextBlock DockPanel.Dock="Top" Margin="-10,-34,0,10" Text="Signals " FontSize="16" Foreground="SteelBlue" HorizontalAlignment="Left" Background="White"  />
-
-					<StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="20,-44,0,0" Background="White" HorizontalAlignment="Right" >
-						<Button Command="{Binding AddItem}" Margin="10,0,3,0"
-							 Width="26" Height="26" Background="Transparent"  BorderBrush="Transparent">
-							<material:MaterialIcon Width="20" Height="20" Foreground="SteelBlue" Kind="Plus"></material:MaterialIcon>
-						</Button>
-						<Button Command="{Binding RemoveItem}"
-							Width="26" Height="26" Background="Transparent"  BorderBrush="Transparent">
-							<material:MaterialIcon Width="20" Height="20" Foreground="SteelBlue" Kind="Minus"></material:MaterialIcon>
-						</Button>
-						<Button Command="{Binding EditValueTable}" Margin="10,0,3,0" ToolTip.Tip="Edit Value Table"
-							 Width="26" Height="26" Background="Transparent"  BorderBrush="Transparent">
-							<material:MaterialIcon Width="20" Height="20" Foreground="SteelBlue" Kind="Table"></material:MaterialIcon>
-						</Button>
-						<Button Command="{Binding EditMuxInfo}" Margin="0,0,3,0" ToolTip.Tip="Edit Mux Info"
-							 Width="26" Height="26" Background="Transparent"  BorderBrush="Transparent">
-							<material:MaterialIcon Width="20" Height="20" Foreground="SteelBlue" Kind="Merge"></material:MaterialIcon>
-						</Button>
-						<Button Command="{Binding EditSignalTransforms}" ToolTip.Tip="Edit Scale and Limits"
-							Width="26" Height="26" Background="Transparent"  BorderBrush="Transparent">
-							<material:MaterialIcon Width="20" Height="20" Foreground="SteelBlue" Kind="ScaleBalance"></material:MaterialIcon>
-						</Button>
+					<TextBlock Text="PGN:"   ToolTip.Tip="PGN as Dec"/>
+					<StackPanel Orientation="Horizontal" Grid.Column="1" Grid.ColumnSpan="2">
+						<TextBox Text="{Binding PGN}" HorizontalContentAlignment="Center" Width="120" Grid.Column="1" />
+						<TextBlock Text="{Binding PGN, StringFormat='0x{0:x8}', FallbackValue=0x00FF00FF}}" ToolTip.Tip="CanID as Hex"
+								   HorizontalAlignment="Center"  Grid.Column="2" VerticalAlignment="Center" Padding="8" Background="WhiteSmoke" />
+						<TextBlock Text="Priority:"  Grid.Row="1" Grid.Column="0"/>
+						<TextBox Text="{Binding Priority}"  Width="50" HorizontalContentAlignment="Center" Grid.Column="1"/>
+					</StackPanel>
+					<TextBlock Text="DP/PDUF/PDUS:" Grid.Row="1"  ToolTip.Tip="PGN Components as Dec"/>
+					<StackPanel Orientation="Horizontal" Margin="0,2" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2">
+						<TextBox IsReadOnly="true" Background="WhiteSmoke"  HorizontalContentAlignment="Center" Text="{Binding DataPage}"  Width="30" />
+						<TextBox IsReadOnly="true" Background="WhiteSmoke"  HorizontalContentAlignment="Center" Text="{Binding PDUF}"  Width="50" />
+						<TextBox IsReadOnly="true" Background="WhiteSmoke"  HorizontalContentAlignment="Center" Text="{Binding PDUS}"   Width="50"  />
 					</StackPanel>
 
-					<DataGrid DockPanel.Dock="Top" Grid.ColumnSpan="1" Name="Releases"
-							 SelectionMode="Single"
-							 ItemsSource="{Binding Signals}" SelectedItem="{Binding SelectedSignal}"
-							 Margin="10,10,20,0" AutoGenerateColumns="False" IsEnabled="{Binding IsEditable}">
-						<DataGrid.Styles>
-							<Style Selector="DataGridCell">
-								<Setter Property="HorizontalContentAlignment" Value="Left"/>
-							</Style>
-						</DataGrid.Styles>
-						<DataGrid.Columns>
-							<DataGridTextColumn Header="ID" CellStyleClasses="Centered" Width="75" Binding="{Binding Id}" IsReadOnly="False"/>
-							<DataGridTextColumn Header="Name" Width="Auto" Binding="{Binding Name}" IsReadOnly="False"/>
-							<DataGridTextColumn Header="Start Bit" CellStyleClasses="Centered"  Width="Auto" Binding="{Binding StartBit}" IsReadOnly="False"/>
-							<DataGridTextColumn Header="Bit Length" CellStyleClasses="Centered"  Width="Auto" Binding="{Binding BitLength}" IsReadOnly="False"/>
-							<DataGridTextColumn Header="Scale"  CellStyleClasses="Centered" Width="Auto" Binding="{Binding Scale}" IsReadOnly="False"/>
-							<DataGridTextColumn Header="Offset" CellStyleClasses="Centered" Width="Auto" Binding="{Binding Offset}" IsReadOnly="False"/>
-						</DataGrid.Columns>
-					</DataGrid>
-				</DockPanel>
-			</Border>
-		</Grid>
+				</Grid>
+
+				<Grid Grid.Row="5" ColumnDefinitions="auto,*" Margin="0,8,0,8" >
+					<TextBlock Foreground="SteelBlue" FontSize="16" Text="Message Options" Margin="3"/>
+					<Border Grid.Column="1" BorderBrush="Gainsboro" Margin="4,10,0,10" BorderThickness="0,1,0,0" Height="2"/>
+				</Grid>
+
+				<Grid Grid.Row="6" Margin="8,-3,8,8" ColumnDefinitions="120,Auto,Auto,Auto" RowDefinitions="38,38,38,*"
+				  IsEnabled="{Binding IsEditable}" >
+
+
+					<TextBlock Text="CRC Signal" Grid.Row="0" Grid.Column="0"/>
+					<StackPanel  Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+						<ComboBox ItemsSource="{Binding CrcTypes}"  SelectedItem="{Binding CrcType}" Width="150" Grid.Row="2" Grid.Column="1" />
+						<TextBlock Text="Signal:" Grid.Row="2" Grid.Column="0"/>
+						<ComboBox ItemsSource="{Binding Signals}"  SelectedItem="{Binding CrcSignal}" IsEnabled="{Binding HasCrc}" Width="350" Grid.Row="2" Grid.Column="1" />
+					</StackPanel>
+
+					<TextBlock Text="Roll Count:" Grid.Row="1" Grid.Column="0"/>
+					<StackPanel  Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+						<CheckBox  Margin="3" IsChecked="{Binding HasRollCount}"    />
+						<TextBlock Text="Signal:" Grid.Row="3" Grid.Column="0"/>
+						<ComboBox ItemsSource="{Binding Signals}" IsEnabled="{Binding HasRollCount}" SelectedItem="{Binding RollCountSignal}" Width="350" Grid.Row="3" Grid.Column="1" />
+					</StackPanel>
+
+					<TextBlock Text="Timeout (ms)" Grid.Row="2" Grid.Column="0" ToolTip.Tip="Notify the client if no message is received in this timeout value. (leave 0 for no notification)."/>
+					<StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+						<TextBox   HorizontalContentAlignment="Center"
+								 Text="{Binding Timeout}" Grid.Row="1" Width="100"  Grid.Column="1"/>
+						<TextBlock Text="Filter Duplicates:" ToolTip.Tip="Duplicated messages are not sent to the client."/>
+						<CheckBox  Margin="3" IsChecked="{Binding FilterReceipt}"/>
+					</StackPanel>
+
+					<TextBlock Text="J1939 Options:" Grid.Row="3" IsVisible="{Binding IsJ1939, FallbackValue=true}" ToolTip.Tip="PGN Components as Dec"/>
+					<StackPanel MinHeight="35" IsVisible="{Binding IsJ1939, FallbackValue=true}" Orientation="Horizontal" Margin="0,2" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2">
+						<CheckBox  Margin="3,0,-10,0" IsChecked="{Binding OverrideSourceAddress}"/>
+						<TextBlock Text="Override Source Address" ToolTip.Tip="Override / Ignore the Source Address When Sending / Receiving Messages."/>
+						<CheckBox  Margin="18,0,-10,0" IsEnabled="{Binding !IsPDU2}"  IsChecked="{Binding OverrideDestinationAddress}"/>
+						<TextBlock IsEnabled="{Binding !IsPDU2}" Text="Override Destination Address" ToolTip.Tip="Override / Ignore the Destination Address When Sending / Receiving Messages. (for PDU-1 Messages)."/>
+					</StackPanel>
+
+				</Grid>
+
+				<Border Grid.Row="7" Margin="20,0,20,0"  BorderBrush="WhiteSmoke" BorderThickness="0,0,0,0">
+					<DockPanel  LastChildFill="True">
+						<Border DockPanel.Dock="Top" BorderBrush="Gainsboro"  BorderThickness="0,1,0,0" Margin="20,20,0,20" Height="2"/>
+						<TextBlock DockPanel.Dock="Top" Margin="-10,-34,0,10" Text="Signals " FontSize="16" Foreground="SteelBlue" HorizontalAlignment="Left" Background="White"  />
+
+						<StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="20,-44,0,0" Background="White" HorizontalAlignment="Right" >
+							<Button Command="{Binding AddItem}" Margin="10,0,3,0"
+								 Width="26" Height="26" Background="Transparent"  BorderBrush="Transparent">
+								<material:MaterialIcon Width="20" Height="20" Foreground="SteelBlue" Kind="Plus"></material:MaterialIcon>
+							</Button>
+							<Button Command="{Binding RemoveItem}"
+								Width="26" Height="26" Background="Transparent"  BorderBrush="Transparent">
+								<material:MaterialIcon Width="20" Height="20" Foreground="SteelBlue" Kind="Minus"></material:MaterialIcon>
+							</Button>
+							<Button Command="{Binding EditValueTable}" Margin="10,0,3,0" ToolTip.Tip="Edit Value Table"
+								 Width="26" Height="26" Background="Transparent"  BorderBrush="Transparent">
+								<material:MaterialIcon Width="20" Height="20" Foreground="SteelBlue" Kind="Table"></material:MaterialIcon>
+							</Button>
+							<Button Command="{Binding EditMuxInfo}" Margin="0,0,3,0" ToolTip.Tip="Edit Mux Info"
+								 Width="26" Height="26" Background="Transparent"  BorderBrush="Transparent">
+								<material:MaterialIcon Width="20" Height="20" Foreground="SteelBlue" Kind="Merge"></material:MaterialIcon>
+							</Button>
+							<Button Command="{Binding EditSignalTransforms}" ToolTip.Tip="Edit Scale and Limits"
+								Width="26" Height="26" Background="Transparent"  BorderBrush="Transparent">
+								<material:MaterialIcon Width="20" Height="20" Foreground="SteelBlue" Kind="ScaleBalance"></material:MaterialIcon>
+							</Button>
+						</StackPanel>
+					</DockPanel>
+				</Border>
+				
+				<DataGrid Grid.Row="8" Grid.ColumnSpan="1" Name="Releases" 
+						SelectionMode="Single"
+						Height="250"
+						ItemsSource="{Binding Signals}" SelectedItem="{Binding SelectedSignal}"
+						Margin="30,10,20,0" AutoGenerateColumns="False" IsEnabled="{Binding IsEditable}">
+					<DataGrid.Styles>
+						<Style Selector="DataGridCell">
+							<Setter Property="HorizontalContentAlignment" Value="Left"/>
+						</Style>
+					</DataGrid.Styles>
+					<DataGrid.Columns>
+						<DataGridTextColumn Header="ID" CellStyleClasses="Centered" Width="75" Binding="{Binding Signal.Id}" IsReadOnly="False"/>
+						<DataGridTextColumn Header="Name" Width="Auto" Binding="{Binding Signal.Name}" IsReadOnly="False"/>
+						<DataGridTextColumn Header="Start Bit" CellStyleClasses="Centered"  Width="Auto" Binding="{Binding Signal.StartBit}" IsReadOnly="False"/>
+						<DataGridTextColumn Header="Bit Length" CellStyleClasses="Centered"  Width="Auto" Binding="{Binding BitLength}" IsReadOnly="False"/>
+						<DataGridTextColumn Header="Scale"  CellStyleClasses="Centered" Width="Auto" Binding="{Binding Signal.Scale}" IsReadOnly="False"/>
+						<DataGridTextColumn Header="Offset" CellStyleClasses="Centered" Width="Auto" Binding="{Binding Signal.Offset}" IsReadOnly="False"/>
+					</DataGrid.Columns>
+				</DataGrid>
+			</StackPanel>
+		</ScrollViewer>
 	</Border>
 </UserControl>

@@ -130,7 +130,6 @@ bool decodeMessage(pb_istream_t *stream, const pb_field_iter_t *field, void **ar
 				// initialize message values.
 				node->msg->id = message.id;
 				node->msg->msgType = message.message_type;
-				node->msg->idMask = message.id_mask;
 				node->msg->overrideDestination = message.override_source_address;
 				node->msg->overrideSource = message.override_source_address;
 				node->msg->rate = message.rate;
@@ -201,7 +200,6 @@ bool decodeMessage(pb_istream_t *stream, const pb_field_iter_t *field, void **ar
 				node->msg->dlc = message.dlc;
 				node->msg->crc = NULL;  // for now.
 				node->msg->crcPos = 0;
-				node->msg->idMask = message.id_mask;
 				node->msg->overrideDestination = message.override_source_address;
 				node->msg->overrideSource = message.override_source_address;
 				addCanMessageList(&rxList[i], node);

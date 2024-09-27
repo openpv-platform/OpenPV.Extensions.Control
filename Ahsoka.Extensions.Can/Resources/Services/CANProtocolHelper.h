@@ -8,13 +8,13 @@ namespace AhsokaCAN
 {
     class CANProtocolHelper
     {
-    public:
-        CANProtocolHelper(CanMessageData data)
-        {
-            messageData = data;
-        }
+        public:
+            CANProtocolHelper(CanMessageData* data)
+            {
+                messageData = data;
+            }
 
-    protected:
-        CanMessageData messageData;
+        protected:
+            CanMessageData* messageData;
     };
 }

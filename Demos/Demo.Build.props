@@ -4,12 +4,8 @@
 		<EnableSourceControlManagerQueries>false</EnableSourceControlManagerQueries>
 	</PropertyGroup>
 	
-	<Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="'$(SolutionName)' != 'Ahsoka.Platform' and '$(RuntimeIdentifier)'=='linux-arm'">
-		<Exec ContinueOnError="true" Command="dotnet restore --runtime linux-arm" />
-	</Target>
-	
 	<ItemGroup Label="Development References" >
-		<ProjectReference Include="..\..\Ahsoka.Core.Can\Ahsoka.Core.Can.csproj" />
-		<ProjectReference Include="..\..\Ahsoka.Core.IO\Ahsoka.Core.IO.csproj" />
+		<ProjectReference Include="..\..\Ahsoka.Extensions.Can\Ahsoka.Extensions.Can.csproj" />
+		<ProjectReference Include="..\..\Ahsoka.Extensions.IO\Ahsoka.Extensions.IO.csproj" />
 	</ItemGroup>
 </Project>

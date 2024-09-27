@@ -5,6 +5,7 @@ using Ahsoka.Services.Can;
 using Ahsoka.Services.Can.Messages;
 using Ahsoka.Utility;
 using Avalonia.Controls;
+using DbcParserLib.Model;
 using Material.Icons;
 using System;
 using System.Collections.Generic;
@@ -26,9 +27,9 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
     UserControl currentView;
     UserControl currentSignalView;
 
-    MessageSignalDefinition selectedSignal;
+    SignalViewModel selectedSignal;
+
     readonly J1939PropertyDefinitions.Id j1939Id = new();
-    readonly ObservableCollection<MessageSignalDefinition> signals = new();
     readonly ObservableCollection<SignalModel> signalsModels = new();
     private ICustomerToolViewModel viewModelInterface;
     #endregion
@@ -50,10 +51,15 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
                 {
                     MessageDefinition.Id = NegateExtendedBit(MessageDefinition.Id);
                     j1939Id.ExtractValues(MessageDefinition.Id);
-                    MessageDefinition.OverrideSourceAddress = true;
+                    this.OverrideSourceAddress = true;
+                    this.OverrideDestinationAddress = true;
                 }
                 else
-                    MessageDefinition.OverrideSourceAddress = false;
+                {
+                    this.OverrideSourceAddress = false;
+                    this.OverrideDestinationAddress = false;
+                }
+
 
                 // Restore Extended Frame Bit
                 if (value != MessageType.RawStandardFrame)
@@ -65,8 +71,6 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
             MessageDefinition.MessageType = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(IsJ1939));
-
-            ReGenerateMask();
         }
     }
 
@@ -134,7 +138,6 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         {
             MessageDefinition.OverrideSourceAddress = value;
             OnPropertyChanged();
-            ReGenerateMask();
         }
     }
 
@@ -148,7 +151,6 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         {
             MessageDefinition.OverrideDestinationAddress = value;
             OnPropertyChanged();
-            ReGenerateMask();
         }
     }
 
@@ -198,30 +200,30 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
     #endregion
 
     #region Roll Count and CRC
-    public MessageSignalDefinition CrcSignal
+    public SignalViewModel CrcSignal
     {
         get
         {
-            return MessageDefinition.Signals.FirstOrDefault(x => x.StartBit == MessageDefinition.CrcBit);
+            return Signals.FirstOrDefault(x => x.Signal.StartBit == MessageDefinition.CrcBit);
         }
         set
         {
             if (value != null)
-                MessageDefinition.CrcBit = value.StartBit;
+                MessageDefinition.CrcBit = value.Signal.StartBit;
         }
     }
 
-    public MessageSignalDefinition RollCountSignal
+    public SignalViewModel RollCountSignal
     {
         get
         {
-            return MessageDefinition.Signals.FirstOrDefault(x => x.StartBit == MessageDefinition.RollCountBit);
+            return Signals.FirstOrDefault(x => x.Signal.StartBit == MessageDefinition.RollCountBit);
         }
         set
         {
             if (value != null)
             {
-                MessageDefinition.RollCountBit = value.StartBit;
+                MessageDefinition.RollCountBit = value.Signal.StartBit;
                 MessageDefinition.RollCountLength = value.BitLength;
             }
 
@@ -286,20 +288,22 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
 
     internal SignalModel SelectedSignalValue { get; set; }
 
-    public ObservableCollection<MessageSignalDefinition> Signals { get { return signals; } }
+    public ObservableCollection<SignalViewModel> Signals { get; init; } = new ObservableCollection<SignalViewModel>();
 
     public ObservableCollection<SignalModel> SignalValues { get { return signalsModels; } }
 
     public MessageDefinition MessageDefinition { get; set; }
 
-    public MessageSignalDefinition SelectedSignal
+    public SignalViewModel SelectedSignal
     {
         get { return selectedSignal; }
         set
         {
-            selectedSignal = value; OnPropertyChanged();
+            selectedSignal = value;
+            OnPropertyChanged();
         }
     }
+
 
     public CrcType[] CrcTypes { get; init; } = Enum.GetValues<CrcType>();
 
@@ -378,6 +382,12 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         {
             definition = new() { Name = "New Message", Id = 100, TransmitNodes = new int[] { NodeDisabled, NodeDisabled }, ReceiveNodes = new int[] { NodeDisabled, NodeDisabled } , UserDefined = true};
 
+            foreach (var port in ParentViewModel.Ports.Where(x => x.IsEnabled))
+            {
+                definition.TransmitNodes[port.Port] = AnyNodeID;
+                definition.ReceiveNodes[port.Port] = AnyNodeID;
+            }
+
             // FindNode Index
             for (uint i = 0; i < UInt32.MaxValue; i++)
                 if (!canViewModel.Messages.Any(x => x.MessageDefinition.Id == i))
@@ -400,12 +410,11 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
 
 
         j1939Id = new(MessageDefinition.Id);
-        SelectedSignal = MessageDefinition.Signals.FirstOrDefault();
 
-        if (definition.IdMask == 0)
-            ReGenerateMask();
+        foreach(var item in  MessageDefinition.Signals)
+            this.Signals.Add(new SignalViewModel(this, item));
 
-        this.signals = new ObservableCollection<MessageSignalDefinition>(MessageDefinition.Signals);
+        SelectedSignal = Signals.FirstOrDefault();
     }
 
     private static void ValidatePorts(CanSetupViewModel canViewModel, MessageDefinition definition)
@@ -465,27 +474,6 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         viewModelInterface.ShowPopup(currentSignalView);
     }
 
-    private void ReGenerateMask()
-    {
-        if (MessageType == MessageType.J1939ExtendedFrame)
-        {
-            uint mask = 0x1C000000; // Mask Priority Out
-           
-            
-            if (OverrideSourceAddress) // Mask Source Address
-                mask |= 0xFF;
-
-            if (OverrideDestinationAddress && !IsPDU2) // Mask DestinationAddress if PFU1
-                mask |= 0xFF00;
-
-            MessageDefinition.IdMask = mask;
-        }
-        else
-        {
-            MessageDefinition.IdMask = 0xFFFFFFFF;
-        }
-    }
-
     public void CloseEditor()
     {
         if (currentSignalView != null)
@@ -516,22 +504,22 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         };
 
         // FindNode Index
-        if (signals.Count > 0)
+        if (Signals.Count > 0)
         {
             for (uint i = 0; i < 255; i++)
-                if (!this.Signals.Any(x => x.Id == i))
+                if (!this.Signals.Any(x => x.Signal.Id == i))
                 {
                     signalDef.Id = i;
                     signalDef.Name += $" {i}";
                     break;
                 }
 
-            signalDef.StartBit = this.signals.Max(x => x.StartBit + x.BitLength);
+            signalDef.StartBit = this.Signals.Max(x => x.Signal.StartBit + x.BitLength);
 
         }
 
         this.MessageDefinition.Signals.Add(signalDef);
-        this.Signals.Add(signalDef);
+        this.Signals.Add(new SignalViewModel(this,signalDef));
     }
 
     internal async void RemoveItem()
@@ -541,7 +529,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         if (!continueWork)
             return;
 
-        this.MessageDefinition.Signals.Remove(selectedSignal);
+        this.MessageDefinition.Signals.Remove(selectedSignal.Signal);
         this.Signals.Remove(selectedSignal);
     }
 
@@ -549,9 +537,9 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
     {
         if (this.selectedSignal != null)
             for (int i = 0; i < 255; i++)
-                if (!this.SelectedSignal.Values.Any(x => x.Key == i))
+                if (!this.SelectedSignal.Signal.Values.Any(x => x.Key == i))
                 {
-                    var signal = new SignalModel() { Key = i, Value = "New Value" };
+                    var signal = new SignalModel() { Key = i, Value = "New Value"};
                     this.SignalValues.Add(signal);
                     break;
                 }
@@ -579,7 +567,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
     {
         this.SignalValues.Clear();
         if (this.selectedSignal != null)
-            foreach (var item in this.SelectedSignal.Values)
+            foreach (var item in this.SelectedSignal.Signal.Values)
                 this.SignalValues.Add(new() { Key = item.Key, Value = item.Value });
     }
 
@@ -588,9 +576,9 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         if (selectedSignal == null)
             return;
 
-        this.SelectedSignal?.Values.Clear();
+        this.SelectedSignal?.Signal.Values.Clear();
         foreach (var item in this.SignalValues)
-            SelectedSignal.Values[item.Key] = item.Value;
+            SelectedSignal.Signal.Values[item.Key] = item.Value;
     }
 
     #endregion
@@ -628,6 +616,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
 
     #endregion
 }
+
 
 
 internal class SignalModel

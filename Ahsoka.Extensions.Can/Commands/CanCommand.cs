@@ -2,14 +2,15 @@
 using Ahsoka.Services.Can;
 using Ahsoka.System;
 using Ahsoka.Utility;
-using ELFSharp.MachO;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 
 namespace Ahsoka.Commands;
 
+[ExcludeFromCodeCoverage]
 [CommandLinePlugin]
 internal static class CanCommands
 {

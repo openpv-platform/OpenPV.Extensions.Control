@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Ahsoka.Services.Can.Messages;
 internal class TPMessageHandler : J1939MessageHandlerBase
 {
-    readonly List<TPSession> sessions = new();
+    static readonly List<TPSession> sessions = new();
     new readonly J1939ProtocolHandler Protocol = null;
 
     internal const uint childPDUF = 0xEB;
@@ -66,10 +66,15 @@ internal class TPMessageHandler : J1939MessageHandlerBase
         {
             var RTS = new J1939PropertyDefinitions.TPCM(BitConverter.ToUInt64(messageData.Data));
 
+            var RTSId = new J1939PropertyDefinitions.Id(RTS.PGN << 8)
+            {
+                SourceAddress = j1939Id.SourceAddress,
+                PDUS = j1939Id.PDUS,
+            };
+
             if (sessions.Where(x => !x.Transmitting).Count() < 2 &&
-            sessions.Where(x => !x.Transmitting && x.DestinationAddress == J1939PropertyDefinitions.BroadcastAddress).Any() &&
-            sessions.Where(x => !x.Transmitting && x.DestinationAddress == j1939Id.PDUS).Any() &&
-            Protocol.InAvailableMessages(RTS.PGN))
+                !sessions.Where(x => !x.Transmitting && x.DestinationAddress == j1939Id.PDUS).Any() &&
+                Protocol.InAvailableMessages(RTSId.WriteToUint(), true))
             {
                 sessions.Add(new TPSession(this, Protocol, Service));
                 sessions.Last().StartReceiveSession(messageData);

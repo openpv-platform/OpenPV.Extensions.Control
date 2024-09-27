@@ -107,8 +107,6 @@ message MessageDefinition
     int32 rate = 5;
     string comment = 6;
     
-    uint32 id_mask = 7;
-
     // Transport Configuration
     bool has_roll_count = 8;
     uint32 roll_count_bit = 9;

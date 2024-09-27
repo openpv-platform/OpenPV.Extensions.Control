@@ -62,6 +62,37 @@ namespace Ahsoka.Test.Control.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to {
+        ///  &quot;name&quot;: &quot;STDemoPackage.1&quot;,
+        ///  &quot;localIpAddress&quot;: &quot;192.168.8.2&quot;,
+        ///  &quot;remoteIpAddress&quot;: &quot;192.168.8.1&quot;,
+        ///  &quot;ports&quot;: [
+        ///    {
+        ///      &quot;port&quot;: 1,
+        ///      &quot;canInterfacePath&quot;: &quot;can1&quot;,
+        ///      &quot;baudRate&quot;: &quot;Baud250kb&quot;,
+        ///      &quot;canInterface&quot;: &quot;SocketCan&quot;,
+        ///      &quot;promiscuousTransmit&quot;: false,
+        ///      &quot;promiscuousReceive&quot;: false,
+        ///      &quot;userDefined&quot;: false
+        ///    }
+        ///  ],
+        ///  &quot;nodes&quot;: [
+        ///    {
+        ///      &quot;idValid&quot;: 0,
+        ///      &quot;port&quot;: 1,
+        ///      &quot;id&quot;: 0,
+        ///      &quot;name&quot;: &quot;DBG&quot;,
+        ///      &quot;comment&quot;: &quot;&quot;,
+        ///      &quot;nodeType&quot;: &quot;UserDefined [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string CANServiceConfiguration {
+            get {
+                return ResourceManager.GetString("CANServiceConfiguration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
         ///  &quot;version&quot;: &quot;3.4.1.10014&quot;,
         ///  &quot;applicationType&quot;: &quot;Dotnet&quot;,
         ///  &quot;systemOrientation&quot;: &quot;DefaultOrientation&quot;,

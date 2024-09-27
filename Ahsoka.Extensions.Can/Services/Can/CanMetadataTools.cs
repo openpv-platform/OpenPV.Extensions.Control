@@ -24,77 +24,80 @@ internal static class CanMetadataTools
 
     internal static CanApplicationConfiguration GenerateApplicationConfig(HardwareInfo hardwareInfo, string config, bool trimStrings)
     {
-        var canInfo = CANHardwareInfoExtension.GetCanInfo(hardwareInfo.PlatformFamily);
-
-        CanApplicationConfiguration appConfig = new();
         try
         {
             var clientConfiguration = ConfigurationFileLoader.LoadFile<CanClientConfiguration>(config);
+            return GenerateApplicationConfig(hardwareInfo, clientConfiguration, trimStrings);
+        }
+        catch { Console.WriteLine($"Unable to read can calibration {config}"); }
 
-            CanPortConfiguration portConfiguration = new()
-            {
-                CommunicationConfiguration = new(),
-                MessageConfiguration = new(),
-                DiagnosticEventConfiguration = new(),
-            };
+        return null;
+    }
 
-            portConfiguration.MessageConfiguration.Ports.AddRange(clientConfiguration.Ports);
-            portConfiguration.MessageConfiguration.Nodes.AddRange(clientConfiguration.Nodes);
-            portConfiguration.MessageConfiguration.Messages.AddRange(clientConfiguration.Messages);
-            portConfiguration.DiagnosticEventConfiguration.DiagnosticEvents.AddRange(clientConfiguration.DiagnosticEvents);
+    internal static CanApplicationConfiguration GenerateApplicationConfig(HardwareInfo hardwareInfo, CanClientConfiguration clientConfiguration, bool trimStrings)
+    {
+        var canInfo = CANHardwareInfoExtension.GetCanInfo(hardwareInfo.PlatformFamily);
 
-            CanHandler.Generate(portConfiguration);
+        CanApplicationConfiguration appConfig = new();       
 
-            // Set Interface Specific Items (CoProcessor is on an IP Path with TTY Path as the Interface.
-            if (clientConfiguration.Ports.First().CanInterface == CanInterface.Coprocessor)
-            {
-                portConfiguration.MessageConfiguration.Ports.First().CanInterfacePath = canInfo.CANPorts.First().CoprocessorSerialPath;
-                portConfiguration.CommunicationConfiguration.LocalIpAddress = clientConfiguration.LocalIpAddress ?? "192.168.0.2";
-                portConfiguration.CommunicationConfiguration.RemoteIpAddress = clientConfiguration.RemoteIpAddress ?? "192.168.0.1";
-            }
+        CanPortConfiguration portConfiguration = new()
+        {
+            CommunicationConfiguration = new(),
+            MessageConfiguration = new(),
+            DiagnosticEventConfiguration = new(),
+        };
 
-            if (trimStrings)
-            {
-                foreach (var node in portConfiguration.MessageConfiguration.Nodes)
-                {
-                    node.Comment = node.Name = null;
-                    switch (node.TransportProtocol)
-                    {
-                        case TransportProtocol.Raw:
-                            node.J1939Info = null;
-                            node.IsoInfo = null;
-                            break;
+        portConfiguration.MessageConfiguration.Ports.AddRange(clientConfiguration.Ports);
+        portConfiguration.MessageConfiguration.Nodes.AddRange(clientConfiguration.Nodes);
+        portConfiguration.MessageConfiguration.Messages.AddRange(clientConfiguration.Messages);
+        portConfiguration.DiagnosticEventConfiguration.DiagnosticEvents.AddRange(clientConfiguration.DiagnosticEvents);
 
-                        case TransportProtocol.IsoTp:
-                            node.J1939Info = null;
-                            break;
+        CanHandler.Generate(portConfiguration);
 
-                        case TransportProtocol.J1939:
-                            node.IsoInfo = null;
-                            break;
-                    }
-                }
-
-                foreach (var message in portConfiguration.MessageConfiguration.Messages)
-                {
-                    message.Comment = message.Name = null;
-                    message.Signals.Clear();
-                }
-            }
-
-            foreach(var dm in portConfiguration.DiagnosticEventConfiguration.DiagnosticEvents)
-            {
-                dm.Name = dm.Comment = null;
-            }
-
-            appConfig.CanPortConfiguration = portConfiguration;
+        // Set Interface Specific Items (CoProcessor is on an IP Path with TTY Path as the Interface.
+        if (clientConfiguration.Ports.First().CanInterface == CanInterface.Coprocessor)
+        {
+            portConfiguration.MessageConfiguration.Ports.First().CanInterfacePath = canInfo.CANPorts.First().CoprocessorSerialPath;
+            portConfiguration.CommunicationConfiguration.LocalIpAddress = clientConfiguration.LocalIpAddress ?? "192.168.0.2";
+            portConfiguration.CommunicationConfiguration.RemoteIpAddress = clientConfiguration.RemoteIpAddress ?? "192.168.0.1";
         }
 
-        catch { Console.WriteLine($"Unable to read can calibration {config}"); }
-        
+        if (trimStrings)
+        {
+            foreach (var node in portConfiguration.MessageConfiguration.Nodes)
+            {
+                node.Comment = node.Name = null;
+                switch (node.TransportProtocol)
+                {
+                    case TransportProtocol.Raw:
+                        node.J1939Info = null;
+                        node.IsoInfo = null;
+                        break;
 
+                    case TransportProtocol.IsoTp:
+                        node.J1939Info = null;
+                        break;
+
+                    case TransportProtocol.J1939:
+                        node.IsoInfo = null;
+                        break;
+                }
+            }
+
+            foreach (var message in portConfiguration.MessageConfiguration.Messages)
+            {
+                message.Comment = message.Name = null;
+                message.Signals.Clear();
+            }
+        }
+
+        foreach(var dm in portConfiguration.DiagnosticEventConfiguration.DiagnosticEvents)
+        {
+            dm.Name = dm.Comment = null;
+        }
+
+        appConfig.CanPortConfiguration = portConfiguration;
         return appConfig;
-
     }
 
     internal static void GenerateCalibrationFromDBC(string canDBCFile, string canConfigurationOutputPath)
@@ -342,6 +345,7 @@ internal static class CanMetadataTools
         outputFileData.AppendLine("#include <string>");
         outputFileData.AppendLine("#include \"AhsokaServices.h\"");
         outputFileData.AppendLine("#include \"CanViewModelBase.h\"");
+        outputFileData.AppendLine("#include \"J1939Helper.h\"");
 
         // Allow Plugin to Extend the Header Using / Import Statements
         generatorExtensions.ExtendHeader(outputFileData, nameSpace, true);
@@ -416,7 +420,7 @@ internal static class CanMetadataTools
         if(definition.MessageType == MessageType.J1939ExtendedFrame)
         {
             outputFileDataCPP.AppendLine();
-            outputFileDataCPP.AppendLine($"\tJ1939Helper& TestMessage::GetProtocol() {{ return protocol; }}");
+            outputFileDataCPP.AppendLine($"\tJ1939Helper*  {className}::GetProtocol() {{ if (protocol == NULL) {{protocol  = new J1939Helper(&message); }} return protocol; }}");
         }
 
         metadataBuilder.AppendLine($"\t\t//Add Props for {className} - CANID: {definition.Id}");
@@ -463,7 +467,7 @@ internal static class CanMetadataTools
         if (definition.MessageType == MessageType.J1939ExtendedFrame)
         {
             fileOutputBuilder.AppendLine();
-            fileOutputBuilder.AppendLine($"\t\t\tJ1939Helper& GetProtocol();");
+            fileOutputBuilder.AppendLine($"\t\t\tJ1939Helper* GetProtocol();");
         }
         
         // Extend Header Methods
@@ -493,7 +497,8 @@ internal static class CanMetadataTools
         metadataAccessors.AppendLine($"\tstd::map<int, CanPropertyInfo>& {className}::GetMetadata() {{ return CanModelMetadata::CanMetadata()->GetMetadata({definition.Id}); }}");
 
         fileOutputBuilder.AppendLine("\t\tprotected:");
-        fileOutputBuilder.AppendLine("\r\n\t\t\tJ1939Helper protocol = J1939Helper(message);");
+        if (definition.MessageType == MessageType.J1939ExtendedFrame)
+            fileOutputBuilder.AppendLine("\r\n\t\t\tJ1939Helper* protocol = NULL;");
         fileOutputBuilder.AppendLine("\t\t\tstd::map<int, CanPropertyInfo>& GetMetadata();");
 
         // Finish Main

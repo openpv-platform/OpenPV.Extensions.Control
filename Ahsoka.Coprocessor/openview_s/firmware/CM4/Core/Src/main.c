@@ -25,6 +25,7 @@
 #include "virt_uart.h"
 #include "lwip.h"
 #include "FreeRTOS.h"
+#include "timers.h"
 #include "stream_buffer.h"
 #include "canHandler.h"
 
@@ -69,7 +70,9 @@ volatile uint32_t intCounter = 0;
 uint16_t VirtUart0ChannelRxSize = 0;
 uint16_t VirtUart1ChannelRxSize = 0;
 SemaphoreHandle_t rxCanSem[2];
-
+SemaphoreHandle_t txCanSem[2];
+TimerHandle_t txCanTimer[2];
+extern void timerCallback(xTimerHandle);
 extern void zmq_init(void);
 
 /* USER CODE END PV */
@@ -218,6 +221,14 @@ int main(void)
 
 	rxCanSem[0] = xSemaphoreCreateCounting( 32, 0 );
 	rxCanSem[1] = xSemaphoreCreateCounting( 32, 0 );
+    txCanSem[0] = xSemaphoreCreateCounting( 32, 0 );
+    txCanSem[1] = xSemaphoreCreateCounting( 32, 0 );
+
+    txCanTimer[0] = xTimerCreate ("tim0", 5, pdTRUE, (void*) 0, timerCallback );
+    // set timer id to timer index
+    vTimerSetTimerID(txCanTimer[0], (void *) 0);
+    txCanTimer[1] = xTimerCreate ("tim1", 5, pdTRUE, (void*) 0, timerCallback );
+    vTimerSetTimerID(txCanTimer[1], (void *) 1);
 	FDCAN_FilterTypeDef sFilterConfig;
 	/* Configure Rx filter */
 	sFilterConfig.IdType = FDCAN_STANDARD_ID|FDCAN_EXTENDED_ID;

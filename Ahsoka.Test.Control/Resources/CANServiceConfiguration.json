@@ -16,6 +16,7 @@
   "nodes": [
     {
       "idValid": 0,
+      "port": 1,
       "id": 0,
       "name": "DBG",
       "comment": "",
@@ -46,6 +47,7 @@
     },
     {
       "idValid": 1,
+      "port": 1,
       "id": 1,
       "name": "CONTROLLER",
       "comment": "",
@@ -76,17 +78,18 @@
     },
     {
       "idValid": 2,
+      "port": 1,
       "id": 2,
       "name": "IO",
       "comment": "",
       "nodeType": "UserDefined",
-      "transportProtocol": "Raw",
+      "transportProtocol": "J1939",
       "j1939Info": {
-        "addressOneValid": 0,
+        "addressOneValid": 10,
         "addressTwoValid": 0,
         "addressThreeValid": 0,
         "addressType": "Static",
-        "addressValueOne": 0,
+        "addressValueOne": 10,
         "addressValueTwo": 0,
         "addressValueThree": 0,
         "industryGroup": 0,
@@ -106,6 +109,7 @@
     },
     {
       "idValid": 3,
+      "port": 1,
       "id": 3,
       "name": "MOTOR",
       "comment": "The motor controller of the car",
@@ -136,6 +140,7 @@
     },
     {
       "idValid": 4,
+      "port": 1,
       "id": 4,
       "name": "SENSOR",
       "comment": "The sensor controller of the car",
@@ -166,6 +171,7 @@
     },
     {
       "idValid": 255,
+      "port": 1,
       "id": 255,
       "name": "ANY",
       "comment": "",
@@ -208,7 +214,6 @@
       "rollCountLength": 0,
       "crcType": "None",
       "crcBit": 0,
-      "setAddressOnSend": true,
       "timeoutMs": 0,
       "filterReceipts": false,
       "userDefined": true,
@@ -220,6 +225,8 @@
         -1,
         255
       ],
+      "overrideSourceAddress": false,
+      "overrideDestinationAddress": false,
       "signals": [
         {
           "muxGroupValid": 0,
@@ -265,7 +272,6 @@
       "rollCountLength": 0,
       "crcType": "None",
       "crcBit": 0,
-      "setAddressOnSend": true,
       "timeoutMs": 0,
       "filterReceipts": false,
       "userDefined": true,
@@ -277,6 +283,8 @@
         -1,
         255
       ],
+      "overrideSourceAddress": false,
+      "overrideDestinationAddress": false,
       "signals": [
         {
           "muxGroupValid": 0,
@@ -395,7 +403,6 @@
       "rollCountLength": 0,
       "crcType": "None",
       "crcBit": 0,
-      "setAddressOnSend": true,
       "timeoutMs": 0,
       "filterReceipts": false,
       "userDefined": true,
@@ -407,6 +414,8 @@
         -1,
         255
       ],
+      "overrideSourceAddress": false,
+      "overrideDestinationAddress": false,
       "signals": [
         {
           "muxGroupValid": 0,
@@ -472,7 +481,6 @@
       "rollCountLength": 0,
       "crcType": "None",
       "crcBit": 0,
-      "setAddressOnSend": true,
       "timeoutMs": 0,
       "filterReceipts": false,
       "userDefined": true,
@@ -484,6 +492,8 @@
         -1,
         255
       ],
+      "overrideSourceAddress": false,
+      "overrideDestinationAddress": false,
       "signals": [
         {
           "muxGroupValid": 0,
@@ -551,7 +561,6 @@
       "rollCountLength": 0,
       "crcType": "None",
       "crcBit": 0,
-      "setAddressOnSend": true,
       "timeoutMs": 0,
       "filterReceipts": false,
       "userDefined": true,
@@ -563,6 +572,8 @@
         -1,
         255
       ],
+      "overrideSourceAddress": false,
+      "overrideDestinationAddress": false,
       "signals": [
         {
           "muxGroupValid": 0,
@@ -834,7 +845,6 @@
       "rollCountLength": 4,
       "crcType": "None",
       "crcBit": 0,
-      "setAddressOnSend": true,
       "timeoutMs": 0,
       "filterReceipts": false,
       "userDefined": true,
@@ -846,6 +856,8 @@
         -1,
         3
       ],
+      "overrideSourceAddress": true,
+      "overrideDestinationAddress": true,
       "signals": [
         {
           "muxGroupValid": 0,
@@ -1133,6 +1145,250 @@
           ]
         }
       ]
+    },
+    {
+      "id": 2150301696,
+      "name": "TestOverride",
+      "messageType": "J1939ExtendedFrame",
+      "dlc": 8,
+      "rate": 0,
+      "comment": "",
+      "hasRollCount": false,
+      "rollCountBit": 0,
+      "rollCountLength": 0,
+      "crcType": "None",
+      "crcBit": 0,
+      "timeoutMs": 0,
+      "filterReceipts": false,
+      "userDefined": true,
+      "transmitNodes": [
+        -1,
+        1
+      ],
+      "receiveNodes": [
+        -1,
+        3
+      ],
+      "overrideSourceAddress": false,
+      "overrideDestinationAddress": false,
+      "signals": [
+        {
+          "muxGroupValid": 0,
+          "minimumValid": 0.0,
+          "maximumValid": 0.0,
+          "defaultValid": 0.0,
+          "id": 0,
+          "name": "Test",
+          "startBit": 0,
+          "bitLength": 64,
+          "byteOrder": "LittleEndian",
+          "valueType": "Double",
+          "defaultValue": 0.0,
+          "scale": 1.0,
+          "offset": 0.0,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "unit": "",
+          "muxRole": "NotMultiplexed",
+          "muxGroup": 0,
+          "comment": "",
+          "values": {}
+        }
+      ]
+    },
+    {
+      "id": 2162339804,
+      "name": "TestRaw",
+      "messageType": "RawExtendedFrame",
+      "dlc": 3,
+      "rate": 0,
+      "comment": "",
+      "hasRollCount": false,
+      "rollCountBit": 0,
+      "rollCountLength": 0,
+      "crcType": "None",
+      "crcBit": 0,
+      "timeoutMs": 0,
+      "filterReceipts": false,
+      "userDefined": true,
+      "transmitNodes": [
+        -1,
+        1
+      ],
+      "receiveNodes": [
+        -1,
+        -1
+      ],
+      "overrideSourceAddress": false,
+      "overrideDestinationAddress": false,
+      "signals": [
+        {
+          "muxGroupValid": 0,
+          "minimumValid": 0.0,
+          "maximumValid": 0.0,
+          "defaultValid": 0.0,
+          "id": 0,
+          "name": "Test",
+          "startBit": 0,
+          "bitLength": 24,
+          "byteOrder": "LittleEndian",
+          "valueType": "Unsigned",
+          "defaultValue": 0.0,
+          "scale": 1.0,
+          "offset": 0.0,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "unit": "",
+          "muxRole": "NotMultiplexed",
+          "muxGroup": 0,
+          "comment": "",
+          "values": {}
+        }
+      ]
+    },
+    {
+      "id": 2151415808,
+      "name": "TestStatic",
+      "messageType": "J1939ExtendedFrame",
+      "dlc": 3,
+      "rate": 0,
+      "comment": "",
+      "hasRollCount": false,
+      "rollCountBit": 0,
+      "rollCountLength": 0,
+      "crcType": "None",
+      "crcBit": 0,
+      "timeoutMs": 0,
+      "filterReceipts": false,
+      "userDefined": true,
+      "transmitNodes": [
+        -1,
+        1
+      ],
+      "receiveNodes": [
+        -1,
+        2
+      ],
+      "overrideSourceAddress": true,
+      "overrideDestinationAddress": true,
+      "signals": [
+        {
+          "muxGroupValid": 0,
+          "minimumValid": 0.0,
+          "maximumValid": 0.0,
+          "defaultValid": 0.0,
+          "id": 0,
+          "name": "New Signal",
+          "startBit": 0,
+          "bitLength": 24,
+          "byteOrder": "LittleEndian",
+          "valueType": "Unsigned",
+          "defaultValue": 0.0,
+          "scale": 1.0,
+          "offset": 0.0,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "unit": "",
+          "muxRole": "NotMultiplexed",
+          "muxGroup": 0,
+          "comment": "",
+          "values": {}
+        }
+      ]
+    },
+    {
+      "id": 2352283648,
+      "name": "TestMultiPacket",
+      "messageType": "J1939ExtendedFrame",
+      "dlc": 16,
+      "rate": 0,
+      "comment": "",
+      "hasRollCount": false,
+      "rollCountBit": 0,
+      "rollCountLength": 0,
+      "crcType": "CheckSum",
+      "crcBit": 0,
+      "timeoutMs": 0,
+      "filterReceipts": false,
+      "userDefined": true,
+      "transmitNodes": [
+        -1,
+        255
+      ],
+      "receiveNodes": [
+        -1,
+        255
+      ],
+      "overrideSourceAddress": true,
+      "overrideDestinationAddress": true,
+      "signals": [
+        {
+          "muxGroupValid": 0,
+          "minimumValid": 0.0,
+          "maximumValid": 0.0,
+          "defaultValid": 0.0,
+          "id": 0,
+          "name": "Crc",
+          "startBit": 0,
+          "bitLength": 8,
+          "byteOrder": "LittleEndian",
+          "valueType": "Unsigned",
+          "defaultValue": 0.0,
+          "scale": 1.0,
+          "offset": 0.0,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "unit": "",
+          "muxRole": "NotMultiplexed",
+          "muxGroup": 0,
+          "comment": "",
+          "values": {}
+        },
+        {
+          "muxGroupValid": 0,
+          "minimumValid": 0.0,
+          "maximumValid": 0.0,
+          "defaultValid": 0.0,
+          "id": 1,
+          "name": "Data1",
+          "startBit": 8,
+          "bitLength": 56,
+          "byteOrder": "LittleEndian",
+          "valueType": "Double",
+          "defaultValue": 0.0,
+          "scale": 1.0,
+          "offset": 0.0,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "unit": "",
+          "muxRole": "NotMultiplexed",
+          "muxGroup": 0,
+          "comment": "",
+          "values": {}
+        },
+        {
+          "muxGroupValid": 0,
+          "minimumValid": 0.0,
+          "maximumValid": 0.0,
+          "defaultValid": 0.0,
+          "id": 2,
+          "name": "Data2",
+          "startBit": 64,
+          "bitLength": 64,
+          "byteOrder": "LittleEndian",
+          "valueType": "Double",
+          "defaultValue": 0.0,
+          "scale": 1.0,
+          "offset": 0.0,
+          "minimum": 0.0,
+          "maximum": 0.0,
+          "unit": "",
+          "muxRole": "NotMultiplexed",
+          "muxGroup": 0,
+          "comment": "",
+          "values": {}
+        }
+      ]
     }
   ],
   "diagnosticEvents": [],
@@ -1140,5 +1396,5 @@
   "generatorNamespace": "Ahsoka.CS.CAN",
   "generatorOutputFile": "Generated/GeneratedCanObjects.cs",
   "generatorBaseClass": "CanViewModelBase",
-  "version": "3.4.1.10014"
+  "version": "3.7.6.30003"
 }

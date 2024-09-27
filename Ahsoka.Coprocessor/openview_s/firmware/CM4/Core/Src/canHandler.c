@@ -2,6 +2,7 @@
 #include "cmsis_os.h"
 #include "FreeRTOS.h"
 #include "semphr.h"
+#include "timers.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -24,11 +25,14 @@ bool coprocessorReady = false;
 void txTimerTask(void* argument);
 
 void rxCanTask(void* argument);
+void timerCallback(TimerHandle_t xTimer);
 
 extern FDCAN_HandleTypeDef hfdcan1;
 extern FDCAN_HandleTypeDef hfdcan2;
 extern uint32_t rxCanMessages;
 extern SemaphoreHandle_t rxCanSem[2];
+extern SemaphoreHandle_t txCanSem[2];
+extern xTimerHandle txCanTimer[2];
 extern nodeList_t* txNode[MAX_PORTS];
 #define NUM_RX_MESSAGES 10
 
@@ -113,11 +117,15 @@ void txTimerTask(void* argument)
     uint32_t port = (uint32_t)argument;
 
     log_info("tx can task started\r\n");
+    xTimerStart(txCanTimer[port], portMAX_DELAY);
+
     while(1)
     {
 
         // delay for time period in ticks / ms.
-        osDelay(TIMER_RESOLUTION);
+        //osDelay(TIMER_RESOLUTION);
+        // wait for timer to expire.
+        xSemaphoreTake(txCanSem[port], portMAX_DELAY);
         xSemaphoreTake(timerListMutex[port], portMAX_DELAY);
         if(timerList[port])
         {
@@ -258,10 +266,10 @@ void rescheduleCanMessageTimer(canMessageTimerList_t** list, canMessageTimerList
     }
     else
     {
-    	canMessageTimerList_t* temp = *list;
+    	canMessageTimerList_t* temp;
         // need to keep walking down the list.
         temp = *list;
-        while(temp && ((temp)->ticksLeft < node->ticksLeft))
+        while(temp && ((temp)->ticksLeft <= node->ticksLeft))
         {
             node->ticksLeft -= (temp)->ticksLeft;
             node->timeoutTicks -= (temp)->ticksLeft;
@@ -273,6 +281,7 @@ void rescheduleCanMessageTimer(canMessageTimerList_t** list, canMessageTimerList
             }
         }
         // temp will point to the record that we should be inserted after.
+        node->nextTimer = temp->nextTimer;
         temp->nextTimer = node;
     }
 }
@@ -309,6 +318,7 @@ canMessageTimerList_t* findCanTxMessage(uint32_t port, canMessageTimerList_t* li
 	{
 		foundNode = createCanMessageTimer();
 		foundNode->msg->id = id;
+		foundNode->msg->msgType = AhsokaCAN_MessageType_RAW_EXTENDED_FRAME;
 		foundNode->msg->overrideDestination = 1;
 		foundNode->msg->overrideSource = 1;
 		foundNode->msg->crc = 0;
@@ -320,26 +330,19 @@ canMessageTimerList_t* findCanTxMessage(uint32_t port, canMessageTimerList_t* li
 
 	while(list != NULL)
 	{
-		if((list->msg->id & 0x1FFFFFFF) == id)
+		int32_t mask = (list->msg->id & 0x00FF0000) >= PDU2_THRESHOLD ? 0x3FFFF00 : 0x3FF0000;
+		if((list->msg->id & 0x1FFFFFFF) == (id & 0x1FFFFFFF))
 			break;
-		else if(list->msg->msgType == AhsokaCAN_MessageType_J1939_EXTENDED_FRAME && (list->msg->id == (id & list->msg->idMask)))
+		else if(list->msg->msgType == AhsokaCAN_MessageType_J1939_EXTENDED_FRAME && (list->msg->id & mask) == (id & mask))
 		{
 			bool knownDestination = findNode(port, list->msg->receiverNodeId)->staticAddress;
-			int32_t destination = (id >> 8) & 0xFF;
 
 			bool available = true;
-			if(!list->msg->overrideDestination)
+			if(list->msg->overrideDestination)
 			{
-				if( ((list->msg->id & 0x00FF0000) < PDU2_THRESHOLD) && !(destination == findNode(port, list->msg->receiverNodeId)->address || !knownDestination) )
+				if( ((list->msg->id & 0x00FF0000) < PDU2_THRESHOLD) && !knownDestination )
 					available &= false;
 			}
-
-			if(!list->msg->overrideSource)
-			{
-				if( !(list->msg->transmitNodeId == txNode[port]->id || list->msg->transmitNodeId == 255) )
-					available &= false;
-			}
-
 
 			if(available)
 				break;
@@ -394,25 +397,26 @@ canMessage_t* findCanMessage(uint32_t port, uint32_t id, bool isExtended, bool p
 
     while(list != NULL)
     {
+    	int32_t mask = (list->msg->id & 0x00FF0000) >= PDU2_THRESHOLD ? 0x3FFFF00 : 0x3FF0000;
 
-    	if(list->msg->id == id)
+    	if((list->msg->id & 0x1FFFFFFF) == (id & 0x1FFFFFFF))
     	{
     		foundMsg = list->msg;
     		break;
     	}
-    	else if((list->msg->msgType == AhsokaCAN_MessageType_J1939_EXTENDED_FRAME) && (isExtended) && (list->msg->id == (id & list->msg->idMask)))
+    	else if((list->msg->msgType == AhsokaCAN_MessageType_J1939_EXTENDED_FRAME) && (isExtended) && ((list->msg->id & mask) == (id & mask)))
     	{
     		int32_t source = id & 0xFF;
     		int32_t destination = (id >> 8) & 0xFF;
 
     		bool available = true;
-    		if(!list->msg->overrideDestination)
+    		if(list->msg->overrideDestination)
     		{
     			if( ((list->msg->id & 0x00FF0000) < PDU2_THRESHOLD) && !(destination == txNode[port]->address || list->msg->receiverNodeId == 255) )
 					available &= false;
     		}
 
-    		if(!list->msg->overrideSource)
+    		if(list->msg->overrideSource)
     		{
     			if(!(source == findNode(port, list->msg->transmitNodeId)->address || list->msg->transmitNodeId == 255))
     				available &= false;
@@ -473,13 +477,16 @@ void sendCan(uint32_t port, canMessage_t* msg)
 	FDCAN_TxHeaderTypeDef header;
     header.DataLength = (msg->dlc << 16);
 
+
+    if(msg->msgType == AhsokaCAN_MessageType_J1939_EXTENDED_FRAME)
+    {
+    	if(msg->overrideSource == 1)
+    	    msg->id |= txNode[port]->address;
+
+		if(msg->overrideDestination == 1 && (( msg->id & 0x00FF0000) < PDU2_THRESHOLD))
+			 msg->id |= findNode(port, msg->receiverNodeId)->address << 8;
+    }
     header.Identifier = msg->id;
-    if(msg->overrideSource == 0)
-    	header.Identifier = msg->id | txNode[port]->address;
-
-    if(msg->overrideDestination == 0 && ((header.Identifier & 0x00FF0000) < PDU2_THRESHOLD))
-    	header.Identifier |= findNode(port, msg->receiverNodeId)->address << 8;
-
 
     header.IdType = (msg->msgType != AhsokaCAN_MessageType_RAW_STANDARD_FRAME) ? FDCAN_EXTENDED_ID : FDCAN_STANDARD_ID;
     header.TxFrameType = FDCAN_DATA_FRAME;
@@ -576,4 +583,17 @@ crcFunc getChecksumFunc(uint32_t type)
 			break;
 
 	}
+}
+
+
+void timerCallback(xTimerHandle xTimer)
+{
+    void* timerId;
+    uint32_t timerIndex;
+    // get the timer index from handle,
+    timerId = pvTimerGetTimerID(xTimer);
+    timerIndex = (uint32_t)timerId;
+    // verhoog the semaphore
+    if(xSemaphoreGive(txCanSem[timerIndex]) != pdPASS)
+        log_info("semaphore failed to give\n");
 }

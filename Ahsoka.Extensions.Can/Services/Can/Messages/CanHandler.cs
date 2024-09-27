@@ -92,6 +92,7 @@ internal class CanHandler
 
         var returnMessage = new CanMessageResult() { Status = MessageStatus.Success, Message = "" };
         foreach (var message in messages)
+        {
             foreach (var protocol in protocols)
             {
                 if (protocol.ConfirmAvailable(message, data, out CanMessageResult result))
@@ -99,8 +100,11 @@ internal class CanHandler
                     if (result.Status == MessageStatus.Error)
                         returnMessage.Status = MessageStatus.Error;
                     returnMessage.Message += $"{result.Message}/n";
-                }                  
+                    break;
+                }
             }
+        }
+            
 
         return returnMessage;
     }

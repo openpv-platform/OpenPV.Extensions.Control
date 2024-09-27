@@ -25,20 +25,6 @@ internal class RawProtocolHandler : BaseProtocolHandler
         return Service.PortConfig.MessageConfiguration.Messages.Any(x => x.MessageType == MessageType.RawStandardFrame || x.MessageType == MessageType.RawExtendedFrame);
     }
 
-    internal override bool InAvailableMessages(uint id, bool received = false)
-    {
-        AvailableMessage message;
-        var found = Service.AvailableMessages.TryGetValue(id, out message);
-
-        if (!found)
-            found = Service.AvailableMessages.TryGetValue(id | 0x80000000, out message);
-
-        if (message?.Message.MessageType != MessageType.RawStandardFrame || message?.Message.MessageType != MessageType.RawExtendedFrame)
-            return false;
-
-        return found;
-    }
-
     internal override bool GetAvailableMessage(uint id, out AvailableMessage message, bool received = false)
     {
         var found = Service.AvailableMessages.TryGetValue(id, out message);

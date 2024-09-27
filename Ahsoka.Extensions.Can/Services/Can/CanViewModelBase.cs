@@ -1,5 +1,6 @@
 ﻿using Ahsoka.Services.Can.Messages;
 using Ahsoka.Utility;
+using DbcParserLib.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -181,44 +182,7 @@ public partial class MessageDefinition
 /// </summary>
 public partial class MessageSignalDefinition
 {
-    /// <summary>
-    /// Description of Signal
-    /// </summary>
-    /// <returns></returns>
-    public override string ToString()
-    {
-        return $"{this.Name} Bit:({this.StartBit} Len:{this.BitLength})";
-    }
-
-#pragma warning disable CS1591
-    // Allows data validation for proto objects
-    [Range(0, byte.MaxValue)]
-    public uint MuxGroupValid
-    {
-        get { return MuxGroup; }
-        set { MuxGroup = value; }
-    }
-
-    [Range(0.0, double.MaxValue)]
-    public double MinimumValid
-    {
-        get { return Minimum; }
-        set { Minimum = value; }
-    }
-
-    [Range(0.0, double.MaxValue)]
-    public double MaximumValid
-    {
-        get { return Maximum; }
-        set { Maximum = value; }
-    }
-
-    [Range(0.0, double.MaxValue)]
-    public double DefaultValid
-    {
-        get { return DefaultValue; }
-        set { Minimum = value; }
-    }
+   
 }
 
 public partial class NodeDefinition
