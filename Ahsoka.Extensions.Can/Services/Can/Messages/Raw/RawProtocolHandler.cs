@@ -25,6 +25,17 @@ internal class RawProtocolHandler : BaseProtocolHandler
         return Service.PortConfig.MessageConfiguration.Messages.Any(x => x.MessageType == MessageType.RawStandardFrame || x.MessageType == MessageType.RawExtendedFrame);
     }
 
+    internal override bool ConfirmAvailable(CanMessageData messageData, object info, out CanMessageResult result)
+    {
+        if (!base.ConfirmAvailable(messageData, info, out result))
+            return false;
+
+        if (messageData.Dlc > 8 && Service.GetType().Name != "DesktopServiceImplementation")
+            result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"Can not send multi-packet messages with raw protocols." };
+
+        return true;
+    }
+
     internal override bool GetAvailableMessage(uint id, out AvailableMessage message, bool received = false)
     {
         var found = Service.AvailableMessages.TryGetValue(id, out message);
@@ -38,15 +49,16 @@ internal class RawProtocolHandler : BaseProtocolHandler
         return found;
     }
 
-    internal override bool ProcessMessage(CanMessageData message, out uint modifiedId)
+    internal override bool ProcessMessage(CanMessageData message, out bool shouldSend)
     {
-        if (!base.ProcessMessage(message, out modifiedId))
+        if (!base.ProcessMessage(message, out shouldSend))
             return false;
+
         if (GetAvailableMessage(message.Id, out AvailableMessage messageInfo))
         {
             if (messageInfo.Message.MessageType == MessageType.RawExtendedFrame && 
                     Service.PortConfig.MessageConfiguration.Ports.First(x => x.Port == Service.Port).CanInterface == CanInterface.SocketCan)
-                modifiedId |= (uint)CanIdFlags.CAN_EFF_FLAG;           
+                message.Id |= (uint)CanIdFlags.CAN_EFF_FLAG;           
         }
         return true;
     }

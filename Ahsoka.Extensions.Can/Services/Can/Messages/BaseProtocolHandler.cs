@@ -36,9 +36,9 @@ internal abstract class BaseProtocolHandler
         return true;
     }
 
-    internal virtual bool ProcessMessage(CanMessageData message, out uint modifiedId)
+    internal virtual bool ProcessMessage(CanMessageData message, out bool shouldSend)
     {
-        modifiedId = message.Id;
+        shouldSend = true;
 
         lock (Service.AvailableMessages)
         {

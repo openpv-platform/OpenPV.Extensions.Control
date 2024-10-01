@@ -22,6 +22,9 @@ internal class STCoprocessorServiceImplementation : CanServiceImplementation
     int heartBeatSendCount = 0;
     int heartBeatReceiveCount = 0;
 
+    CancellationTokenSource source = null;
+    Task recurringMessageHandler;
+
     protected override void OnClose()
     {
         // Start MQ Broker to talk to Server
@@ -30,6 +33,7 @@ internal class STCoprocessorServiceImplementation : CanServiceImplementation
         // Cancel and Wait for Result.
         heartBeatCancellationSource.Cancel();
         heartBeat.Wait();
+        recurringMessageHandler.Wait();
     }
 
     protected override void OnOpen()
@@ -91,7 +95,9 @@ internal class STCoprocessorServiceImplementation : CanServiceImplementation
                 }
             });
         }
-        
+
+        source = new();
+        recurringMessageHandler = ProcessRecurringMessages(source);
     }
 
     private void SendServiceReadyMessage()
@@ -112,6 +118,10 @@ internal class STCoprocessorServiceImplementation : CanServiceImplementation
         lock (coProcessorSocket)
             if (coProcessorSocket.IsConnected)
             {
+                for (int i = canMessageDataCollection.Messages.Count - 1; i >= 0; i--)
+                    if (!ProcessMessage(canMessageDataCollection.Messages[i]))
+                        canMessageDataCollection.Messages.RemoveAt(i);
+                
                 // Prepare Response Message 
                 using MemoryStream headerStream = new();
                 ProtoBuf.Serializer.Serialize(headerStream, new AhsokaMessageHeader() { TransportId = CanMessageTypes.Ids.SendCanMessages.EnumToInt() });
@@ -128,14 +138,19 @@ internal class STCoprocessorServiceImplementation : CanServiceImplementation
         lock (coProcessorSocket)
             if (coProcessorSocket.IsConnected)
             {
-                // Prepare Response Message 
-                using MemoryStream headerStream = new();
-                ProtoBuf.Serializer.Serialize(headerStream, new AhsokaMessageHeader() { TransportId = CanMessageTypes.Ids.SendRecurringCanMessage.EnumToInt() });
+                if (recurringMessage.Message.Dlc > 8)
+                    AddRecurringMessage(recurringMessage);
+                else
+                {
+                    // Prepare Response Message 
+                    using MemoryStream headerStream = new();
+                    ProtoBuf.Serializer.Serialize(headerStream, new AhsokaMessageHeader() { TransportId = CanMessageTypes.Ids.SendRecurringCanMessage.EnumToInt() });
 
-                using MemoryStream dataStream = new();
-                ProtoBuf.Serializer.Serialize(dataStream, recurringMessage);
+                    using MemoryStream dataStream = new();
+                    ProtoBuf.Serializer.Serialize(dataStream, recurringMessage);
 
-                coProcessorSocket.SendMessage(headerStream.ToArray(), dataStream.ToArray());
+                    coProcessorSocket.SendMessage(headerStream.ToArray(), dataStream.ToArray());
+                }         
             }
     }
 

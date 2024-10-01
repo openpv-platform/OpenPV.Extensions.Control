@@ -40,15 +40,15 @@ internal class CanHandler
         }
     }
 
-    internal uint ProcessMessage(CanMessageData messageData)
+    internal bool ProcessMessage(CanMessageData messageData)
     {
         foreach (var protocol in protocols)
         {
-            if (protocol.ProcessMessage(messageData, out var modifiedId))
-                return modifiedId;            
+            if (protocol.ProcessMessage(messageData, out bool shouldSend))
+                return shouldSend;            
         }
 
-        return 0;
+        return false;
     }
 
     internal CanMessageResult SendPredefined(SendInformation sendInfo)

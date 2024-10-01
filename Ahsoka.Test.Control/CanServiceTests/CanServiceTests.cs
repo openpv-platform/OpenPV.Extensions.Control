@@ -487,7 +487,7 @@ public class CanServiceTests : LinearTestBase
         Assert.IsTrue(output.Status == MessageStatus.Success);
 
         foreach (var message in  collection.Messages)
-            message.Id = handler.ProcessMessage(message);
+            handler.ProcessMessage(message);
 
         //Confirm processes ids are correct
         Assert.IsTrue(collection.Messages[0].Id == 0x80E2AFDC);

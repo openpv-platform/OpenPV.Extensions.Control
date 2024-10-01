@@ -93,15 +93,13 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
             }
             else
                 result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"J1939 node either failed to claim address or was superseded by a higher priority ECU" };
-        else if (messageData.Dlc > 8)
-            result = MessageHandler.SendPredefined(new SendInformation() { messageData = messageData });
 
         return true;
     }
 
-    internal override bool ProcessMessage(CanMessageData message, out uint modifiedId)
+    internal override bool ProcessMessage(CanMessageData message, out bool shouldSend)
     {
-        if (!base.ProcessMessage(message, out modifiedId))
+        if (!base.ProcessMessage(message, out shouldSend))
             return false;
 
         if (GetAvailableMessage(message.Id, out AvailableMessage messageInfo))
@@ -109,12 +107,21 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
             var j1939id = new J1939PropertyDefinitions.Id(message.Id);
 
             if (messageInfo.Message.OverrideSourceAddress)
-                modifiedId |= (CanState.CurrentAddress & 0xFF); 
+                message.Id |= (CanState.CurrentAddress & 0xFF); 
             if (messageInfo.Message.OverrideDestinationAddress && j1939id.PDUF < PDU2Threshold)
-                modifiedId |= (CanState.NodeAddresses[messageInfo.Message.ReceiveNodes[Service.Port]] & 0xFF) << 8;
+                message.Id |= (CanState.NodeAddresses[messageInfo.Message.ReceiveNodes[Service.Port]] & 0xFF) << 8;
            
             if (Service.PortConfig.MessageConfiguration.Ports.First(x => x.Port == Service.Port).CanInterface == CanInterface.SocketCan)
-                modifiedId |= (uint)CanIdFlags.CAN_EFF_FLAG;
+                message.Id |= (uint)CanIdFlags.CAN_EFF_FLAG;
+
+            if (message.Dlc > 8)
+            {
+                shouldSend = false;
+                MessageHandler.SendPredefined(new SendInformation()
+                {
+                    messageData = message
+                });
+            }
         }
         return true;
     }

@@ -115,11 +115,11 @@ internal abstract class CanServiceImplementation
         return new CanMessageResult() { Status = MessageStatus.Success };
     }
 
-    internal uint ProcessMessage(CanMessageData messageData)
+    internal bool ProcessMessage(CanMessageData messageData)
     {
         if (!promiscuousTransmit)
             return canHandler.ProcessMessage(messageData);
-        return messageData.Id;
+        return true;
     }
 
     internal void FilterIncomingMessage(CanMessageData messageData, out bool shouldSend)

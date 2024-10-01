@@ -84,50 +84,51 @@ internal class ECOMServiceImplementation : CanServiceImplementation
         {
             foreach (var canMessage in canMessageDataCollection.Messages)
             {
-                var modifiedID = ProcessMessage(canMessage);
-
-                byte returnError;
-                if (modifiedID >= 0x80000000) // Extended Frame
+                if (ProcessMessage(canMessage))
                 {
-                    var ecomMessage = new EFFMessage
+                    byte returnError;
+                    if (canMessage.Id >= 0x80000000) // Extended Frame
                     {
-                        ID = modifiedID,
-                        DataLength = (byte)canMessage.Dlc,
-                        data1 = canMessage.Data[0],
-                        data2 = canMessage.Data[1],
-                        data3 = canMessage.Data[2],
-                        data4 = canMessage.Data[3],
-                        data5 = canMessage.Data[4],
-                        data6 = canMessage.Data[5],
-                        data7 = canMessage.Data[6],
-                        data8 = canMessage.Data[7]
-                    };
-                    returnError = ECOMLibrary.CANTransmitMessageEx(ecomHandle, ref ecomMessage);
-                }
-                else
-                {
-                    var ecomMessage = new SFFMessage();
-                    var idBytes = BitConverter.GetBytes(modifiedID);
-                    ecomMessage.IDH = idBytes[1];
-                    ecomMessage.IDL = idBytes[0];
-                    ecomMessage.DataLength = (byte)canMessage.Dlc;
-                    ecomMessage.data1 = canMessage.Data[0];
-                    ecomMessage.data2 = canMessage.Data[1];
-                    ecomMessage.data3 = canMessage.Data[2];
-                    ecomMessage.data4 = canMessage.Data[3];
-                    ecomMessage.data5 = canMessage.Data[4];
-                    ecomMessage.data6 = canMessage.Data[5];
-                    ecomMessage.data7 = canMessage.Data[6];
-                    ecomMessage.data8 = canMessage.Data[7];
-                    returnError = ECOMLibrary.CANTransmitMessage(ecomHandle, ref ecomMessage);
-                }
+                        var ecomMessage = new EFFMessage
+                        {
+                            ID = canMessage.Id,
+                            DataLength = (byte)canMessage.Dlc,
+                            data1 = canMessage.Data[0],
+                            data2 = canMessage.Data[1],
+                            data3 = canMessage.Data[2],
+                            data4 = canMessage.Data[3],
+                            data5 = canMessage.Data[4],
+                            data6 = canMessage.Data[5],
+                            data7 = canMessage.Data[6],
+                            data8 = canMessage.Data[7]
+                        };
+                        returnError = ECOMLibrary.CANTransmitMessageEx(ecomHandle, ref ecomMessage);
+                    }
+                    else
+                    {
+                        var ecomMessage = new SFFMessage();
+                        var idBytes = BitConverter.GetBytes(canMessage.Id);
+                        ecomMessage.IDH = idBytes[1];
+                        ecomMessage.IDL = idBytes[0];
+                        ecomMessage.DataLength = (byte)canMessage.Dlc;
+                        ecomMessage.data1 = canMessage.Data[0];
+                        ecomMessage.data2 = canMessage.Data[1];
+                        ecomMessage.data3 = canMessage.Data[2];
+                        ecomMessage.data4 = canMessage.Data[3];
+                        ecomMessage.data5 = canMessage.Data[4];
+                        ecomMessage.data6 = canMessage.Data[5];
+                        ecomMessage.data7 = canMessage.Data[6];
+                        ecomMessage.data8 = canMessage.Data[7];
+                        returnError = ECOMLibrary.CANTransmitMessage(ecomHandle, ref ecomMessage);
+                    }
 
-                if (returnError != ECOMLibrary.ECI_NO_ERROR)
-                {
-                    StringBuilder errMsg = new(400);
-                    ECOMLibrary.GetFriendlyErrorMessage(returnError, errMsg, 400);
-                    AhsokaLogging.LogMessage(AhsokaVerbosity.High, $"Message failed to send with error: {errMsg}");
-                }
+                    if (returnError != ECOMLibrary.ECI_NO_ERROR)
+                    {
+                        StringBuilder errMsg = new(400);
+                        ECOMLibrary.GetFriendlyErrorMessage(returnError, errMsg, 400);
+                        AhsokaLogging.LogMessage(AhsokaVerbosity.High, $"Message failed to send with error: {errMsg}");
+                    }
+                }           
             }
         }
     }

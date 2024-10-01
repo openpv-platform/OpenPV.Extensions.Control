@@ -67,16 +67,18 @@ internal class STSocketCanServiceImplementation : CanServiceImplementation
         if (socketCAN.IsStarted)
         {
             foreach (var canMessage in canMessageDataCollection.Messages)
-            {
-                var modifiedID = ProcessMessage(canMessage);
-            
-                // Protect SocketCAN from Incorrectly Set Messages
-                if (modifiedID > 0x07FF)
-                    modifiedID |= (uint)CanIdFlags.CAN_EFF_FLAG;
+            {        
+                if (ProcessMessage(canMessage))
+                {
+                    // Protect SocketCAN from Incorrectly Set Messages
+                    if (canMessage.Id > 0x07FF)
+                        canMessage.Id |= (uint)CanIdFlags.CAN_EFF_FLAG;
 
-                CanFrame frame = new(modifiedID, canMessage.Data);
+                    CanFrame frame = new(canMessage.Id, canMessage.Data);
 
-                socketCAN.QueueWriteMessage(frame);
+                    socketCAN.QueueWriteMessage(frame);
+                }
+                
             }
         }
     }

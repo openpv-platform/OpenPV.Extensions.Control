@@ -103,24 +103,31 @@ internal class TPMessageHandler : J1939MessageHandlerBase
 
     internal override bool OnSend(SendInformation sendInfo, out CanMessageResult result)
     {
-        result = null;
-        if (!Enabled || (sendInfo.messageData != null && sendInfo.messageData.Dlc <= 8))
-            return false;
-
-        AhsokaLogging.LogMessage(AhsokaVerbosity.High, "TP Send");
-
-        var j1939Id = new J1939PropertyDefinitions.Id(sendInfo.messageData.Id);
-        if (sessions.Where(x => x.Transmitting).Count() == 2)
-            result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"No space for additional Multi-packet sessions" };
-        else if (sessions.Where(x => x.Transmitting && x.DestinationAddress == J1939PropertyDefinitions.BroadcastAddress).Count() == 1)
-            result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"Can only send one broadcast message at a time" };
-        else if (sessions.Where(x => x.Transmitting && x.DestinationAddress == j1939Id.PDUS).Count() == 1)
-            result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"Message to this address already in progress" };
-        else
+        try
         {
-            sessions.Add(new TPSession(this, Protocol, Service));
-            sessions.Last().StartTransmitSession(sendInfo.messageData);
-            result = new CanMessageResult() { Status = MessageStatus.Success, Message = $"Multi-packet transmit session started" };
+            result = null;
+            if (!Enabled || (sendInfo.messageData != null && sendInfo.messageData.Dlc <= 8))
+                return false;
+
+            var j1939Id = new J1939PropertyDefinitions.Id(sendInfo.messageData.Id);
+            if (sessions.Where(x => x.Transmitting).Count() == 2)
+                result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"No space for additional Multi-packet sessions" };
+            else if (sessions.Where(x => x.Transmitting && x.DestinationAddress == J1939PropertyDefinitions.BroadcastAddress).Count() == 1)
+                result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"Can only send one broadcast message at a time" };
+            else if (sessions.Where(x => x.Transmitting && x.DestinationAddress == j1939Id.PDUS).Count() == 1)
+                result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"Message to this address already in progress" };
+            else
+            {
+                sessions.Add(new TPSession(this, Protocol, Service));
+                sessions.Last().StartTransmitSession(sendInfo.messageData);
+                result = new CanMessageResult() { Status = MessageStatus.Success, Message = $"Multi-packet transmit session started" };
+            }
+            AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"{result.Message}");
+        }
+        catch (Exception ex) 
+        { 
+            AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP send failed with message: {ex.Message}");
+            result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"TP send failed with message: {ex.Message}" };
         }
 
         return true;
@@ -196,6 +203,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                 Transmitting = true;
                 if (j1939Id.PDUS == J1939PropertyDefinitions.BroadcastAddress)
                 {
+                    AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Transmit BAM Started");
                     var response = new CanMessageData
                     {
                         Id = handler.CreateMessageId(SourceAddress, J1939PropertyDefinitions.BroadcastAddress)
@@ -210,9 +218,11 @@ internal class TPMessageHandler : J1939MessageHandlerBase
 
                     response.Id = (handler.CreateMessageId(SourceAddress, J1939PropertyDefinitions.BroadcastAddress) & 0xFF00FFFF) | TPMessageHandler.childPDUF << 16;
                     SendPackets(messageData, response, 1, (uint)numberOfPackets);
+                    AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Transmit BAM Completed");
                 }
                 else
                 {
+                    AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Transmit Started");
                     var response = new CanMessageData
                     {
                         Id = handler.CreateMessageId(SourceAddress, DestinationAddress)
@@ -249,12 +259,14 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                                     CTS.PacketsRequested = (uint)(numberOfPackets - CTS.PacketStart) + 1;
                                 }
 
+                                AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Transmit CTS Received sending {CTS.PacketsRequested} packets staring from {CTS.PacketStart}");
                                 response.Id = (handler.CreateMessageId(SourceAddress, DestinationAddress) & 0xFF00FFFF) | TPMessageHandler.childPDUF << 16;
                                 SendPackets(messageData, response, CTS.PacketStart, CTS.PacketsRequested);
                                 delay = T3;
                             }
                             else if (CTS.ControlByte is J1939PropertyDefinitions.CMControl.EndOfMsgACK or J1939PropertyDefinitions.CMControl.Abort)
                             {
+                                AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Transmit Completed");
                                 transmissionFinished = true;
                             }
                         }
@@ -266,6 +278,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                             messageCollection.Messages.Clear();
                             messageCollection.Messages.Add(response);
                             service.SendCanMessages(messageCollection);
+                            AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Transmit Aborted");
                             transmissionFinished = true;
                         }
                     }
@@ -288,6 +301,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                 var sequenceNumber = 1;
                 if (j1939Id.PDUS == J1939PropertyDefinitions.BroadcastAddress)
                 {
+                    AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Receive BAM Started");
                     var BAM = new J1939PropertyDefinitions.TPCM(BitConverter.ToUInt64(messageData.Data));
 
                     var message = new CanMessageData();
@@ -323,12 +337,14 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                         else break;
                     }
 
+                    AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Receive BAM Completed");
                     messageCollection.Messages.Clear();
                     messageCollection.Messages.Add(message);
                     service.Service.NotifyCanMessages(messageCollection);
                 }
                 else if (j1939Id.PDUS == protocol.CanState.CurrentAddress)
                 {
+                    AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Receive Started");
                     var RTS = new J1939PropertyDefinitions.TPCM(BitConverter.ToUInt64(messageData.Data));
                     if (RTS.PacketsPerCTS > RTS.NumPackets)
                         RTS.PacketsPerCTS = RTS.NumPackets;
@@ -365,6 +381,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                             messageCollection.Messages.Clear();
                             messageCollection.Messages.Add(message);
                             service.Service.NotifyCanMessages(messageCollection);
+                            AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Receive Completed");
                             receiveFinished = true;
                         }
                         else
@@ -380,6 +397,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                             service.SendCanMessages(messageCollection);
                             var delay = T2;
 
+                            AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Receive requesting {packetsRequested} packets staring from {nextPacket}");
                             while (sequenceNumber < nextPacket)
                             {
                                 errorOccured = false;
@@ -412,6 +430,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                                 if (errorOccured)
                                     if (++numRetransmits > 2)
                                     {
+                                        AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Receive Aborted");
                                         var abort = new J1939PropertyDefinitions.TPCM() { ControlByte = J1939PropertyDefinitions.CMControl.Abort, AbortReason = 5, AbortRole = 1, PGN = PGN };
                                         response.Data = BitConverter.GetBytes(abort.WriteToUint());
                                         messageCollection.Messages.Clear();
