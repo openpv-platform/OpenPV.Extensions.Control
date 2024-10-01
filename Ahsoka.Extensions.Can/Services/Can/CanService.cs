@@ -98,7 +98,6 @@ public class CanService : AhsokaServiceBase<CanMessageTypes.Ids>
             fs.Seek(0, SeekOrigin.Begin);
             calibration = ProtoBuf.Serializer.Deserialize<CanApplicationConfiguration>(fs);
             AhsokaLogging.LogMessage(AhsokaVerbosity.High, $"CAN Configuration Loaded From {configPath}");
-
         }
     }
 
