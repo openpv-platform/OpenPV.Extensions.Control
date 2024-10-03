@@ -604,14 +604,6 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         }
     }
 
-    public UserControl GetUserControl()
-    {
-        var view = ParentViewModel.MessageEditView;
-        view.DataContext = null;
-        view.DataContext = this;
-        return view;
-    }
-
     public IEnumerable<ICanTreeNode> GetChildren() { return Enumerable.Empty<ICanTreeNode>(); }
 
     #endregion

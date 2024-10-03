@@ -508,16 +508,6 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNo
         }
     }
 
-    public UserControl GetUserControl()
-    {
-        var view = ParentViewModel.NodeEditView;
-        view.DataContext = null;
-        RefreshMessageList();
-        view.DataContext = this;
-        
-        return view;
-    }
-
     public IEnumerable<ICanTreeNode> GetChildren() { return Enumerable.Empty<ICanTreeNode>(); }
 
     #endregion

@@ -27,7 +27,5 @@ internal interface ICanTreeNode
 
     public MaterialIconKind Icon { get; }
 
-    public UserControl GetUserControl();
-
     public IEnumerable<ICanTreeNode> GetChildren();
 }

@@ -191,14 +191,6 @@ internal class PortViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNo
         }
     }
 
-    public UserControl GetUserControl()
-    {
-        var view = ParentViewModel.PortEditView;
-        view.DataContext = null;
-        view.DataContext = this;
-        return view;
-    }
-
     public IEnumerable<ICanTreeNode> GetChildren() { return Enumerable.Empty<ICanTreeNode>(); }
 
     #endregion

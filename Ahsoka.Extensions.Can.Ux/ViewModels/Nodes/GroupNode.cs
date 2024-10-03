@@ -38,7 +38,6 @@ internal class CanGroupNode<T> : ICanTreeNode<T>
         return Children.Cast<ICanTreeNode>();
     }
 
-    public UserControl GetUserControl() { return null; }
 }
 
 
