@@ -5,7 +5,6 @@ using Ahsoka.Services.Can;
 using Ahsoka.Services.Can.Messages;
 using Ahsoka.Utility;
 using Avalonia.Controls;
-using Avalonia.Media;
 using Material.Icons;
 using System;
 using System.Collections.Generic;
@@ -160,8 +159,9 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNo
         set
         {
             isSelected = value; OnPropertyChanged();
-            OnPropertyChanged(nameof(IconColor));
-            OnPropertyChanged(nameof(BackColor));
+
+            if (isSelected)
+                RefreshMessageList();
         }
     }
 
@@ -304,19 +304,7 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNo
             OnPropertyChanged();
         }
     }
-
-    public IBrush IconColor
-    {
-        get { return IsSelected ? Brushes.SteelBlue : Brushes.Gainsboro; }
-        set { }
-    }
-
-    public IBrush BackColor
-    {
-        get { return IsSelected ? Brushes.WhiteSmoke : Brushes.White; }
-        set { }
-    }
-    #endregion
+     #endregion
 
     #region Methods
     public NodeViewModel(CanSetupViewModel setupViewModel, ICustomerToolViewModel viewModelRoot, NodeDefinition definition)
@@ -373,8 +361,6 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNo
         foreach(var item in ParentViewModel.Messages)
             this.Messages.Add(new SelectedMessageViewModel(this, item));
     }
-
- 
 
     internal void UpdateAddressClaim()
     {

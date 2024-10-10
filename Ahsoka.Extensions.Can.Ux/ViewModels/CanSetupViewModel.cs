@@ -42,6 +42,8 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
     #endregion
 
     #region Properties
+    public bool IsSelected { get; set; }
+
     public ObservableCollection<ICanTreeNode> RootNodes
     {
         get;
@@ -53,6 +55,9 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
         get { return selectedTreeNode; }
         set
         {
+            if (selectedTreeNode != null)
+                selectedTreeNode.IsSelected = false;
+
             var firstItem = value?.GetChildren().FirstOrDefault();
             if (firstItem != null)
                 value = firstItem;
@@ -63,6 +68,9 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
             GenerateViewModel = value as CanSetupViewModel;
 
             selectedTreeNode = value;
+            if (selectedTreeNode != null)
+                selectedTreeNode.IsSelected = true;
+
             OnPropertyChanged();
         }
     }

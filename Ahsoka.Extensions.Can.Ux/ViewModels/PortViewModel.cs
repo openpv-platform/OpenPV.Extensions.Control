@@ -23,6 +23,8 @@ internal class PortViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNo
     #endregion
 
     #region Props
+    public bool IsSelected { get; set; }
+
     public uint Port 
     {
         get { return portDefinition.Port; }

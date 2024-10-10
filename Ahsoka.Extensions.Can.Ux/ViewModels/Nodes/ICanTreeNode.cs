@@ -23,6 +23,8 @@ internal interface ICanTreeNode
 
     public bool IsEditable { get; }
 
+    public bool IsSelected { get; set; }
+
     public string NodeDescription { get; set; }
 
     public MaterialIconKind Icon { get; }

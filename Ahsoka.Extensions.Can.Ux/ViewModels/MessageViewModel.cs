@@ -282,6 +282,8 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
     #endregion
 
     #region Properties
+    public bool IsSelected { get; set; }
+
     internal Ahsoka.Services.Can.ValueType[] ValueTypes { get; init; } = Enum.GetValues<Ahsoka.Services.Can.ValueType>();
     
     internal ByteOrder[] ByteOrders { get; init; } = Enum.GetValues<ByteOrder>();

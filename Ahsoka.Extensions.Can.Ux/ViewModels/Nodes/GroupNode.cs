@@ -1,10 +1,4 @@
-﻿using Ahsoka.DeveloperTools;
-using Ahsoka.DeveloperTools.Views;
-using Avalonia.Controls;
-using Material.Icons;
-using Material.Icons.Avalonia;
-using System;
-using System.Collections;
+﻿using Material.Icons;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -20,6 +14,8 @@ internal class CanGroupNode<T> : ICanTreeNode<T>
     } = new();
 
     public bool IsEnabled { get; set; } = true;
+   
+    public bool IsSelected { get; set; } = false;
 
     public bool IsEditable { get; set; } = false;
 
