@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ahsoka.CS.CAN", "Demos\Ahso
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ahsoka.CS.GTK", "Demos\Ahsoka.CS.GTK\Ahsoka.CS.GTK.csproj", "{FBF20838-7D94-438A-9B59-A88E3F4BD068}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ahsoka.Extensions.IO.UX", "Ahsoka.Extensions.IO.Ux\Ahsoka.Extensions.IO.UX.csproj", "{DC2EF19E-D6F2-47D4-A93D-0F3457F268A6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,6 +97,14 @@ Global
 		{FBF20838-7D94-438A-9B59-A88E3F4BD068}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FBF20838-7D94-438A-9B59-A88E3F4BD068}.Release|x64.ActiveCfg = Release|x64
 		{FBF20838-7D94-438A-9B59-A88E3F4BD068}.Release|x64.Build.0 = Release|x64
+		{DC2EF19E-D6F2-47D4-A93D-0F3457F268A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC2EF19E-D6F2-47D4-A93D-0F3457F268A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC2EF19E-D6F2-47D4-A93D-0F3457F268A6}.Debug|x64.ActiveCfg = Debug|x64
+		{DC2EF19E-D6F2-47D4-A93D-0F3457F268A6}.Debug|x64.Build.0 = Debug|x64
+		{DC2EF19E-D6F2-47D4-A93D-0F3457F268A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC2EF19E-D6F2-47D4-A93D-0F3457F268A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC2EF19E-D6F2-47D4-A93D-0F3457F268A6}.Release|x64.ActiveCfg = Release|x64
+		{DC2EF19E-D6F2-47D4-A93D-0F3457F268A6}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
