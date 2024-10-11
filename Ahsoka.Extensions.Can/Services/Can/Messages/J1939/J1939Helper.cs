@@ -15,6 +15,8 @@ namespace Ahsoka.Services.Can.Messages
             id = new J1939PropertyDefinitions.Id(data.Id);
         }
 
+        public uint PGN { get { return id.PGN; } }
+
         public uint Priority
         {
             get { return id.Priority; }

@@ -69,9 +69,9 @@
 
 				<StackPanel Grid.Row="2" IsVisible="{Binding IsSelf , FallbackValue=false}">
 					<Grid IsVisible="{Binding IsJ1939}" Margin="5" ColumnDefinitions="145,Auto,145,Auto" RowDefinitions="*,*,*,*,*" IsEnabled="{Binding IsEditable}">
-						<TextBlock Text="Address Claim Min:"  Grid.Row="0" Grid.Column="0"/>
+						<TextBlock Text="Default Address:"  Grid.Row="0" Grid.Column="0"/>
 						<TextBox Text="{Binding ACMin}" Grid.Row="0" Width="100" Grid.Column="1" />
-						<TextBlock Text="Max:"  Grid.Row="0" Grid.Column="2"/>
+						<TextBlock Text="Max Address:"  Grid.Row="0" Grid.Column="2"/>
 						<TextBox Text="{Binding ACMax}" Grid.Row="0" Width="100" Grid.Column="3" />
 
 						<TextBlock Text="Industry Group:"  Grid.Row="1" Grid.Column="0"/>

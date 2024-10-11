@@ -245,45 +245,58 @@ canMessageTimerList_t* createCanMessageTimer(void)
 }
 void rescheduleCanMessageTimer(canMessageTimerList_t** list, canMessageTimerList_t* node)
 {
-    // this function is used from the timer thread, so don't need to take semaphores
+	// this function is used from the timer thread, so don't need to take semaphores
 
-    node->ticksLeft = node->msg->rate / TIMER_RESOLUTION;
-    node->scheduled = true;
+	    node->ticksLeft = node->msg->rate / TIMER_RESOLUTION;
+	    node->scheduled = true;
 
-    if(*list == NULL)
-    {
-        // list is empty, easy
-    	*list = node;
-    }
-    else if((*list)->ticksLeft >= node->ticksLeft)
-    {
-    	//log_info("add to top of list\r\n");
-        // new node will expire first, so make it front of list, and adjust the timeouts of the old first.
-        (*list)->ticksLeft -= node->ticksLeft;
-        (*list)->timeoutTicks -= node->ticksLeft;
-        node->nextTimer = *list;
-        *list = node;
-    }
-    else
-    {
-    	canMessageTimerList_t* temp;
-        // need to keep walking down the list.
-        temp = *list;
-        while(temp && ((temp)->ticksLeft <= node->ticksLeft))
-        {
-            node->ticksLeft -= (temp)->ticksLeft;
-            node->timeoutTicks -= (temp)->ticksLeft;
-            if(temp->nextTimer)
-            	temp = temp->nextTimer;
-            else    // found the end of the list!
-            {
-            	break;
-            }
-        }
-        // temp will point to the record that we should be inserted after.
-        node->nextTimer = temp->nextTimer;
-        temp->nextTimer = node;
-    }
+	    if (*list == NULL)
+	    {
+	        // list is empty, easy
+	        *list = node;
+	    }
+	    else
+	    {
+	        canMessageTimerList_t* temp = *list;  // start walking down the list.
+	        canMessageTimerList_t* prev = NULL;
+	        bool insert = false;
+	        while (temp)
+	        {
+	            if (node->ticksLeft <= temp->ticksLeft)
+	            {
+	                temp->ticksLeft -= node->ticksLeft;
+	                temp->timeoutTicks -= node->ticksLeft;
+	                // insert the timer in front of temp
+	                if (prev == NULL)
+	                {
+	                    // at front of list.
+	                    node->nextTimer = *list;
+	                    *list = node;
+
+
+	                }
+	                else
+	                {
+	                    // insert the node.
+	                    prev->nextTimer = node;
+	                    node->nextTimer = temp;
+	                }
+	                insert = true;
+	                break; // found the insertion point.
+	            }
+	            else
+	            {
+	                node->ticksLeft -= temp->ticksLeft;
+	                node->timeoutTicks -= temp->ticksLeft;
+	            }
+	            prev = temp;
+	            temp = temp->nextTimer;
+	        }
+	        if (!insert)
+	        {
+	            prev->nextTimer = node; // put at end of list.
+	        }
+	    }
 }
 void updateCanMessageTimerValues( canMessageTimerList_t* node, AhsokaCAN_RecurringCanMessage message)
 {
@@ -328,14 +341,26 @@ canMessageTimerList_t* findCanTxMessage(uint32_t port, canMessageTimerList_t* li
 		return foundNode;
 	}
 
+	canMessageTimerList_t* listStart = list;
+
+	while(list != NULL)
+	{
+		if( ((list->msg->id & 0x1FFFFFFF) == (id & 0x1FFFFFFF)) && (list->msg->msgType != AhsokaCAN_MessageType_J1939_EXTENDED_FRAME) )
+		{
+			foundNode = list;
+			foundNode->msg->id = id;
+			return foundNode;
+		}
+		list = list->nextMsg;
+	}
+
+    list = listStart;
 	while(list != NULL)
 	{
 		int32_t mask = (list->msg->id & 0x00FF0000) >= PDU2_THRESHOLD ? 0x3FFFF00 : 0x3FF0000;
-		if((list->msg->id & 0x1FFFFFFF) == (id & 0x1FFFFFFF))
-			break;
-		else if(list->msg->msgType == AhsokaCAN_MessageType_J1939_EXTENDED_FRAME && (list->msg->id & mask) == (id & mask))
+		if( ((list->msg->id & mask) == (id & mask)) && (list->msg->msgType == AhsokaCAN_MessageType_J1939_EXTENDED_FRAME) )
 		{
-			bool knownDestination = findNode(port, list->msg->receiverNodeId)->staticAddress;
+			bool knownDestination = findNode(port, list->msg->receiverNodeId)->address != -1;
 
 			bool available = true;
 			if(list->msg->overrideDestination)
@@ -345,16 +370,14 @@ canMessageTimerList_t* findCanTxMessage(uint32_t port, canMessageTimerList_t* li
 			}
 
 			if(available)
-				break;
+			{
+				foundNode = list;
+				foundNode->msg->id = id;
+				return foundNode;
+			}
 		}
 		list = list->nextMsg;
 	}
-
-    if(list)
-    {
-    	foundNode = list;
-    	foundNode->msg->id = id;
-    }
 
     return foundNode; 
 }
@@ -395,17 +418,24 @@ canMessage_t* findCanMessage(uint32_t port, uint32_t id, bool isExtended, bool p
 		return foundMsg;
 	}
 
-    while(list != NULL)
-    {
-    	int32_t mask = (list->msg->id & 0x00FF0000) >= PDU2_THRESHOLD ? 0x3FFFF00 : 0x3FF0000;
+    canMessageTimerList_t* listStart = list;
 
-    	if((list->msg->id & 0x1FFFFFFF) == (id & 0x1FFFFFFF))
-    	{
-    		foundMsg = list->msg;
-    		break;
-    	}
-    	else if((list->msg->msgType == AhsokaCAN_MessageType_J1939_EXTENDED_FRAME) && (isExtended) && ((list->msg->id & mask) == (id & mask)))
-    	{
+	while(list != NULL)
+	{
+		if( ((list->msg->id & 0x1FFFFFFF) == (id & 0x1FFFFFFF)) && (list->msg->msgType != AhsokaCAN_MessageType_J1939_EXTENDED_FRAME) )
+		{
+			foundMsg = list->msg;
+			return foundMsg;
+		}
+		list = list->next;
+	}
+
+	list = listStart;
+	while(list != NULL)
+	{
+		int32_t mask = (list->msg->id & 0x00FF0000) >= PDU2_THRESHOLD ? 0x3FFFF00 : 0x3FF0000;
+		if( ((list->msg->id & mask) == (id & mask)) && isExtended && (list->msg->msgType == AhsokaCAN_MessageType_J1939_EXTENDED_FRAME) )
+		{
     		int32_t source = id & 0xFF;
     		int32_t destination = (id >> 8) & 0xFF;
 
@@ -422,14 +452,14 @@ canMessage_t* findCanMessage(uint32_t port, uint32_t id, bool isExtended, bool p
     				available &= false;
     		}
 
-    		if(available)
-    		{
-    			foundMsg = list->msg;
-    			break;
-    		}
-    	}
-    	list=list->next;
-    }
+			if(available)
+			{
+				foundMsg = list->msg;
+				return foundMsg;
+			}
+		}
+		list = list->next;
+	}
     return foundMsg; 
 }
 

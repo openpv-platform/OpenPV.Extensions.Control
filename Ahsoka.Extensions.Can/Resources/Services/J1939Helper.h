@@ -65,6 +65,11 @@ namespace AhsokaCAN
                 id.ExtractValues(messageData->id());
             }
 
+            uint GetPGN() { return id.GetPGN(); }
+
+            uint GetPriority() { return id.GetPriority(); }
+            void SetPriority(uint value) { id.SetPriority(value); messageData->set_id(id.WriteToUint()); }
+
             uint GetSourceAddress() { return id.GetSourceAddress(); }
             void SetSourceAddress(uint value) { id.SetSourceAddress(value); messageData->set_id(id.WriteToUint()); }
 
