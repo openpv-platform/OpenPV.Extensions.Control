@@ -47,8 +47,9 @@ internal class CanCodeGenerator : IExtensionGenerator
                 if (commandtypes.HasFlag(CommandTypes.ModelGenerators))
                 {
                     var calibration = JsonUtility.Deserialize<CanClientConfiguration>(File.ReadAllText(configFile));
-                    commandsToExecute.Add($"--GenerateCANClasses \"{Path.GetFileName(packageInfo.GetPackageInfoPath())}\" \"{calibration.GeneratorOutputFile}\" \"{calibration.GeneratorNamespace}\" \"{calibration.GeneratorBaseClass}\" {packageInfo.ApplicationType}",
-                              GeneratorCommandType.AhsokaCommandLine);
+                    if (calibration.GeneratorEnabled)
+                        commandsToExecute.Add($"--GenerateCANClasses \"{Path.GetFileName(packageInfo.GetPackageInfoPath())}\" \"{calibration.GeneratorOutputFile}\" \"{calibration.GeneratorNamespace}\" \"{calibration.GeneratorBaseClass}\" {packageInfo.ApplicationType}",
+                                  GeneratorCommandType.AhsokaCommandLine);
                 }
 
             }
