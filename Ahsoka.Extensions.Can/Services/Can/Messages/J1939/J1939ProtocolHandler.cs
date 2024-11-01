@@ -1,4 +1,5 @@
 ﻿using Ahsoka.ServiceFramework;
+using Ahsoka.Services.Can.Platform;
 using SocketCANSharp;
 using System;
 using System.Collections.Generic;
@@ -114,7 +115,7 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
             if (Service.PortConfig.MessageConfiguration.Ports.First(x => x.Port == Service.Port).CanInterface == CanInterface.SocketCan)
                 message.Id |= (uint)CanIdFlags.CAN_EFF_FLAG;
 
-            if (message.Dlc > 8)
+            if (message.Dlc > 8 && !(this.Service is DesktopServiceImplementation))
             {
                 shouldSend = false;
                 MessageHandler.SendPredefined(new SendInformation()
