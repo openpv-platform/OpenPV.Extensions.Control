@@ -133,7 +133,8 @@ internal abstract class IOServiceImplementationBase
 
     public SetOutputResponse SetDigitalOut(DigitalOutput d)
     {
-        if (!digitalOutList.DigitalOutputs.Any(x => x.Pin == d.Pin))
+        var output = digitalOutList.DigitalOutputs.FirstOrDefault(x => x.Pin == d.Pin);
+        if (output == null)
             return new() { ErrorDescription = "Output Pin Not Found!" };
 
         lock (_ioService)
@@ -143,6 +144,7 @@ internal abstract class IOServiceImplementationBase
             // Notify Data Service of New Value.
             _ioService.UpdateCacheValue(IOServiceMessages.DigitalOutput_ + d.Pin.ToString(), (int)d.State);
 
+            output = d;
             return returnValue;
         }
     }

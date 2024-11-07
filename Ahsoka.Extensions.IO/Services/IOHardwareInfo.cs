@@ -13,7 +13,7 @@ public partial class IOHardwareInfoExtension
     /// </summary>
     /// <param name="family"></param>
     /// <returns></returns>
-    public static IOHardwareInfoExtension GetIOInfo(PlatformFamily family)
+    public static IOHardwareInfoExtension GetIOInfo(PlatformFamily family, string qualifier)
     {
         switch (family)
         {
@@ -29,13 +29,26 @@ public partial class IOHardwareInfoExtension
                 };
 
             case PlatformFamily.OpenViewLinux:
-                return new IOHardwareInfoExtension()
+                switch (qualifier)
                 {
-                    AnalogInputs = [1, 2],
-                    AnalogOutputs = [],
-                    DigitalInputs = [1, 2],
-                    DigitalOutputs = [1, 2],
-                };
+                    case "Atlas":
+                        return new IOHardwareInfoExtension()
+                        {
+                            AnalogInputs = [1, 2],
+                            AnalogOutputs = [],
+                            DigitalInputs = [1, 2],
+                            DigitalOutputs = [1, 2, 3, 4],
+                        };
+                    default:
+                        return new IOHardwareInfoExtension()
+                        {
+                            AnalogInputs = [1, 2],
+                            AnalogOutputs = [],
+                            DigitalInputs = [1, 2],
+                            DigitalOutputs = [1, 2,],
+                        };
+                }
+                
 
             case PlatformFamily.OpenViewLinuxPro:
                 return new IOHardwareInfoExtension()

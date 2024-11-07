@@ -49,7 +49,7 @@ public class IOService : AhsokaServiceBase<IOMessageTypes.Ids>
 
         _IOImplementationBase = GetInterop();
 
-        var ioInfo = IOHardwareInfoExtension.GetIOInfo(SystemInfo.HardwareInfo.PlatformFamily);
+        var ioInfo = IOHardwareInfoExtension.GetIOInfo(SystemInfo.HardwareInfo.PlatformFamily, SystemInfo.HardwareInfo.PlatformQualifier);
 
         _IOImplementationBase.Init(this, ioInfo);
 
