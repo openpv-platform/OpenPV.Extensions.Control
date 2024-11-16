@@ -1,6 +1,5 @@
 void CanServiceClient::OpenCommunicationChannel()
 {
-    auto endPoint = GetEndPoint<CanService_t>();
     auto callback = [this](CanMessageTypes::Ids transportId, AhsokaServiceFramework::AhsokaMessageType_t& message)
     {
         if (transportId == CanMessageTypes_Ids_CAN_MESSAGES_RECEIVED && messageReceived != 0)
@@ -10,13 +9,13 @@ void CanServiceClient::OpenCommunicationChannel()
             stateReceived((CanState&)message);
     };
 
-    endPoint->NotifyMessageReceived(callback);     
-    calibration = endPoint->SendNotificationWithResponse<CanApplicationConfiguration>(CanMessageTypes_Ids_OPEN_COMMUNICATION_CHANNEL);
+    NotifyMessageReceived(callback);     
+    calibration = SendNotificationWithResponse<CanApplicationConfiguration>(CanMessageTypes_Ids_OPEN_COMMUNICATION_CHANNEL);
 }
 
 void CanServiceClient::CloseCommunicationChannel()
 {
-    GetEndPoint<CanService_t>()->SendNotificationWithResponse(CanMessageTypes_Ids_CLOSE_COMMUNICATION_CHANNEL);
+    SendNotificationWithResponse(CanMessageTypes_Ids_CLOSE_COMMUNICATION_CHANNEL);
     calibration = 0;
 }
 
@@ -26,7 +25,7 @@ void CanServiceClient::SendCanMessages(uint canPort, IHasCanData& message)
     collection.set_can_port(canPort);
     collection.mutable_messages()->Add(message.CreateCanMessageData());
 
-    GetEndPoint<CanService_t>()->SendNotificationWithResponse(CanMessageTypes_Ids_SEND_CAN_MESSAGES, &collection);
+    SendNotificationWithResponse(CanMessageTypes_Ids_SEND_CAN_MESSAGES, &collection);
 }
 
 CanPortConfiguration& CanServiceClient::GetPortConfiguration()
