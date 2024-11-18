@@ -13,12 +13,12 @@
 	<Import Label="Ahsoka Local Build Properties" Condition="Exists('../Demo.Build.props')" Project="../Demo.Build.props" />
 
 	<ItemGroup Label="" Condition="!Exists('../Demo.Build.props')">
-		<PackageReference Include="Ahsoka.Extensions.CAN" Version="3.*-*" />
+		<PackageReference Include="Ahsoka.Extensions.CAN" Version="4.*-*" />
 	</ItemGroup>
 
 	<ItemGroup Label="Reference to Ahsoka Nuget Packages">
-		<PackageReference Include="Ahsoka.Core.Drawing" Version="3.*-*" />
-		<PackageReference Include="Ahsoka.Core" Version="3.*-*" />
+		<PackageReference Include="Ahsoka.Core.Drawing" Version="4.*-*" />
+		<PackageReference Include="Ahsoka.Core" Version="4.*-*" />
 	</ItemGroup>
 
 	<!--Beginning in OpenPV 3.0, Command Line Code Generators have been simplified and now execute as part of the 

@@ -28,7 +28,7 @@ public class IOServiceTests : LinearTestBase
         systemClient.SetBuzzerConfig(buzzerConfig);
 
         // Stop the Runtimes
-        AhsokaRuntime.ShutdownAll();
+        AhsokaRuntime.Default.StopAllEndPoints();
     }
 
 
@@ -44,20 +44,18 @@ public class IOServiceTests : LinearTestBase
     public void TestBaseServiceComponents()
     {
         // Create Client Runtime and Add Services
-        IOServiceClient systemClient = new();
-        AhsokaRuntime.CreateBuilder()
-                     .AddClients(systemClient)
-                     .StartWithInternalServices();
+        IOServiceClient ioClient = new();
+        ioClient.Start();
 
       
-        var buzzerConfig = systemClient.GetBuzzerConfig();
-        systemClient.SetBuzzerConfig(buzzerConfig);
+        var buzzerConfig = ioClient.GetBuzzerConfig();
+        ioClient.SetBuzzerConfig(buzzerConfig);
 
-        var vbat = systemClient.GetVBat();
-        var pin = systemClient.GetIGNPin();
+        var vbat = ioClient.GetVBat();
+        var pin = ioClient.GetIGNPin();
 
         // Stop the Runtimes
-        AhsokaRuntime.ShutdownAll();
+        AhsokaRuntime.Default.StopAllEndPoints();
     }
 
     [TestMethod]

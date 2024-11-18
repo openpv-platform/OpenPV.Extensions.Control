@@ -35,7 +35,7 @@ public class IOServiceClient : AhsokaClientBase<IOMessageTypes.Ids>
     /// <returns></returns>
     public BuzzerConfig GetBuzzerConfig()
     {
-        return SendNotificationWithResponse<BuzzerConfig>(IOMessageTypes.Ids.GetBuzzerConfig);
+        return SendMessageWithResponse<BuzzerConfig>(IOMessageTypes.Ids.GetBuzzerConfig);
     }
 
     /// <summary>
@@ -44,7 +44,7 @@ public class IOServiceClient : AhsokaClientBase<IOMessageTypes.Ids>
     /// <param name="buzzerConfig">The buzzer information to update.</param>
     public void SetBuzzerConfig(BuzzerConfig buzzerConfig)
     {
-        SendNotificationWithResponse<EmptyNotification>(IOMessageTypes.Ids.SetBuzzerConfig, buzzerConfig);
+        SendMessageWithResponse<EmptyNotification>(IOMessageTypes.Ids.SetBuzzerConfig, buzzerConfig);
     }
     /// <summary>
     ///  Returns the current value of the Battery Input (Power) in millivolts.
@@ -52,7 +52,7 @@ public class IOServiceClient : AhsokaClientBase<IOMessageTypes.Ids>
     /// <returns>Voltage Value</returns>
     public VoltageValue GetVBat()
     {
-        return SendNotificationWithResponse<VoltageValue>(IOMessageTypes.Ids.GetBatteryVoltage);
+        return SendMessageWithResponse<VoltageValue>(IOMessageTypes.Ids.GetBatteryVoltage);
     }
 
     /// <summary>
@@ -61,7 +61,7 @@ public class IOServiceClient : AhsokaClientBase<IOMessageTypes.Ids>
     /// <returns>Voltage Value</returns>
     public IgnitionState GetIGNPin()
     {
-        return SendNotificationWithResponse<IgnitionState>(IOMessageTypes.Ids.GetIgnitionPin);
+        return SendMessageWithResponse<IgnitionState>(IOMessageTypes.Ids.GetIgnitionPin);
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public class IOServiceClient : AhsokaClientBase<IOMessageTypes.Ids>
     /// <returns>DigitalInput Collection</returns>
     public void SetPollingInterval(PollingInterval message)
     {
-        SendNotificationWithResponse(IOMessageTypes.Ids.SetPollInterval,message);
+        SendMessageWithResponse(IOMessageTypes.Ids.SetPollInterval,message);
     }
 
     /// <summary>
@@ -80,7 +80,7 @@ public class IOServiceClient : AhsokaClientBase<IOMessageTypes.Ids>
     /// <returns>DigitalInput Collection</returns>
     public PollingInterval GetPollingInterval()
     {
-        return SendNotificationWithResponse<PollingInterval>(IOMessageTypes.Ids.GetPollInterval);
+        return SendMessageWithResponse<PollingInterval>(IOMessageTypes.Ids.GetPollInterval);
     }
 
     /// <summary>
@@ -89,7 +89,7 @@ public class IOServiceClient : AhsokaClientBase<IOMessageTypes.Ids>
     /// <returns>DigitalInput Collection</returns>
     public DigitalInputList RequestDigitalInputs()
     {
-        return SendNotificationWithResponse<DigitalInputList>(IOMessageTypes.Ids.RetrieveDigitalInputs);
+        return SendMessageWithResponse<DigitalInputList>(IOMessageTypes.Ids.RetrieveDigitalInputs);
     }
 
     /// <summary>
@@ -98,7 +98,7 @@ public class IOServiceClient : AhsokaClientBase<IOMessageTypes.Ids>
     /// <returns>Analog Input Collection</returns>
     public AnalogInputList RequestAnalogInputs()
     {
-        return SendNotificationWithResponse<AnalogInputList>(IOMessageTypes.Ids.RetrieveAnalogInputs);
+        return SendMessageWithResponse<AnalogInputList>(IOMessageTypes.Ids.RetrieveAnalogInputs);
     }
 
     /// <summary>
@@ -107,7 +107,7 @@ public class IOServiceClient : AhsokaClientBase<IOMessageTypes.Ids>
     /// <returns>Digital Output Collection</returns>
     public DigitalOutputList RequestDigitalOutputs()
     {
-        return SendNotificationWithResponse<DigitalOutputList>(IOMessageTypes.Ids.RetrieveDigitalOutputs);
+        return SendMessageWithResponse<DigitalOutputList>(IOMessageTypes.Ids.RetrieveDigitalOutputs);
     }
 
     /// <summary>
@@ -116,7 +116,7 @@ public class IOServiceClient : AhsokaClientBase<IOMessageTypes.Ids>
     /// <returns>Analog Output Collection</returns>
     public AnalogOutputList RequestAnalogOutputs()
     {
-        return SendNotificationWithResponse<AnalogOutputList>(IOMessageTypes.Ids.RetrieveAnalogOutputs);
+        return SendMessageWithResponse<AnalogOutputList>(IOMessageTypes.Ids.RetrieveAnalogOutputs);
     }
 
     /// <summary>
@@ -126,7 +126,7 @@ public class IOServiceClient : AhsokaClientBase<IOMessageTypes.Ids>
     /// <returns>Current Value of the Input</returns>
     public GetInputResponse GetAnalogInput(AnalogInput analogInput)
     {
-        return SendNotificationWithResponse<GetInputResponse>(IOMessageTypes.Ids.GetAnalogInput, analogInput);
+        return SendMessageWithResponse<GetInputResponse>(IOMessageTypes.Ids.GetAnalogInput, analogInput);
     }
 
     /// <summary>
@@ -136,7 +136,7 @@ public class IOServiceClient : AhsokaClientBase<IOMessageTypes.Ids>
     /// <returns>Current Value of the Input</returns>
     public GetInputResponse GetDigitalInput(DigitalInput digitalInput)
     {
-        return SendNotificationWithResponse<GetInputResponse>(IOMessageTypes.Ids.GetDigitalInput, digitalInput);
+        return SendMessageWithResponse<GetInputResponse>(IOMessageTypes.Ids.GetDigitalInput, digitalInput);
     }
 
     /// <summary>
@@ -146,7 +146,7 @@ public class IOServiceClient : AhsokaClientBase<IOMessageTypes.Ids>
     /// <returns>Result of the Operation</returns>
     public SetOutputResponse SetDigitalOut(DigitalOutput digitalOutput)
     {
-        return SendNotificationWithResponse<SetOutputResponse>(IOMessageTypes.Ids.SetDigitalOutput, digitalOutput);
+        return SendMessageWithResponse<SetOutputResponse>(IOMessageTypes.Ids.SetDigitalOutput, digitalOutput);
     }
 
     /// <summary>
@@ -156,6 +156,6 @@ public class IOServiceClient : AhsokaClientBase<IOMessageTypes.Ids>
     /// <returns>Result of the Operation</returns>
     public SetOutputResponse SetAnalogOut(AnalogOutput analogOutput)
     {
-        return SendNotificationWithResponse<SetOutputResponse>(IOMessageTypes.Ids.SetAnalogOutput, analogOutput);
+        return SendMessageWithResponse<SetOutputResponse>(IOMessageTypes.Ids.SetAnalogOutput, analogOutput);
     }
 }

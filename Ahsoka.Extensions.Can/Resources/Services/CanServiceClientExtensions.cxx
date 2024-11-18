@@ -10,12 +10,12 @@ void CanServiceClient::OpenCommunicationChannel()
     };
 
     NotifyMessageReceived(callback);     
-    calibration = SendNotificationWithResponse<CanApplicationConfiguration>(CanMessageTypes_Ids_OPEN_COMMUNICATION_CHANNEL);
+    calibration = SendMessageWithResponse<CanApplicationConfiguration>(CanMessageTypes_Ids_OPEN_COMMUNICATION_CHANNEL);
 }
 
 void CanServiceClient::CloseCommunicationChannel()
 {
-    SendNotificationWithResponse(CanMessageTypes_Ids_CLOSE_COMMUNICATION_CHANNEL);
+    SendMessageWithResponse(CanMessageTypes_Ids_CLOSE_COMMUNICATION_CHANNEL);
     calibration = 0;
 }
 
@@ -25,7 +25,7 @@ void CanServiceClient::SendCanMessages(uint canPort, IHasCanData& message)
     collection.set_can_port(canPort);
     collection.mutable_messages()->Add(message.CreateCanMessageData());
 
-    SendNotificationWithResponse(CanMessageTypes_Ids_SEND_CAN_MESSAGES, &collection);
+    SendMessageWithResponse(CanMessageTypes_Ids_SEND_CAN_MESSAGES, &collection);
 }
 
 CanPortConfiguration& CanServiceClient::GetPortConfiguration()

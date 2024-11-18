@@ -1,5 +1,5 @@
 ﻿using Ahsoka.Core.Drawing.Base;
-using Ahsoka.Core.Drawing.Cairo;
+using Ahsoka.Core.Drawing.Utility;
 using Ahsoka.Dispatch;
 using System;
 
@@ -20,8 +20,8 @@ internal class CairoUI
     public void StartAndRun(Dispatcher defaultDispatcher)
     {
         // Create the Ahsoka Cairo Drawing API and matching Window
-        CairoDrawingWindow window = new(OperatingSystem.IsLinux());
-        CairoDrawingApi api = new(window.Bounds);
+        DrawingWindow window = new(OperatingSystem.IsLinux());
+        SkiaDrawingApi api = window.GetSkiaApi() ;
 
         // Setup Drawing Objects and Values
         var cloudTemp = api.CreateImage("Cloud.png");
@@ -62,22 +62,23 @@ internal class CairoUI
         float angle = (float)Math.PI * 4;
         bool touched = false;
 
-        // Handle the Touch Recieved Event
-        // here we will simply change the color of the background on the touch
-        window.TouchReceived += (o, args) =>
+        window.PrepareFrame += (o, args) =>
         {
-            if (args.Event == TouchEvent.Pressed)
-                touched = true;
-            else if (args.Event == TouchEvent.Released)
-                touched = false;
+            // Handle Events for Frame
+            foreach (var eventItem in args.Events)
+            {
+                if (eventItem.Event == TouchEvent.Pressed)
+                    touched = true;
+                else if (eventItem.Event == TouchEvent.Released)
+                    touched = false;
+            }
+
+            args.ShouldRender = true;
         };
 
         // Handle the Draw Frame.
-        window.DrawFrame += (o, args) =>
+        window.RenderFrame += (o, args) =>
         {
-            // Initialize the API for each Frame
-            api.StartFrame(args.Context);
-
             // Clear Background
             api.Clear(backgroundColor);
 
@@ -115,12 +116,6 @@ internal class CairoUI
 
             cloudPosition = new DrawingRect(x, y, cloudPosition.Width, cloudPosition.Height);
 
-            api.EndFrame();
-
-            //Normally we would only draw if there is a change to our model or data
-            // however here we are simply drawing at max framerate to bound our ball around
-            // the screen similar to many game loops
-            window.RequestDraw();
         };
 
         // Start the Dispatcher and Use Our Windows Invoker

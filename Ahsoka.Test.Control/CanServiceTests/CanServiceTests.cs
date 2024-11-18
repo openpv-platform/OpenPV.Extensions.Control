@@ -69,7 +69,7 @@ public class CanServiceTests : LinearTestBase
         File.Delete(canDBCFile);
         File.Delete(canConfigFile);
 
-        AhsokaRuntime.ShutdownAll();
+        AhsokaRuntime.Default.StopAllEndPoints();
     }
 
 
@@ -154,9 +154,8 @@ public class CanServiceTests : LinearTestBase
 
         // Create Service Client and Start Runtime
         CanServiceClient client = new();
-        AhsokaRuntime.CreateBuilder()
-            .AddClients(client)
-            .StartWithInternalServices();
+        client.Start();
+
 
         // Start Comms with CoProcessor.
         client.OpenCommunicationChannel();

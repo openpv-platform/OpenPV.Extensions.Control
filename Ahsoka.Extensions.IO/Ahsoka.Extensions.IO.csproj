@@ -36,7 +36,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="System.Device.Gpio" Version="3.2.0" />
-		<PackageReference Include="protobuf-net" Version="3.2.30" />
+		<PackageReference Include="protobuf-net" Version="3.2.45" />
 		<PackageReference Include="protobuf-net.BuildTools" Version="3.2.33">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -45,7 +45,7 @@
 
 	
 	<ItemGroup Label="Submodule Dev References">
-		<PackageReference Include="Ahsoka.Core" Version="3.7.17">
+		<PackageReference Include="Ahsoka.Core" Version="4.0.1-zzz-develop.28">
 			<IncludeAssets>all</IncludeAssets>
 			<ExcludeAssets>none</ExcludeAssets>
 			<PrivateAssets>none</PrivateAssets>
