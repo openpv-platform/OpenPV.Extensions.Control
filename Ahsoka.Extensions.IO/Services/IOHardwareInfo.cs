@@ -36,7 +36,7 @@ public partial class IOHardwareInfoExtension
                         {
                             AnalogInputs = [1, 2],
                             AnalogOutputs = [],
-                            DigitalInputs = [1, 2],
+                            DigitalInputs = [1, 2, 3],
                             DigitalOutputs = [1, 2, 3, 4],
                         };
                     default:

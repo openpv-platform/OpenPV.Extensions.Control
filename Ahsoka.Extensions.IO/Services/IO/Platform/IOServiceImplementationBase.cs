@@ -144,7 +144,7 @@ internal abstract class IOServiceImplementationBase
             // Notify Data Service of New Value.
             _ioService.UpdateCacheValue(IOServiceMessages.DigitalOutput_ + d.Pin.ToString(), (int)d.State);
 
-            output = d;
+            output.State = d.State;
             return returnValue;
         }
     }
@@ -168,7 +168,7 @@ internal abstract class IOServiceImplementationBase
     public GetInputResponse GetAnalogInput(AnalogInput aIn)
     {
         if (!analogInList.AnalogInputs.Any(x => x.Pin == aIn.Pin))
-            return new() { ErrorDescription = "Output Pin Not Found!" };
+            return new() { ErrorDescription = "Input Pin Not Found!" };
 
         // Return Current Value if timer is running
         // if not, call the input read directly
@@ -188,7 +188,7 @@ internal abstract class IOServiceImplementationBase
     public GetInputResponse GetDigitalInput(DigitalInput dIn)
     {
         if (!digitalInList.DigitalInputs.Any(x => x.Pin == dIn.Pin))
-            return new() { ErrorDescription = "Output Pin Not Found!" };
+            return new() { ErrorDescription = "Input Pin Not Found!" };
 
         // Return Current Value if timer is running
         // if not, call the input read directly
