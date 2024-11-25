@@ -5,7 +5,7 @@ using System;
 
 namespace Ahsoka.CS.CAN;
 
-internal class CairoUI
+internal class CanUI
 {
     // Const Colors for our Drawing
     static readonly DrawingColor backgroundColor = new(0xFF4682B4);
@@ -27,7 +27,7 @@ internal class CairoUI
         var cloudTemp = api.CreateImage("Cloud.png");
 
         // This is our screen bounds
-        DrawingRect bounds = window.Bounds;
+        DrawingSize bounds = window.Size;
 
         // This is the start position of our Circle / Cloud
         DrawingRect cloudPosition = new((bounds.Width / 2.0f - cloudTemp.Width / 2.0f),

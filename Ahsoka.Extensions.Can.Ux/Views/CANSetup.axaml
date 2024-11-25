@@ -116,10 +116,19 @@
 							Child="" 
 							BorderThickness="1,0,0,0" BorderBrush="WhiteSmoke">
 						<Grid>
-							<CustomerTools:CANGenerateView Margin="0,-65,0,0" DataContext="{Binding GenerateViewModel}" IsVisible="{Binding, Converter={x:Static ObjectConverters.IsNotNull}}" />
-							<CustomerTools:CANNodeEditView Margin="0,-65,0,0"  DataContext="{Binding NodeViewModel}"  IsVisible="{Binding, Converter={x:Static ObjectConverters.IsNotNull}}"/>
-							<CustomerTools:CANMessageEditView Margin="0,-65,0,0"  DataContext="{Binding MessageViewModel}"  IsVisible="{Binding, Converter={x:Static ObjectConverters.IsNotNull}}"/>
-							<CustomerTools:CANPortEditView Margin="0,-65,0,0"  DataContext="{Binding PortViewModel}" IsVisible="{Binding, Converter={x:Static ObjectConverters.IsNotNull}}" />
+							<Grid IsVisible="{Binding GenerateViewModel, Converter={x:Static ObjectConverters.IsNotNull}}">
+								<CustomerTools:CANGenerateView Margin="0,-65,0,0" DataContext="{Binding GenerateViewModel}"  />
+							</Grid>
+							<Grid  IsVisible="{Binding NodeViewModel, Converter={x:Static ObjectConverters.IsNotNull}}">
+								<CustomerTools:CANNodeEditView Margin="0,-65,0,0"  DataContext="{Binding NodeViewModel}" />
+							</Grid>
+							<Grid  IsVisible="{Binding MessageViewModel , Converter={x:Static ObjectConverters.IsNotNull}}">
+								<CustomerTools:CANMessageEditView Margin="0,-65,0,0"  DataContext="{Binding MessageViewModel}"/>
+							</Grid>
+							<Grid  IsVisible="{Binding PortViewModel, Converter={x:Static ObjectConverters.IsNotNull}}">
+								<CustomerTools:CANPortEditView Margin="0,-65,0,0"  DataContext="{Binding PortViewModel}" />
+							</Grid>
+
 						</Grid>
 					</Border>
 				</Grid>

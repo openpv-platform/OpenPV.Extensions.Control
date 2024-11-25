@@ -9,7 +9,7 @@ namespace Ahsoka.CS.CAN;
 
 public class Program
 {
-    static readonly CairoUI basicUI = new();
+    static readonly CanUI basicUI = new();
     static uint lastSpeed = 0;
     static readonly uint speedDirection = 1000;
 
