@@ -104,34 +104,33 @@ public class CanService : AhsokaServiceBase<CanMessageTypes.Ids>
     /// <summary>
     /// Handle Recieved Messages to pass to the Service Implementation
     /// </summary>
-    /// <param name="messageHeader"></param>
-    /// <param name="message"></param>
-    protected override void OnHandleReceive(AhsokaMessageHeader messageHeader, object message)
+    /// <param name="request"></param>
+    protected override void OnHandleServiceRequest(AhsokaServiceRequest request)
     {
-        switch (messageHeader.TransportId.IntToEnum<CanMessageTypes.Ids>())
+        switch (request.TransportId)
         {
             case CanMessageTypes.Ids.OpenCommunicationChannel:
-                HandleOpenChannel(messageHeader);
+                HandleOpenChannel(request);
                 break;
 
             case CanMessageTypes.Ids.CloseCommunicationChannel:
 
-                HandleCloseChannel(messageHeader);
+                HandleCloseChannel(request);
                 break;
 
             case CanMessageTypes.Ids.SendCanMessages:
 
-                HandleSendCanMessages(messageHeader, message as CanMessageDataCollection);
+                HandleSendCanMessages(request, request.Message as CanMessageDataCollection);
                 break;
 
             case CanMessageTypes.Ids.SendRecurringCanMessage:
 
-                SendRecurringMessage(messageHeader, message as RecurringCanMessage);
+                SendRecurringMessage(request, request.Message as RecurringCanMessage);
                 break;
 
             case CanMessageTypes.Ids.ApplyMessageFilter:
 
-                HandleFilterCanMessages(messageHeader, message as ClientCanFilter);
+                HandleFilterCanMessages(request, request.Message as ClientCanFilter);
                 break;
 
             default:
@@ -139,15 +138,15 @@ public class CanService : AhsokaServiceBase<CanMessageTypes.Ids>
         }
     }
 
-    private void HandleFilterCanMessages(AhsokaMessageHeader messageHeader, ClientCanFilter clientCanFilter)
+    private void HandleFilterCanMessages(AhsokaServiceRequest messageHeader, ClientCanFilter clientCanFilter)
     {
         if (portHandlers.TryGetValue(clientCanFilter.CanPort, out CanServiceImplementation impl))
             impl.SetClientMessageFilter(clientCanFilter);
 
-        SendMessageInternal(messageHeader);
+        SendResponse(messageHeader);
     }
 
-    private void HandleOpenChannel(AhsokaMessageHeader messageHeader)
+    private void HandleOpenChannel(AhsokaServiceRequest messageHeader)
     {
         // Load Handlers
         foreach (var item in calibration.CanPortConfiguration.MessageConfiguration.Ports)
@@ -165,55 +164,45 @@ public class CanService : AhsokaServiceBase<CanMessageTypes.Ids>
             }
         }
 
-        SendMessageInternal(messageHeader, calibration);
+        SendResponse(messageHeader, calibration);
     }
 
-    private void HandleCloseChannel(AhsokaMessageHeader messageHeader)
+    private void HandleCloseChannel(AhsokaServiceRequest messageHeader)
     {
         foreach (var item in portHandlers)
             item.Value.Close();
 
         portHandlers.Clear();
 
-        SendMessageInternal(messageHeader);
+        SendResponse(messageHeader);
     }
 
-    private void HandleSendCanMessages(AhsokaMessageHeader messageHeader, CanMessageDataCollection canMessageDataCollection)
+    private void HandleSendCanMessages(AhsokaServiceRequest messageHeader, CanMessageDataCollection canMessageDataCollection)
     {
         var status = new CanMessageResult();
         if (portHandlers.TryGetValue(canMessageDataCollection.CanPort, out CanServiceImplementation impl))
             status = impl.HandleSendCanRequest(canMessageDataCollection);
 
-        SendMessageInternal(messageHeader, status);
+        SendResponse(messageHeader, status);
     }
 
-    private void SendRecurringMessage(AhsokaMessageHeader messageHeader, RecurringCanMessage canMessageDataCollection)
+    private void SendRecurringMessage(AhsokaServiceRequest messageHeader, RecurringCanMessage canMessageDataCollection)
     {
         var status = new CanMessageResult();
         if (portHandlers.TryGetValue(canMessageDataCollection.CanPort, out CanServiceImplementation impl))
             status = impl.HandleSendRecurringRequest(canMessageDataCollection);
 
-        SendMessageInternal(messageHeader, status);
+        SendResponse(messageHeader, status);
     }
 
     internal void NotifyStateUpdate(CanState stateInfo)
     {
-        AhsokaMessageHeader header = new()
-        {
-            TransportId = CanMessageTypes.Ids.NetworkStateChanged.EnumToInt()
-        };
-
-        SendMessageInternal(header, stateInfo, true);
+        SendNotification(CanMessageTypes.Ids.NetworkStateChanged, stateInfo);
     }
 
     internal void NotifyCanMessages(CanMessageDataCollection messages)
     {
-        AhsokaMessageHeader header = new()
-        {
-            TransportId = CanMessageTypes.Ids.CanMessagesReceived.EnumToInt()
-        };
-
-        SendMessageInternal(header, messages, true);
+        SendNotification(CanMessageTypes.Ids.CanMessagesReceived, messages);
     }
 
     #endregion

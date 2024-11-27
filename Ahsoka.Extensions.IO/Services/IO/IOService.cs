@@ -3,7 +3,6 @@ using Ahsoka.Core.IO.Hardware;
 using Ahsoka.Installer;
 using Ahsoka.ServiceFramework;
 using Ahsoka.Services.IO.Platform;
-using Ahsoka.Services.System;
 using Ahsoka.System;
 using Ahsoka.System.Hardware;
 using Ahsoka.Utility;
@@ -86,19 +85,15 @@ public class IOService : AhsokaServiceBase<IOMessageTypes.Ids>
                         AhsokaLogging.LogMessage(AhsokaVerbosity.Low, $"Ignition Monitor: IgnitionState is {response.State}");
                         ignitionState = response.State;
 
-                        int transportID = IOMessageTypes.Ids.IgnitionOnNotification.EnumToInt();
+                        IOMessageTypes.Ids transportID = IOMessageTypes.Ids.IgnitionOnNotification;
                         if (ignitionState == IgnitionStates.Off)
-                            transportID = IOMessageTypes.Ids.IgnitionOffNotification.EnumToInt();
+                            transportID = IOMessageTypes.Ids.IgnitionOffNotification;
 
-                        var header = new AhsokaMessageHeader()
-                        {
-                            TransportId = transportID
-                        };
 
                         // Update Ignition in Data Service
                         UpdateCacheValue(IOServiceMessages.CurrentIgnitionState, ignitionState.EnumToInt());
 
-                        SendMessageInternal(header, new EmptyNotification(), true);
+                        SendNotification(transportID, new EmptyNotification());
                     }
 
                     Task.Delay(1000, cancelNotifications.Token).Wait();
@@ -119,72 +114,72 @@ public class IOService : AhsokaServiceBase<IOMessageTypes.Ids>
 
     }
 
-    protected override void OnEndPointDisconnected()
+    protected override void OnEndPointStopped()
     {
-        base.OnEndPointDisconnected();
+        base.OnEndPointStopped();
         _IOImplementationBase.StopPolling();
         cancelNotifications?.Cancel();
 
     }
 
-    protected override void OnHandleReceive(AhsokaMessageHeader messageHeader, object message)
+    protected override void OnHandleServiceRequest(AhsokaServiceRequest request)
     {
-        switch (messageHeader.TransportId.IntToEnum<IOMessageTypes.Ids>())
+        switch (request.TransportId)
         {
             case IOMessageTypes.Ids.SetPollInterval:
-                HandleSetPollInterval(messageHeader, message as PollingInterval);
+                HandleSetPollInterval(request, request.Message as PollingInterval);
                 break;
 
             case IOMessageTypes.Ids.GetPollInterval:
-                HandleGetPollInterval(messageHeader);
+                HandleGetPollInterval(request);
                 break;
 
             case IOMessageTypes.Ids.RetrieveDigitalOutputs:
-                HandleRetrieveDigitalOutputs(messageHeader, message);
+                HandleRetrieveDigitalOutputs(request, request.Message);
                 break;
 
             case IOMessageTypes.Ids.RetrieveDigitalInputs:
-                HandleRetrieveDigitalInputs(messageHeader, message);
+                HandleRetrieveDigitalInputs(request, request.Message);
                 break;
 
             case IOMessageTypes.Ids.RetrieveAnalogOutputs:
-                HandleRetrieveAnalogOutputs(messageHeader, message);
+                HandleRetrieveAnalogOutputs(request, request.Message);
                 break;
 
             case IOMessageTypes.Ids.RetrieveAnalogInputs:
-                HandleRetrieveAnalogInputs(messageHeader, message);
+                HandleRetrieveAnalogInputs(request, request.Message);
                 break;
 
             case IOMessageTypes.Ids.SetDigitalOutput:
-                HandelSetDigitalOut(messageHeader, message as DigitalOutput);
+                HandelSetDigitalOut(request, request.Message as DigitalOutput);
                 break;
 
             case IOMessageTypes.Ids.SetAnalogOutput:
-                HandelSetAnalogOut(messageHeader, message as AnalogOutput);
+                HandelSetAnalogOut(request, request.Message as AnalogOutput);
                 break;
 
             case IOMessageTypes.Ids.GetAnalogInput:
-                HandleGetAnalogIn(messageHeader, message as AnalogInput);
+                HandleGetAnalogIn(request, request.Message as AnalogInput);
                 break;
 
             case IOMessageTypes.Ids.GetDigitalInput:
-                HandleGetDigitalIn(messageHeader, message as DigitalInput);
+                HandleGetDigitalIn(request, request.Message as DigitalInput);
                 break;
 
             case IOMessageTypes.Ids.GetBuzzerConfig:
-                HandleGetBuzzerConfig(messageHeader);
+                HandleGetBuzzerConfig(request);
                 break;
 
             case IOMessageTypes.Ids.SetBuzzerConfig:
-                HandleSetBuzzerConfig(messageHeader, message as BuzzerConfig);
+                HandleSetBuzzerConfig(request, request.Message as BuzzerConfig);
                 break;
 
             case IOMessageTypes.Ids.GetBatteryVoltage:
-                HandleGetVBat(messageHeader);
+                HandleGetVBat(request);
                 break;
 
             case IOMessageTypes.Ids.GetIgnitionPin:
-                HandleGetIGNPin(messageHeader);
+                HandleGetIGNPin(request);
                 break;
 
             default:
@@ -192,103 +187,101 @@ public class IOService : AhsokaServiceBase<IOMessageTypes.Ids>
         }
     }
 
-    private void HandleGetPollInterval(AhsokaMessageHeader messageHeader)
+    private void HandleGetPollInterval(AhsokaServiceRequest messageHeader)
     {
         var response = _IOImplementationBase.GetPollingInterval();
-        SendMessageInternal(messageHeader, response);
+        SendResponse(messageHeader, response);
     }
 
-    private void HandleSetPollInterval(AhsokaMessageHeader messageHeader, PollingInterval message)
+    private void HandleSetPollInterval(AhsokaServiceRequest messageHeader, PollingInterval message)
     {
         _IOImplementationBase.SetPollingInterval(message);
-        SendMessageInternal(messageHeader);
+        SendResponse(messageHeader);
 
     }
 
-    private void HandleRetrieveDigitalOutputs(AhsokaMessageHeader messageHeader, object message)
+    private void HandleRetrieveDigitalOutputs(AhsokaServiceRequest messageHeader, object message)
     {
         var response = _IOImplementationBase.RetrieveDigitalOutputs();
-        SendMessageInternal(messageHeader, response);
+        SendResponse(messageHeader, response);
     }
 
-    private void HandleRetrieveDigitalInputs(AhsokaMessageHeader messageHeader, object message)
+    private void HandleRetrieveDigitalInputs(AhsokaServiceRequest messageHeader, object message)
     {
         var response = _IOImplementationBase.RetrieveDigitalInputs();
-        SendMessageInternal(messageHeader, response);
+        SendResponse(messageHeader, response);
     }
 
-    private void HandleRetrieveAnalogInputs(AhsokaMessageHeader messageHeader, object message)
+    private void HandleRetrieveAnalogInputs(AhsokaServiceRequest messageHeader, object message)
     {
         var response = _IOImplementationBase.RetrieveAnalogInputs();
-        SendMessageInternal(messageHeader, response);
+        SendResponse(messageHeader, response);
     }
 
-    private void HandleRetrieveAnalogOutputs(AhsokaMessageHeader messageHeader, object message)
+    private void HandleRetrieveAnalogOutputs(AhsokaServiceRequest messageHeader, object message)
     {
         var response = _IOImplementationBase.RetrieveAnalogOutputs();
-        SendMessageInternal(messageHeader, response);
+        SendResponse(messageHeader, response);
     }
 
-    private void HandleGetDigitalIn(AhsokaMessageHeader messageHeader, DigitalInput d)
+    private void HandleGetDigitalIn(AhsokaServiceRequest messageHeader, DigitalInput d)
     {
         var response = _IOImplementationBase.GetDigitalInput(d);
-        SendMessageInternal(messageHeader, response);
+        SendResponse(messageHeader, response);
     }
 
-    private void HandleGetAnalogIn(AhsokaMessageHeader messageHeader, AnalogInput a)
+    private void HandleGetAnalogIn(AhsokaServiceRequest messageHeader, AnalogInput a)
     {
         var response = _IOImplementationBase.GetAnalogInput(a);
-        SendMessageInternal(messageHeader, response);
+        SendResponse(messageHeader, response);
     }
 
-    private void HandelSetDigitalOut(AhsokaMessageHeader messageHeader, DigitalOutput d)
+    private void HandelSetDigitalOut(AhsokaServiceRequest messageHeader, DigitalOutput d)
     {
         var response = _IOImplementationBase.SetDigitalOut(d);
-        SendMessageInternal(messageHeader, response);
+        SendResponse(messageHeader, response);
     }
 
-    private void HandelSetAnalogOut(AhsokaMessageHeader messageHeader, AnalogOutput a)
+    private void HandelSetAnalogOut(AhsokaServiceRequest messageHeader, AnalogOutput a)
     {
         var response = _IOImplementationBase.SetAnalogOut(a);
-        SendMessageInternal(messageHeader, response);
+        SendResponse(messageHeader, response);
     }
 
-
-
-    private void HandleGetBuzzerConfig(AhsokaMessageHeader messageHeader)
+    private void HandleGetBuzzerConfig(AhsokaServiceRequest messageHeader)
     {
-        SendMessageInternal(messageHeader, _IOImplementationBase.GetBuzzerConfig());
+        SendResponse(messageHeader, _IOImplementationBase.GetBuzzerConfig());
     }
 
-    private void HandleSetBuzzerConfig(AhsokaMessageHeader messageHeader, BuzzerConfig buzzerConfig)
+    private void HandleSetBuzzerConfig(AhsokaServiceRequest messageHeader, BuzzerConfig buzzerConfig)
     {
         _IOImplementationBase.SetBuzzerConfig(buzzerConfig);
-        SendMessageInternal(messageHeader);
+        SendResponse(messageHeader);
     }
 
 
-    private void HandleGetVBat(AhsokaMessageHeader messageHeader)
+    private void HandleGetVBat(AhsokaServiceRequest messageHeader)
     {
         if (HardwareInteractionDisabled)
         {
-            SendMessageInternal(messageHeader, new VoltageValue());
+            SendResponse(messageHeader, new VoltageValue());
             return;
         }
 
         var response = _IOImplementationBase.GetVBat();
-        SendMessageInternal(messageHeader, response);
+        SendResponse(messageHeader, response);
     }
 
-    private void HandleGetIGNPin(AhsokaMessageHeader messageHeader)
+    private void HandleGetIGNPin(AhsokaServiceRequest messageHeader)
     {
         if (HardwareInteractionDisabled)
         {
-            SendMessageInternal(messageHeader, new IgnitionState() { State = IgnitionStates.Unknown });
+            SendResponse(messageHeader, new IgnitionState() { State = IgnitionStates.Unknown });
             return;
         }
 
         var response = _IOImplementationBase.GetIGNPin();
-        SendMessageInternal(messageHeader, response);
+        SendResponse(messageHeader, response);
     }
     #endregion
 }
