@@ -5,25 +5,25 @@
 #include "CanService.pb.h"
 #include "encodeCanMessages.h"
 #include "decodeCanMessages.h"
-#include "zmq_message_list.h"
-
-extern zmtp_channel_t* sendChannel;
-extern uint32_t zmq_send_multipart(zmtp_channel_t *self, zmq_message_list_t* list );
 
 static void handleHeartbeat(void);
 static void sendCoprocessorReady(void);
 
-static void sendCANMessages(zmq_message_list_t* list);
-static void sendRecurringCANMessage(zmq_message_list_t* list);
-static void addCANFilter(zmq_message_list_t* list);
-static void networkStateChanged(zmq_message_list_t* list);
+#define  HEADER_BUFFER_SIZE 40
+#define  DATA_BUFFER_SIZE 1024
 
-void canMessageHandler(zmq_message_list_t* list)
+static uint8_t headerBuffer[HEADER_BUFFER_SIZE];
+static uint8_t dataBuffer[DATA_BUFFER_SIZE];
+
+extern void sendAhsokaMessage(uint8_t* header, uint32_t headerLength, uint8_t* data, uint32_t dataLength);
+
+
+
+void canMessageHandler(uint8_t* header, uint32_t headerLength, uint8_t* data, uint32_t dataLength)
 {
     
-    AhsokaCAN_CanMessageTypes_Ids id = decodeCanMessageType(list->msg->data, list->msg->size);
+    AhsokaCAN_CanMessageTypes_Ids id = decodeCanMessageType(header, headerLength);
     // remove type
-    list = zmq_message_list_get_next(list);
     // process message
     switch(id)
     {
@@ -40,25 +40,25 @@ void canMessageHandler(zmq_message_list_t* list)
 
         case AhsokaCAN_CanMessageTypes_Ids_NETWORK_STATE_CHANGED:
             //log_info("network state changed\r\n");
-            networkStateChanged(list);
+            decodeNetworkStateChanged(data, dataLength);
             break;
 
         case AhsokaCAN_CanMessageTypes_Ids_SEND_CAN_MESSAGES:
             //log_info("send can message\r\n");
             // send single can message
-            sendCANMessages(list);
+            decodeSendCANMessages(data, dataLength);
             break;
 
         case AhsokaCAN_CanMessageTypes_Ids_SEND_RECURRING_CAN_MESSAGE:
            // log_info("send recurring can message\r\n");
             // add recurring can message to list of recurring messages
-            sendRecurringCANMessage(list);
+            decodeSendRecurringCANMessage(data, dataLength);
             break;
 
         case AhsokaCAN_CanMessageTypes_Ids_APPLY_MESSAGE_FILTER:
             //log_info("apply message filter\r\n");
             // add filter to list of messages to look for.
-            addCANFilter(list);
+            decodeAddCANFilter(data, dataLength);
             break;
 
         case AhsokaCAN_CanMessageTypes_Ids_COPROCESSOR_HEARTBEAT:
@@ -77,12 +77,10 @@ void canMessageHandler(zmq_message_list_t* list)
             log_info("none or bad CAN Message type:%d\r\n",id);
             break;
     }
-    // all done with the list, so delete it.
-    zmq_message_list_delete(list);
-
 }
 void sendCoprocessorReady(void)
 {
+	uint32_t count = 0;
 	//static bool readySent = false;
 
 	// then if we haven't sent one before, send a coprocessor ready message.
@@ -90,68 +88,38 @@ void sendCoprocessorReady(void)
 	{
 		//readySent = true;
 		// now serialize and send the ready message.
-		zmq_message_list_t* list = zmq_new_message_list();
-		zmtp_msg_t* frame = encodeCanMessageType(AhsokaCAN_CanMessageTypes_Ids_COPROCESSOR_IS_READY_NOTIFICATION);
-		zmq_add_message_list(list, frame);
 
-		zmtp_msg_t* emptyFrame = zmtp_msg_new(0, 0);
-		zmq_add_message_list(list, emptyFrame);
-		// send the message
-		zmq_send_multipart(sendChannel, list);
+		count = encodeCanMessageType(AhsokaCAN_CanMessageTypes_Ids_COPROCESSOR_IS_READY_NOTIFICATION, headerBuffer, HEADER_BUFFER_SIZE);
+
+		if(count > 0)
+			sendAhsokaMessage(headerBuffer, count, NULL, 0);
 
 		decodeCoprocessorReady();
 	}
+
 }
 static void handleHeartbeat(void)
 {
+	uint32_t count = 0;
     // for a heartbeat, first send a heartbeat message
-    zmq_message_list_t* list = zmq_new_message_list();
-    zmtp_msg_t* frame = encodeCanMessageType(AhsokaCAN_CanMessageTypes_Ids_COPROCESSOR_HEARTBEAT);
-    zmq_add_message_list(list, frame);
-    // get and empty frame and add it to the list for a heartbeat.
-    zmtp_msg_t* emptyFrame = zmtp_msg_new(0, 0);
-    zmq_add_message_list(list, emptyFrame);
-    // send the message, send takes care of deleting the message memory!
-    zmq_send_multipart(sendChannel, list);    
-    // for old version, send ready when we get the heartbeat.
-    //sendCoprocessorReady();
-}
-
-static void sendCANMessages(zmq_message_list_t* list)
-{
-    // message is a collection of can messages to send.
-    decodeSendCANMessages(list->msg->data, list->msg->size);
-}
-
-static void sendRecurringCANMessage(zmq_message_list_t* list)
-{
-    decodeSendRecurringCANMessage(list->msg->data, list->msg->size);
-}
-
-static void addCANFilter(zmq_message_list_t* list)
-{
-    decodeAddCANFilter(list->msg->data, list->msg->size);
-}
-
-static void networkStateChanged(zmq_message_list_t* list)
-{
-	decodeNetworkStateChanged(list->msg->data, list->msg->size);
+    count = encodeCanMessageType(AhsokaCAN_CanMessageTypes_Ids_COPROCESSOR_HEARTBEAT, headerBuffer, HEADER_BUFFER_SIZE);
+    if(count > 0)
+    	sendAhsokaMessage(headerBuffer, count, NULL, 0);
 }
 
 void handleReceiveCanMessages(canMessageSimple_t* canMessages, uint32_t numMessages)
 {
+	uint32_t headerLength;
+	uint32_t dataLength;
+
 	//log_info("handle rx message\r\n");
 	// for a heartbeat, first send a heartbeat message
-	zmq_message_list_t* list = zmq_new_message_list();
-	zmtp_msg_t* frame = encodeCanMessageType(AhsokaCAN_CanMessageTypes_Ids_CAN_MESSAGES_RECEIVED);
-	zmq_add_message_list(list, frame);
+	headerLength = encodeCanMessageType(AhsokaCAN_CanMessageTypes_Ids_CAN_MESSAGES_RECEIVED, headerBuffer, HEADER_BUFFER_SIZE);
+
 	// get and empty frame and add it to the list for a heartbeat.
-	frame = encodeCanMessageCollection(canMessages, numMessages);
-	if(frame == NULL)
-	{
-		frame = zmtp_msg_new(0, 0);
-	}
-	zmq_add_message_list(list, frame);
+	dataLength = encodeCanMessageCollection(canMessages, numMessages, dataBuffer, DATA_BUFFER_SIZE);
+
 	// send the message, send takes care of deleting the message memory!
-	zmq_send_multipart(sendChannel, list);
+	sendAhsokaMessage(headerBuffer, headerLength, dataBuffer, dataLength);
+
 }

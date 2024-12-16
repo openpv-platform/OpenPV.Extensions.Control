@@ -4,7 +4,7 @@
 #include "CanService.pb.h"
 #include "CanConfiguration.pb.h"
 
-#define TIMER_RESOLUTION  5
+#define TIMER_RESOLUTION  1
 #define MAX_PORTS 2
 #define PDU2_THRESHOLD 0xF00000
 

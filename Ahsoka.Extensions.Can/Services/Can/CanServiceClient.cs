@@ -49,7 +49,7 @@ public class CanServiceClient : AhsokaClientBase<CanMessageTypes.Ids>
     /// </summary>
     public void OpenCommunicationChannel()
     {
-        Calibrations = SendMessageWithResponse<CanApplicationConfiguration>(CanMessageTypes.Ids.OpenCommunicationChannel);
+        Calibrations = SendNotificationWithResponse<CanApplicationConfiguration>(CanMessageTypes.Ids.OpenCommunicationChannel);
     }
 
     /// <summary>
@@ -57,7 +57,7 @@ public class CanServiceClient : AhsokaClientBase<CanMessageTypes.Ids>
     /// </summary>
     public void CloseCommunicationChannel()
     {
-        SendMessageWithResponse<EmptyNotification>(CanMessageTypes.Ids.CloseCommunicationChannel);
+        SendNotificationWithResponse<EmptyNotification>(CanMessageTypes.Ids.CloseCommunicationChannel);
         Calibrations = null;
     }
 
@@ -75,7 +75,7 @@ public class CanServiceClient : AhsokaClientBase<CanMessageTypes.Ids>
         };
         collection.Messages.AddRange(messages);
 
-        return SendMessageWithResponse<CanMessageResult>(CanMessageTypes.Ids.SendCanMessages, collection);
+        return SendNotificationWithResponse<CanMessageResult>(CanMessageTypes.Ids.SendCanMessages, collection);
     }
 
     /// <summary>
@@ -98,7 +98,7 @@ public class CanServiceClient : AhsokaClientBase<CanMessageTypes.Ids>
     /// <param name="message"></param>
     public CanMessageResult SendRecurringCanMessage(RecurringCanMessage message)
     {
-        return SendMessageWithResponse<CanMessageResult>(CanMessageTypes.Ids.SendRecurringCanMessage, message);
+        return SendNotificationWithResponse<CanMessageResult>(CanMessageTypes.Ids.SendRecurringCanMessage, message);
     }
 
     /// <summary>
@@ -107,6 +107,6 @@ public class CanServiceClient : AhsokaClientBase<CanMessageTypes.Ids>
     /// <param name="filter"></param>
     public void ApplyCanFilter(ClientCanFilter filter)
     {
-        SendMessageWithResponse(CanMessageTypes.Ids.ApplyMessageFilter, filter);
+        SendNotificationWithResponse(CanMessageTypes.Ids.ApplyMessageFilter, filter);
     }
 }

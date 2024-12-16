@@ -20,6 +20,8 @@
 	</PropertyGroup>
 
 	<ItemGroup Label="Debugging Source Support">
+		<PackageReference Include="Ahsoka.Core" Version="4.0.1-zzz-develop.38" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.1" />
 		<PackageReference Include="Microsoft.SourceLink.AzureRepos.Git" Version="8.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -47,18 +49,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Ahsoka.Core" Version="4.0.1-zzz-develop.38">
-			<IncludeAssets>all</IncludeAssets>
-			<ExcludeAssets>none</ExcludeAssets>
-			<PrivateAssets>none</PrivateAssets>
-		</PackageReference>
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="System.IO.Hashing" Version="8.0.0" />
+		<PackageReference Include="System.IO.Ports" Version="8.0.0" />
 	</ItemGroup>
 	
 	<ItemGroup>

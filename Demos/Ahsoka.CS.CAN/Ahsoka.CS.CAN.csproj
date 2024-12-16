@@ -17,6 +17,7 @@
 	</ItemGroup>
 
 	<ItemGroup Label="Reference to Ahsoka Nuget Packages">
+		<PackageReference Include="System.IO.Ports" Version="8.0.0" />
 		<PackageReference Include="Ahsoka.Core.Drawing" Version="4.*-*" />
 		<PackageReference Include="Ahsoka.Core" Version="4.*-*" />
 	</ItemGroup>

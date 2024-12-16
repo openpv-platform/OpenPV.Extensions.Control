@@ -245,10 +245,23 @@ canMessageTimerList_t* createCanMessageTimer(void)
 }
 void rescheduleCanMessageTimer(canMessageTimerList_t** list, canMessageTimerList_t* node)
 {
+    static uint32_t offsetCnt = 0;
+
 	// this function is used from the timer thread, so don't need to take semaphores
 
-	    node->ticksLeft = node->msg->rate / TIMER_RESOLUTION;
-	    node->scheduled = true;
+        // if the node has already been scheduled, don't adjust for offset.  Else, adjust for offset.
+        if(node->scheduled)
+        {
+	        node->ticksLeft = node->msg->rate / TIMER_RESOLUTION;
+        }
+        else
+        {
+            uint32_t temp = (node->msg->rate / 10) * offsetCnt; 
+            node->ticksLeft = (node->msg->rate + temp)/TIMER_RESOLUTION;
+            node->scheduled = true;
+            offsetCnt++;
+            offsetCnt %=10; // keep offset in range of 0-9 
+        }
 
 	    if (*list == NULL)
 	    {
@@ -418,7 +431,7 @@ canMessage_t* findCanMessage(uint32_t port, uint32_t id, bool isExtended, bool p
 		return foundMsg;
 	}
 
-    canMessageTimerList_t* listStart = list;
+    canMessageList_t* listStart = list;
 
 	while(list != NULL)
 	{

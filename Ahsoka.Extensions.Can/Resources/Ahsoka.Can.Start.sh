@@ -10,5 +10,5 @@ until [ -e ${InterfacePath} ]; do
 done
 
 #Start Application
-slattach -p slip -L -m ${InterfacePath} &
-ifconfig sl0 ${IpAddressLocal} pointtopoint ${IpAddressRemote} up
+#slattach -p slip -L -m ${InterfacePath} &
+#ifconfig sl0 ${IpAddressLocal} pointtopoint ${IpAddressRemote} up
