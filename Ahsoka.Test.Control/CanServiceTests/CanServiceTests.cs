@@ -490,7 +490,7 @@ public class CanServiceTests : LinearTestBase
 
         //Confirm processes ids are correct
         Assert.IsTrue(collection.Messages[0].Id == 0x80E2AFDC);
-        Assert.IsTrue(collection.Messages[1].Id == 0x803C0A28); //Should end in 28
+        Assert.IsTrue(collection.Messages[1].Id == 0x803C0A28);
         Assert.IsTrue(collection.Messages[2].Id == 0x802B107F);
 
         //Test address claim send

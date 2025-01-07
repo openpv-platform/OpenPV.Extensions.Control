@@ -110,11 +110,12 @@ internal class J1939PropertyDefinitions
 
     public class TPCM
     {
+        ulong[] data = { 0 };
         //RTS
         private CanPropertyInfo controlInfo = new(0, 8, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
         private CanPropertyInfo messageInfo = new(8, 16, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
         private CanPropertyInfo packetInfo = new(24, 8, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
-        private CanPropertyInfo responseInfo = new(32, 8, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
+        private CanPropertyInfo responseInfo = new(32, 8, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0, -1, 0xFF);
         private CanPropertyInfo pgnInfo = new(40, 24, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
 
         //CTS
@@ -130,17 +131,17 @@ internal class J1939PropertyDefinitions
         private CanPropertyInfo roleInfo = new(16, 2, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
         private CanPropertyInfo reservedAbort = new(18, 22, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
 
-        public CMControl ControlByte { get; set; }
-        public uint MessageSize { get; set; }
-        public uint NumPackets { get; set; }
-        public uint PacketsPerCTS { get; set; }
-        public uint PGN { get; set; }
+        public CMControl ControlByte { get { return controlInfo.GetValue<CMControl>(data, false); } set { controlInfo.SetValue(ref data, value, false); } }
+        public uint MessageSize { get { return messageInfo.GetValue<uint>(data, false); } set { messageInfo.SetValue(ref data, value, false); } }
+        public uint NumPackets { get { return packetInfo.GetValue<uint>(data, false); } set { packetInfo.SetValue(ref data, value, false); } }
+        public uint PacketsPerCTS { get { return responseInfo.GetValue<uint>(data, false); } set { responseInfo.SetValue(ref data, value, false); } }
+        public uint PGN { get { return pgnInfo.GetValue<uint>(data, false); } set { pgnInfo.SetValue(ref data, value, false); } }
 
-        public uint PacketsRequested { get; set; }
-        public uint PacketStart { get; set; }
+        public uint PacketsRequested { get { return sendInfo.GetValue<uint>(data, false); } set { sendInfo.SetValue(ref data, value, false); } }
+        public uint PacketStart { get { return sequenceInfo.GetValue<uint>(data, false); } set { sequenceInfo.SetValue(ref data, value, false); } }
 
-        public uint AbortReason { get; set; }
-        public uint AbortRole { get; set; }
+        public uint AbortReason { get { return reasonInfo.GetValue<uint>(data, false); } set { reasonInfo.SetValue(ref data, value, false); } }
+        public uint AbortRole { get { return roleInfo.GetValue<uint>(data, false); } set { roleInfo.SetValue(ref data, value, false); } }
 
         public TPCM() { }
 
@@ -151,65 +152,25 @@ internal class J1939PropertyDefinitions
 
         public ulong WriteToUint()
         {
-            var data = new ulong[] { 0 };
-
-            controlInfo.SetValue(ref data, ControlByte, false);
-            if (ControlByte is CMControl.RTS or CMControl.EndOfMsgACK)
+            if (ControlByte == CMControl.CTS)
             {
-                messageInfo.SetValue(ref data, MessageSize, false);
-                packetInfo.SetValue(ref data, NumPackets, false);
-                responseInfo.SetValue(ref data, PacketsPerCTS, false);
-            }
-            else if (ControlByte == CMControl.CTS)
-            {
-                sendInfo.SetValue(ref data, PacketsRequested, false);
-                sequenceInfo.SetValue(ref data, PacketStart, false);
                 reservedCTS.SetValue(ref data, 0xFFFF, false);
             }
             else if (ControlByte == CMControl.BAM)
             {
-                messageInfo.SetValue(ref data, MessageSize, false);
-                packetInfo.SetValue(ref data, NumPackets, false);
                 reservedBAM.SetValue(ref data, 0xFF, false);
             }
             else if (ControlByte == CMControl.Abort)
             {
-                reasonInfo.SetValue(ref data, AbortReason, false);
-                roleInfo.SetValue(ref data, AbortRole, false);
                 reservedAbort.SetValue(ref data, 0xFFFFFF, false);
             }
-            pgnInfo.SetValue(ref data, PGN, false);
 
             return data[0];
         }
 
-        public void ExtractValues(ulong data)
+        public void ExtractValues(ulong newData)
         {
-            var input = new ulong[] { data };
-
-            ControlByte = (CMControl)controlInfo.GetValue<uint>(input, false);
-            if (ControlByte is CMControl.RTS or CMControl.EndOfMsgACK)
-            {
-                MessageSize = messageInfo.GetValue<uint>(input, false);
-                NumPackets = packetInfo.GetValue<uint>(input, false);
-                PacketsPerCTS = responseInfo.GetValue<uint>(input, false);
-            }
-            else if (ControlByte == CMControl.CTS)
-            {
-                PacketsRequested = sendInfo.GetValue<uint>(input, false);
-                PacketStart = sequenceInfo.GetValue<uint>(input, false);
-            }
-            else if (ControlByte == CMControl.BAM)
-            {
-                MessageSize = messageInfo.GetValue<uint>(input, false);
-                NumPackets = packetInfo.GetValue<uint>(input, false);
-            }
-            else if (ControlByte == CMControl.Abort)
-            {
-                AbortReason = reasonInfo.GetValue<uint>(input, false);
-                AbortRole = roleInfo.GetValue<uint>(input, false);
-            }
-            PGN = pgnInfo.GetValue<uint>(input, false);
+            data[0] = newData;
         }
 
 

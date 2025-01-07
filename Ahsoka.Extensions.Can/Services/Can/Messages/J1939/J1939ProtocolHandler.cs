@@ -90,7 +90,7 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
             if (CanState.CurrentAddress == J1939PropertyDefinitions.BroadcastAddress)
             {
                 startupQueue.Add(info);
-                result = new CanMessageResult() { Status = MessageStatus.Success };
+                result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"J1939 node waiting for address claim, message has been queued" };
             }
             else
                 result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"J1939 node either failed to claim address or was superseded by a higher priority ECU" };
