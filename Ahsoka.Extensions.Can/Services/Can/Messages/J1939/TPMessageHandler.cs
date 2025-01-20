@@ -17,7 +17,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
 
     protected TPMessageHandler(CanHandler messageHandler, J1939ProtocolHandler protocolHandler, CanServiceImplementation service)
         : base(messageHandler, protocolHandler, service, 0xEC, 0, 3)
-    { 
+    {
         Protocol = protocolHandler;
     }
 
@@ -98,8 +98,8 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                     messageCollection.Messages.Add(response);
                     Service.SendCanMessages(messageCollection);
                 }
-            }       
-        }    
+            }
+        }
 
         return true;
     }
@@ -127,8 +127,8 @@ internal class TPMessageHandler : J1939MessageHandlerBase
             }
             AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"{result.Message}");
         }
-        catch (Exception ex) 
-        { 
+        catch (Exception ex)
+        {
             AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP send failed with message: {ex.Message}");
             result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"TP send failed with message: {ex.Message}" };
         }
@@ -206,7 +206,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
 
             Task.Run(() =>
             {
-                
+
                 if (j1939Id.PDUS == J1939PropertyDefinitions.BroadcastAddress)
                 {
                     AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Transmit BAM Started");
@@ -295,7 +295,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                     }
                 }
             }).ContinueWith((result) =>
-            {               
+            {
                 handler.EndSession(this);
             });
         }
@@ -309,7 +309,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
             Transmitting = false;
 
             Task.Run(() =>
-            {             
+            {
                 var sequenceNumber = 1;
                 if (j1939Id.PDUS == J1939PropertyDefinitions.BroadcastAddress)
                 {
@@ -473,7 +473,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                                     }
                                     break;
                                 }
-                                    
+
                             }
                         }
                     }
@@ -506,11 +506,11 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                     TPEvent.Wait(delay);
                 }
             }
-            if (messageCollection.Messages.Count > 0) 
+            if (messageCollection.Messages.Count > 0)
                 service.SendCanMessages(messageCollection);
 
-                TPEvent.Wait(Tr / 2);
-            }
+            TPEvent.Wait(Tr / 2);
         }
     }
+
 }

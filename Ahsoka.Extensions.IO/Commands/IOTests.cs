@@ -41,30 +41,6 @@ internal class IOTests
 
     }
 
-    private static void USBTest(SystemServiceClient client)
-    {
-        Thread.Sleep(1000);
-        Console.WriteLine("Starting USB Role Swapping Test in SystemService");
-        client.GetUsbInfo();
-        Thread.Sleep(1000);
-        Console.WriteLine("Setting USB-C port to Host mode for 20 seconds. Check for USB Stick");
-        UsbInfo usbInfo = new()
-        {
-            Mode = UsbMode.Host,
-            MountPoint = "/mnt/stick"
-        };
-        client.SetUsbInfo(usbInfo);
-        Thread.Sleep(100);
-        client.GetUsbInfo();
-        Thread.Sleep(20000);
-        Console.WriteLine("Setting USB-C port to Device mode. Check for Gadget connection");
-        usbInfo.Mode = UsbMode.Device;
-        usbInfo.MountPoint = "";
-        client.SetUsbInfo(usbInfo);
-        Thread.Sleep(100);
-        client.GetUsbInfo();
-        Console.WriteLine("Completed USB Role Swapping Test in SystemService");
-    }
 
     private static void BuzzerTest(IOServiceClient client)
     {
