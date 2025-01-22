@@ -20,7 +20,7 @@
 	</PropertyGroup>
 
 	<ItemGroup Label="Debugging Source Support">
-		<PackageReference Include="Ahsoka.Core" Version="4.0.1-zzz-develop.60" />
+		<PackageReference Include="Ahsoka.Core" Version="4.0.1-zzz-develop.63" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.1" />
 		<PackageReference Include="Microsoft.SourceLink.AzureRepos.Git" Version="8.0.0">
 			<PrivateAssets>all</PrivateAssets>

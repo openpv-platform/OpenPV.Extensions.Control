@@ -1,13 +1,13 @@
 ﻿using Ahsoka.Installer.Components;
 using Ahsoka.ServiceFramework;
 using Ahsoka.Services.Can.Platform;
+using Ahsoka.Socket;
 using Ahsoka.System;
 using Ahsoka.System.Hardware;
-using Ahsoka.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using static NetMQ.NetMQSelector;
+using System.Linq;
 
 namespace Ahsoka.Services.Can;
 
@@ -15,7 +15,7 @@ namespace Ahsoka.Services.Can;
 /// Service for Interacting with CAN via the CAN Service Implementation (typically MCU)
 /// </summary>
 [AhsokaService(Name)]
-public class CanService : AhsokaServiceBase<CanMessageTypes.Ids>
+public class CanService : AhsokaServiceBase<CanMessageTypes.Ids>, IAhsokaGatewayEndPoint
 {
     #region Fields
     /// <summary>
@@ -24,6 +24,9 @@ public class CanService : AhsokaServiceBase<CanMessageTypes.Ids>
     public const string Name = "CanService";
     readonly CanApplicationConfiguration calibration;
     readonly Dictionary<uint, CanServiceImplementation> portHandlers = new();
+
+    bool gatewayEnabled = false;
+    CanServiceSocket canSocket;
     #endregion
 
     #region Methods
@@ -99,6 +102,14 @@ public class CanService : AhsokaServiceBase<CanMessageTypes.Ids>
             calibration = ProtoBuf.Serializer.Deserialize<CanApplicationConfiguration>(fs);
             AhsokaLogging.LogMessage(AhsokaVerbosity.High, $"CAN Configuration Loaded From {configPath}");
         }
+    }
+
+    public void EnableGateway(uint port, uint id, uint mask = 0x1FFFFFFF)
+    {
+        gatewayEnabled = true;
+        canSocket = new(port, id, mask);
+        ((IAhsokaServiceSocket)canSocket).Connect(this);
+        ((IAhsokaServiceEndPoint)this).AddLocalSocket(canSocket);
     }
 
     /// <summary>
@@ -202,7 +213,22 @@ public class CanService : AhsokaServiceBase<CanMessageTypes.Ids>
 
     internal void NotifyCanMessages(CanMessageDataCollection messages)
     {
-        SendNotification(CanMessageTypes.Ids.CanMessagesReceived, messages);
+        if (gatewayEnabled && canSocket.FilterMessage(messages.Messages[0]))
+        {
+            foreach(var message in messages.Messages)       
+                canSocket.SendToGateway(message);
+        }
+         else   
+            SendNotification(CanMessageTypes.Ids.CanMessagesReceived, messages);
+    }
+
+    public void HandleGatewayMessage(IAhsokaServiceSocket registeredSocket, AhsokaServiceMessage message)
+    {
+        var collection = new CanMessageDataCollection() { CanPort = canSocket.Port };
+        collection.Messages.Add(SocketMessageEncoding.MessageToCAN(message, canSocket.Id, message.IsNotification));
+
+        if (portHandlers.TryGetValue(collection.CanPort, out CanServiceImplementation impl))
+            impl.HandleSendCanRequest(collection);
     }
 
     #endregion

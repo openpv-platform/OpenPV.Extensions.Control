@@ -84,7 +84,7 @@ internal class ECOMServiceImplementation : CanServiceImplementation
                 if (ProcessMessage(canMessage))
                 {
                     byte returnError;
-                    if (canMessage.Id >= 0x80000000) // Extended Frame
+                    if (canMessage.Id >= 0x07FF) // Extended Frame
                     {
                         var ecomMessage = new EFFMessage
                         {

@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+	
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<Platforms>AnyCPU;x64</Platforms>
+		<TargetFramework>net8.0</TargetFramework>
+		<ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+	</PropertyGroup>
+
+	<Import Label="Ahsoka Local Build Properties" Condition="Exists('../Demo.Build.props')" Project="../Demo.Build.props" />
+
+	<ItemGroup Label="" Condition="!Exists('../Demo.Build.props')">
+		<PackageReference Include="Ahsoka.Extensions.CAN" Version="4.*-*" />
+	</ItemGroup>
+
+	<ItemGroup Label="Reference to Ahsoka Nuget Packages">
+		<PackageReference Include="System.IO.Ports" Version="8.0.0" />
+		<PackageReference Include="Ahsoka.Core.Drawing" Version="4.*-*" />
+		<PackageReference Include="Ahsoka.Core" Version="4.*-*" />
+	</ItemGroup>
+
+	<!--Beginning in OpenPV 3.0, Command Line Code Generators have been simplified and now execute as part of the 
+	SDK Installation so Targets (ExportCanClasses) & Properties (Can Generator Properties) below are no 
+	longer needed. With this change, the Developer Toolkit will generate your CAN Models as part of the SDK Update 
+	or after Changes to the CanConfiguration.
+	
+	NOTE: For developers that prefer to keep the model generation here as part of their local build system, you can set the 
+	CanGenerateClassesOnBuild Property to True to continue using the older style code generation method.  You 
+	will need to disable the Code Generation in the Associated CAN Extension and remove the included "GeneratedObjects" file
+	to avoid conflicts-->
+	<PropertyGroup Label="CAN Generator Properties">
+		<CanClassOutputFile>Generated\GeneratedCanObjects.cs</CanClassOutputFile>
+		<CanGenerateClassesOnBuild>false</CanGenerateClassesOnBuild>
+	</PropertyGroup>
+	<Target Label="ExportCANClasses" Condition="'$(CanGenerateClassesOnBuild)'=='True' and Exists('$(AhsokaCommandLinePath)')" Name="ExportCANClasses" BeforeTargets="CoreCompile">
+		<Message Text="CommandLine Path = $(AhsokaCommandLinePath)" Importance="high" />
+		<Exec ContinueOnError="true" Command="$(AhsokaCommandLinePath) --GenerateCANClasses OpenLinuxST.PackageInfo.json  $(CanClassOutputFile) Ahsoka.CS.CAN CanViewModelBase Dotnet" Outputs="$(CanClassOutputFile)">
+			<Output ItemName="Generated" TaskParameter="Outputs" />
+		</Exec>
+		<ItemGroup>
+			<Compile Include="@(Generated)" />
+		</ItemGroup>
+	</Target>
+	<ItemGroup>
+		<None Update="Cloud.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="CANServiceConfiguration.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+</Project>

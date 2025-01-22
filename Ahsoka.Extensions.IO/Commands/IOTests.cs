@@ -41,7 +41,6 @@ internal class IOTests
 
     }
 
-
     private static void BuzzerTest(IOServiceClient client)
     {
         Console.WriteLine("Starting Buzzer Test");

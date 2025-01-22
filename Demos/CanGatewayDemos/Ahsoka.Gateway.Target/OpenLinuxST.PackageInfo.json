@@ -1,0 +1,78 @@
+{
+  "version": "4.0.1.10063",
+  "applicationType": "Dotnet",
+  "execCommand": "Ahsoka.Gateway.Target",
+  "packageName": "Ahsoka.Gateway.Target",
+  "packageDescription": "CAN Services Demo",
+  "applicationVersion": "1.0",
+  "packageApplicationFolder": "publish",
+  "packageOutputDirectory": "../PackageOutput",
+  "licenses": [],
+  "optimizedServiceManager": true,
+  "customPackageInfo": {
+    "includeApplication": false,
+    "includeBootLogo": false,
+    "includeInstallerUI": false,
+    "includeFirmwareUpdate": false
+  },
+  "dotNetInfo": {
+    "projectPath": "Ahsoka.Gateway.Target.csproj",
+    "publishProfile": "Properties/PublishProfiles/LinuxProfile.pubxml"
+  },
+  "cppInfo": {
+    "projectType": "QT"
+  },
+  "serviceInfo": {
+    "runtimeConfiguration": {
+      "serviceStartup": "NoAutoStart",
+      "releaseOption": "NoAutoStart",
+      "extensionInfo": [
+        {
+          "extensionName": "CAN Service Extension",
+          "configurationFile": "CANServiceConfiguration.json"
+        }
+      ],
+      "startupDelay": 0,
+      "requireChallenge": "NotRequired",
+      "services": [
+        {
+          "socketType": "TcpSocket",
+          "serviceName": "CanService",
+          "tcpListenAddress": "*",
+          "tcpConnectionAddress": "localhost",
+          "dataChannel": 5007,
+          "isExtension": false,
+          "behaviors": "AutoStart"
+        },
+        {
+          "socketType": "TcpSocket",
+          "serviceName": "SystemService",
+          "tcpListenAddress": "*",
+          "tcpConnectionAddress": "localhost",
+          "dataChannel": 5001,
+          "isExtension": false,
+          "behaviors": "AutoStart"
+        }
+      ]
+    },
+    "environmentValues": []
+  },
+  "screenConfiguration": {
+    "showUnknownSurfaces": false,
+    "bootLogoPath": "EnovLogo.png",
+    "orientation": "DefaultOrientation",
+    "surfaceSetups": []
+  },
+  "hardwareConfiguration": {
+    "hardwareItems": [],
+    "usbStartStatePrimary": "Default",
+    "usbStartStateSecondary": "Default"
+  },
+  "packageType": "opvEncrypted",
+  "packageStructureVersion": 1,
+  "platformFamily": "OpenViewLinux",
+  "platformQualifier": "S70",
+  "securityMode": "None",
+  "applicationId": "00000000-0000-0000-0000-000000000000",
+  "components": []
+}
