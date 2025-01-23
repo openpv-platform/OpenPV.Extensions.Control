@@ -69,7 +69,8 @@ internal class STCoprocessorServiceImplementation : CanServiceImplementation
 
         // Wait for CoProcessor Message (CoProcessorReady)
         AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"Waiting for CoProcessor Ready Message Port: {Port}");
-        isReadyHandle.WaitOne(); // Disabled until CoProcessor App is Speaking Metmq
+        if (!isReadyHandle.WaitOne(5000)) // Disabled until CoProcessor App is Speaking Metmq
+            throw new TimeoutException("CoProcessor did not return ready signal");        
 
         if (heartBeat == null)
         {
