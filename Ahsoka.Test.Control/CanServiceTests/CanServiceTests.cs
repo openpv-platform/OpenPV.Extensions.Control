@@ -460,6 +460,7 @@ public class CanServiceTests : LinearTestBase
         impl.Open(service, config.CanPortConfiguration, 1);
 
         var handler = new CanHandler(impl);
+        handler.Init();
 
         // Wait for Address Claim to Finish.   
         // In real system recieve messages are redirected until AC is done.
