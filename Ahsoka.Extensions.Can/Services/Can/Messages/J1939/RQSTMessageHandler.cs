@@ -33,7 +33,7 @@ internal class RQSTMessageHandler : J1939MessageHandlerBase
         }
     }
 
-    protected override void OnInit()
+    internal override void OnInit()
     {
         return;
     }

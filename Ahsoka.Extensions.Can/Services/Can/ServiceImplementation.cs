@@ -61,6 +61,7 @@ internal abstract class CanServiceImplementation
 
         OnOpen();
         canHandler = new CanHandler(this);
+        canHandler.Init();
     }
 
     internal void Close()

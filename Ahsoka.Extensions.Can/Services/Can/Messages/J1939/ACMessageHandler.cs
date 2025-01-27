@@ -40,7 +40,7 @@ internal class ACMessageHandler : J1939MessageHandlerBase
         }
     }
 
-    protected override void OnInit()
+    internal override void OnInit()
     {
         protocol = (J1939ProtocolHandler)Protocol;
 
@@ -212,7 +212,10 @@ internal class ACMessageHandler : J1939MessageHandlerBase
                         addressClaimed = true;
                     }
                     else
+                    {
+                        AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"J1939 address could not be claimed");
                         minAddress++;
+                    }
             }
         }
 

@@ -45,7 +45,7 @@
 
 	
 	<ItemGroup Label="Submodule Dev References">
-		<PackageReference Include="Ahsoka.Core" Version="4.0.1-zzz-develop.63">
+		<PackageReference Include="Ahsoka.Core" Version="4.0.1-zzz-develop.64">
 			<IncludeAssets>all</IncludeAssets>
 			<ExcludeAssets>none</ExcludeAssets>
 			<PrivateAssets>none</PrivateAssets>

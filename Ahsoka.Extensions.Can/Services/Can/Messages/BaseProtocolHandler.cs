@@ -20,6 +20,14 @@ internal abstract class BaseProtocolHandler
         this.Enabled = IsEnabled();
     }
 
+    internal void Init()
+    {
+        foreach (var message in Messages)
+        {
+            message.OnInit();
+        }
+    }
+
     internal virtual bool ConfirmAvailable(CanMessageData messageData, object info, out CanMessageResult result )
     {
         result = new CanMessageResult();

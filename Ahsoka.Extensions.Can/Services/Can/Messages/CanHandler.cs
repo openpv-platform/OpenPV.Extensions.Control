@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ahsoka.ServiceFramework;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -37,6 +38,13 @@ internal class CanHandler
         {
             var method = protocol.GetMethod("Generate", BindingFlags.Static | BindingFlags.NonPublic);
             method?.Invoke(null, new object[] { config });
+        }
+    }
+    internal void Init()
+    {
+        foreach (var protocol in protocols)
+        {
+            protocol.Init();
         }
     }
 

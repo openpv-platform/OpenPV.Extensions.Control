@@ -49,10 +49,11 @@ internal class TPMessageHandler : J1939MessageHandlerBase
         }
     }
 
-    protected override void OnInit()
+    internal override void OnInit()
     {
-        foreach (SessionType session in Enum.GetValues(typeof(SessionType)))
-            sessions.Add(session, new List<TPSession>());
+        if (Enabled)
+            foreach (SessionType session in Enum.GetValues(typeof(SessionType)))
+                sessions.Add(session, new List<TPSession>());
         return;
     }
 
