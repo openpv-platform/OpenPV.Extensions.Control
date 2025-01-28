@@ -16,6 +16,7 @@
   "nodes": [
     {
       "idValid": 0,
+      "port": 1,
       "id": 0,
       "name": "DBG",
       "comment": "",
@@ -46,6 +47,7 @@
     },
     {
       "idValid": 1,
+      "port": 1,
       "id": 1,
       "name": "CONTROLLER",
       "comment": "",
@@ -76,6 +78,7 @@
     },
     {
       "idValid": 2,
+      "port": 1,
       "id": 2,
       "name": "IO",
       "comment": "",
@@ -106,6 +109,7 @@
     },
     {
       "idValid": 3,
+      "port": 1,
       "id": 3,
       "name": "MOTOR",
       "comment": "The motor controller of the car",
@@ -136,6 +140,7 @@
     },
     {
       "idValid": 4,
+      "port": 1,
       "id": 4,
       "name": "SENSOR",
       "comment": "The sensor controller of the car",
@@ -166,6 +171,7 @@
     },
     {
       "idValid": 255,
+      "port": 1,
       "id": 255,
       "name": "ANY",
       "comment": "",
@@ -208,7 +214,6 @@
       "rollCountLength": 0,
       "crcType": "None",
       "crcBit": 0,
-      "setAddressOnSend": true,
       "timeoutMs": 0,
       "filterReceipts": false,
       "userDefined": true,
@@ -220,12 +225,10 @@
         -1,
         255
       ],
+      "overrideSourceAddress": false,
+      "overrideDestinationAddress": false,
       "signals": [
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 0.0,
-          "defaultValid": 0.0,
           "id": 0,
           "name": "DRIVER_HEARTBEAT_cmd",
           "startBit": 0,
@@ -265,7 +268,6 @@
       "rollCountLength": 0,
       "crcType": "None",
       "crcBit": 0,
-      "setAddressOnSend": true,
       "timeoutMs": 0,
       "filterReceipts": false,
       "userDefined": true,
@@ -277,12 +279,10 @@
         -1,
         255
       ],
+      "overrideSourceAddress": false,
+      "overrideDestinationAddress": false,
       "signals": [
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 0.0,
-          "defaultValid": 0.0,
           "id": 0,
           "name": "IO_DEBUG_test_unsigned",
           "startBit": 0,
@@ -304,10 +304,6 @@
           ]
         },
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 0.0,
-          "defaultValid": 0.0,
           "id": 0,
           "name": "IO_DEBUG_test_enum",
           "startBit": 8,
@@ -332,10 +328,6 @@
           ]
         },
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 0.0,
-          "defaultValid": 0.0,
           "id": 0,
           "name": "IO_DEBUG_test_signed",
           "startBit": 16,
@@ -357,10 +349,6 @@
           ]
         },
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 0.0,
-          "defaultValid": 0.0,
           "id": 0,
           "name": "IO_DEBUG_test_float",
           "startBit": 24,
@@ -395,7 +383,6 @@
       "rollCountLength": 0,
       "crcType": "None",
       "crcBit": 0,
-      "setAddressOnSend": true,
       "timeoutMs": 0,
       "filterReceipts": false,
       "userDefined": true,
@@ -407,12 +394,10 @@
         -1,
         255
       ],
+      "overrideSourceAddress": false,
+      "overrideDestinationAddress": false,
       "signals": [
         {
-          "muxGroupValid": 0,
-          "minimumValid": -5.0,
-          "maximumValid": 5.0,
-          "defaultValid": 0.0,
           "id": 0,
           "name": "MOTOR_CMD_steer",
           "startBit": 0,
@@ -434,10 +419,6 @@
           ]
         },
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 9.0,
-          "defaultValid": 0.0,
           "id": 0,
           "name": "MOTOR_CMD_drive",
           "startBit": 4,
@@ -472,7 +453,6 @@
       "rollCountLength": 0,
       "crcType": "None",
       "crcBit": 0,
-      "setAddressOnSend": true,
       "timeoutMs": 0,
       "filterReceipts": false,
       "userDefined": true,
@@ -484,12 +464,10 @@
         -1,
         255
       ],
+      "overrideSourceAddress": false,
+      "overrideDestinationAddress": false,
       "signals": [
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 0.0,
-          "defaultValid": 0.0,
           "id": 0,
           "name": "MOTOR_STATUS_wheel_error",
           "startBit": 0,
@@ -512,10 +490,6 @@
           ]
         },
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 0.0,
-          "defaultValid": 0.0,
           "id": 0,
           "name": "MOTOR_STATUS_speed_kph",
           "startBit": 8,
@@ -551,7 +525,6 @@
       "rollCountLength": 0,
       "crcType": "None",
       "crcBit": 0,
-      "setAddressOnSend": true,
       "timeoutMs": 0,
       "filterReceipts": false,
       "userDefined": true,
@@ -563,12 +536,10 @@
         -1,
         255
       ],
+      "overrideSourceAddress": false,
+      "overrideDestinationAddress": false,
       "signals": [
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 0.0,
-          "defaultValid": 0.0,
           "id": 0,
           "name": "SENSOR_SONARS_mux",
           "startBit": 0,
@@ -591,10 +562,6 @@
           ]
         },
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 0.0,
-          "defaultValid": 0.0,
           "id": 0,
           "name": "SENSOR_SONARS_err_count",
           "startBit": 4,
@@ -617,10 +584,6 @@
           ]
         },
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 0.0,
-          "defaultValid": 0.0,
           "id": 0,
           "name": "SENSOR_SONARS_left",
           "startBit": 16,
@@ -643,10 +606,6 @@
           ]
         },
         {
-          "muxGroupValid": 1,
-          "minimumValid": 0.0,
-          "maximumValid": 0.0,
-          "defaultValid": 0.0,
           "id": 0,
           "name": "SENSOR_SONARS_no_filt_left",
           "startBit": 16,
@@ -668,10 +627,6 @@
           ]
         },
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 0.0,
-          "defaultValid": 0.0,
           "id": 0,
           "name": "SENSOR_SONARS_middle",
           "startBit": 28,
@@ -694,10 +649,6 @@
           ]
         },
         {
-          "muxGroupValid": 1,
-          "minimumValid": 0.0,
-          "maximumValid": 0.0,
-          "defaultValid": 0.0,
           "id": 0,
           "name": "SENSOR_SONARS_no_filt_middle",
           "startBit": 28,
@@ -719,10 +670,6 @@
           ]
         },
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 0.0,
-          "defaultValid": 0.0,
           "id": 0,
           "name": "SENSOR_SONARS_right",
           "startBit": 40,
@@ -745,10 +692,6 @@
           ]
         },
         {
-          "muxGroupValid": 1,
-          "minimumValid": 0.0,
-          "maximumValid": 0.0,
-          "defaultValid": 0.0,
           "id": 0,
           "name": "SENSOR_SONARS_no_filt_right",
           "startBit": 40,
@@ -770,10 +713,6 @@
           ]
         },
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 0.0,
-          "defaultValid": 0.0,
           "id": 0,
           "name": "SENSOR_SONARS_rear",
           "startBit": 52,
@@ -796,10 +735,6 @@
           ]
         },
         {
-          "muxGroupValid": 1,
-          "minimumValid": 0.0,
-          "maximumValid": 0.0,
-          "defaultValid": 0.0,
           "id": 0,
           "name": "SENSOR_SONARS_no_filt_rear",
           "startBit": 52,
@@ -834,7 +769,6 @@
       "rollCountLength": 4,
       "crcType": "None",
       "crcBit": 0,
-      "setAddressOnSend": true,
       "timeoutMs": 0,
       "filterReceipts": false,
       "userDefined": true,
@@ -846,12 +780,10 @@
         -1,
         3
       ],
+      "overrideSourceAddress": false,
+      "overrideDestinationAddress": false,
       "signals": [
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 3.0,
-          "defaultValid": 0.0,
           "id": 695,
           "name": "Engine_Override_Control_Mode",
           "startBit": 0,
@@ -878,10 +810,6 @@
           ]
         },
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 3.0,
-          "defaultValid": 0.0,
           "id": 696,
           "name": "Engine_Requested_Speed_Control_Conditions",
           "startBit": 2,
@@ -908,10 +836,6 @@
           ]
         },
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 3.0,
-          "defaultValid": 0.0,
           "id": 897,
           "name": "Override_Control_Mode_Priority",
           "startBit": 4,
@@ -938,10 +862,6 @@
           ]
         },
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 8031.88,
-          "defaultValid": 0.0,
           "id": 898,
           "name": "Engine_Requested_Speed_Speed_Limit",
           "startBit": 8,
@@ -963,10 +883,6 @@
           ]
         },
         {
-          "muxGroupValid": 0,
-          "minimumValid": -125.0,
-          "maximumValid": 125.0,
-          "defaultValid": 0.0,
           "id": 518,
           "name": "Engine_Requested_Torque_Torque_Limit",
           "startBit": 24,
@@ -988,10 +904,6 @@
           ]
         },
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 7.0,
-          "defaultValid": 0.0,
           "id": 3349,
           "name": "TSC1_Transmission_Rate",
           "startBit": 32,
@@ -1022,10 +934,6 @@
           ]
         },
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 31.0,
-          "defaultValid": 0.0,
           "id": 3350,
           "name": "TSC1_Control_Purpose",
           "startBit": 35,
@@ -1054,10 +962,6 @@
           ]
         },
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 0.875,
-          "defaultValid": 0.0,
           "id": 4191,
           "name": "Engine_Requested_Torque____High_Resolution",
           "startBit": 40,
@@ -1083,10 +987,6 @@
           ]
         },
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 15.0,
-          "defaultValid": 0.0,
           "id": 4206,
           "name": "Message_Counter",
           "startBit": 56,
@@ -1108,10 +1008,6 @@
           ]
         },
         {
-          "muxGroupValid": 0,
-          "minimumValid": 0.0,
-          "maximumValid": 15.0,
-          "defaultValid": 0.0,
           "id": 4207,
           "name": "Message_Checksum",
           "startBit": 60,
@@ -1138,7 +1034,7 @@
   "diagnosticEvents": [],
   "generatorEnabled": true,
   "generatorNamespace": "Ahsoka.CS.CAN",
-  "generatorOutputFile": "Generated/GeneratedCanObjects.cs",
+  "generatorOutputFile": "../Generated/GeneratedCanObjects.cs",
   "generatorBaseClass": "CanViewModelBase",
-  "version": "3.4.1.10014"
+  "version": "4.0.1.10066"
 }

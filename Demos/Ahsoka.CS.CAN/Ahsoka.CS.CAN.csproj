@@ -48,8 +48,11 @@
 		<None Update="Cloud.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="CANServiceConfiguration.json">
+		<None Update="Platform_OpenView\CANServiceConfiguration.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Generated\" />
 	</ItemGroup>
 </Project>

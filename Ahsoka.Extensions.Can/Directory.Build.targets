@@ -35,7 +35,8 @@
 			<PackageCopyToOutput>true</PackageCopyToOutput>
 			<IncludeInPackage>true</IncludeInPackage>
 			<Pack>true</Pack>
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Private>true</Private>
+			<CopyToOutputDirectory>None</CopyToOutputDirectory>
 			<Visible>true</Visible>
 		</Content>
 		<Content Include="$(DemoRoot)DemoOutputs\Ahsoka_QT_CAN.zip">
@@ -44,7 +45,8 @@
 			<PackageCopyToOutput>true</PackageCopyToOutput>
 			<IncludeInPackage>true</IncludeInPackage>
 			<Pack>true</Pack>
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Private>true</Private>
+			<CopyToOutputDirectory>None</CopyToOutputDirectory>
 			<Visible>true</Visible>
 		</Content>
 	</ItemGroup>

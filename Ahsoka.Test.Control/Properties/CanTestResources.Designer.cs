@@ -93,21 +93,21 @@ namespace Ahsoka.Test.Control.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to {
-        ///  &quot;version&quot;: &quot;3.4.1.10014&quot;,
+        ///  &quot;version&quot;: &quot;4.0.1.10066&quot;,
         ///  &quot;applicationType&quot;: &quot;Dotnet&quot;,
-        ///  &quot;systemOrientation&quot;: &quot;DefaultOrientation&quot;,
         ///  &quot;execCommand&quot;: &quot;Ahsoka.CS.CAN&quot;,
         ///  &quot;packageName&quot;: &quot;Ahsoka.CS.CAN&quot;,
         ///  &quot;packageDescription&quot;: &quot;CAN Services Demo&quot;,
         ///  &quot;applicationVersion&quot;: &quot;1.0&quot;,
         ///  &quot;packageApplicationFolder&quot;: &quot;publish&quot;,
         ///  &quot;packageOutputDirectory&quot;: &quot;../PackageOutput&quot;,
-        ///  &quot;startupLogoPath&quot;: &quot;EnovLogo.png&quot;,
-        ///  &quot;includeInstallerUI&quot;: false,
-        ///  &quot;includeFirmwareUpdate&quot;: false,
         ///  &quot;licenses&quot;: [],
-        ///  &quot;dotNetInfo&quot;: {
-        ///    &quot;projectPath&quot;: &quot; [rest of string was truncated]&quot;;.
+        ///  &quot;optimizedServiceManager&quot;: true,
+        ///  &quot;customPackageInfo&quot;: {
+        ///    &quot;includeApplication&quot;: false,
+        ///    &quot;includeBootLogo&quot;: false,
+        ///    &quot;includeInstallerUI&quot;: false,
+        ///    &quot;includeFirmwareUpdate&quot;:  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string OpenLinuxST_PackageInfo {
             get {
@@ -134,11 +134,11 @@ namespace Ahsoka.Test.Control.Properties {
         ///  &quot;nodes&quot;: [
         ///    {
         ///      &quot;idValid&quot;: 0,
+        ///      &quot;port&quot;: 1,
         ///      &quot;id&quot;: 0,
         ///      &quot;name&quot;: &quot;DBG&quot;,
         ///      &quot;comment&quot;: &quot;&quot;,
-        ///      &quot;nodeType&quot;: &quot;UserDefined&quot;,
-        ///      &quot;transpo [rest of string was truncated]&quot;;.
+        ///      &quot;nodeType&quot;: &quot;UserDefined [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string STDemoPackage_1_cancalibration {
             get {

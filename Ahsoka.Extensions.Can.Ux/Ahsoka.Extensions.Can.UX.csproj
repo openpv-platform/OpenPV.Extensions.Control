@@ -51,7 +51,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Ahsoka.DeveloperTools.Core" Version="4.0.1-zzz-develop.60" />
+		<PackageReference Include="Ahsoka.DeveloperTools.Core" Version="4.*-*" />
 	</ItemGroup>
 
 	<ItemGroup>

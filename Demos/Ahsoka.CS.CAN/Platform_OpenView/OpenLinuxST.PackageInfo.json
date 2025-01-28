@@ -1,22 +1,27 @@
 {
-  "version": "3.4.1.10014",
+  "version": "4.0.1.10066",
   "applicationType": "Dotnet",
-  "systemOrientation": "DefaultOrientation",
   "execCommand": "Ahsoka.CS.CAN",
   "packageName": "Ahsoka.CS.CAN",
   "packageDescription": "CAN Services Demo",
   "applicationVersion": "1.0",
   "packageApplicationFolder": "publish",
   "packageOutputDirectory": "../PackageOutput",
-  "startupLogoPath": "EnovLogo.png",
-  "includeInstallerUI": false,
-  "includeFirmwareUpdate": false,
   "licenses": [],
-  "dotNetInfo": {
-    "projectPath": "Ahsoka.CS.CAN.csproj",
-    "publishProfile": "Properties/PublishProfiles/LinuxProfile.pubxml"
+  "optimizedServiceManager": true,
+  "customPackageInfo": {
+    "includeApplication": false,
+    "includeBootLogo": false,
+    "includeInstallerUI": false,
+    "includeFirmwareUpdate": false
   },
-  "cppInfo": {},
+  "dotNetInfo": {
+    "projectPath": "../Ahsoka.CS.CAN.csproj",
+    "publishProfile": "../Properties/PublishProfiles/LinuxProfile.pubxml"
+  },
+  "cppInfo": {
+    "projectType": "QT"
+  },
   "serviceInfo": {
     "runtimeConfiguration": {
       "serviceStartup": "NoAutoStart",
@@ -35,7 +40,6 @@
           "serviceName": "CanService",
           "tcpListenAddress": "*",
           "tcpConnectionAddress": "localhost",
-          "bleServiceUuidBase": "96730000-8f5d-4cef-8289-744c8faa1a66",
           "dataChannel": 5007,
           "isExtension": false,
           "behaviors": "AutoStart"
@@ -45,7 +49,6 @@
           "serviceName": "SystemService",
           "tcpListenAddress": "*",
           "tcpConnectionAddress": "localhost",
-          "bleServiceUuidBase": "96730000-8f5d-4cef-8289-744c8faa1a66",
           "dataChannel": 5001,
           "isExtension": false,
           "behaviors": "AutoStart"
@@ -53,6 +56,17 @@
       ]
     },
     "environmentValues": []
+  },
+  "screenConfiguration": {
+    "showUnknownSurfaces": false,
+    "bootLogoPath": "EnovLogo.png",
+    "orientation": "DefaultOrientation",
+    "surfaceSetups": []
+  },
+  "hardwareConfiguration": {
+    "hardwareItems": [],
+    "usbStartStatePrimary": "Default",
+    "usbStartStateSecondary": "Default"
   },
   "packageType": "opvEncrypted",
   "packageStructureVersion": 1,

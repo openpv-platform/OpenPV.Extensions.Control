@@ -16,6 +16,7 @@ namespace Ahsoka.Installer.Components;
 
 internal class CanInstallerComponent : InstallEngineComponent
 {
+
     public const string applicationBinaryName = "coprocessorApplication.bin";
     public const string applicationConfiguration = "applicationConfiguration.pbuff";
     public const string coprocessorConfiguration = "coprocessorConfiguration.pbuff";
@@ -25,8 +26,10 @@ internal class CanInstallerComponent : InstallEngineComponent
     public static readonly Guid CanApplicationComponentType = new("FB25736F-B9B7-4581-89D4-10238FC1CA71");
 
     public override Guid ComponentType => CanApplicationComponentType;
-    
+
     public override string ComponentName => PackageName;
+
+    public override List<PlatformFamily> SupportedPlatforms => [PlatformFamily.OpenViewLinux];
 
     protected override PackageComponent OnCreatePackageStream(string buildLocation,
         PackageInformation info,
@@ -38,7 +41,7 @@ internal class CanInstallerComponent : InstallEngineComponent
         if (hardwareDef == null)
             return null;
 
-        string config = info.ServiceInfo.RuntimeConfiguration.ExtensionInfo.FirstOrDefault(x=>x.ExtensionName == "CAN Service Extension")?.ConfigurationFile;
+        string config = info.ServiceInfo.RuntimeConfiguration.ExtensionInfo.FirstOrDefault(x => x.ExtensionName == "CAN Service Extension")?.ConfigurationFile;
         if (!File.Exists(config))
         {
             string error = "A configuration file was not found for the CAN Service Extension.";
@@ -217,7 +220,7 @@ internal class CanInstallerComponent : InstallEngineComponent
             string enableCommand = File.Exists(pathToApplication) ? CanInterface.Coprocessor.ToString().ToLower() : CanInterface.SocketCan.ToString().ToLower();
 
             // Stops the coprocessor if running
-            if(File.Exists("/sys/class/remoteproc/remoteproc0/state"))
+            if (File.Exists("/sys/class/remoteproc/remoteproc0/state"))
                 ProcessUtility.RunProcessScript("echo stop > /sys/class/remoteproc/remoteproc0/state", null, out string sOut, out string sErr);
 
             context.Log?.Report(new InstallLogInfo() { LogMessageType = LogMessageType.Information, LogMessage = $"Enabling {enableCommand} Application" });
