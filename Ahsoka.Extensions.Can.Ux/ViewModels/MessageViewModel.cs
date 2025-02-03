@@ -1,11 +1,10 @@
-﻿using Ahsoka.DeveloperTools.Core;
+﻿using Ahsoka.Core.Utility;
+using Ahsoka.DeveloperTools.Core;
 using Ahsoka.DeveloperTools.Views;
 using Ahsoka.Extensions.Can.UX.ViewModels.Nodes;
 using Ahsoka.Services.Can;
 using Ahsoka.Services.Can.Messages;
-using Ahsoka.Utility;
 using Avalonia.Controls;
-using DbcParserLib.Model;
 using Material.Icons;
 using System;
 using System.Collections.Generic;
@@ -23,7 +22,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
     public const int BroadcastVal = 255;
     public const int AnyNodeID = 255;
     public const int NodeDisabled = -1;
-   
+
     UserControl currentView;
     UserControl currentSignalView;
 
@@ -124,7 +123,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         set
         {
             j1939Id.PDUS = value;
-            OnPropertyChanged();           
+            OnPropertyChanged();
         }
     }
 
@@ -157,7 +156,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
     public uint PGN
     {
         get { return j1939Id.PGN; }
-        set 
+        set
         {
             j1939Id.PGN = value;
 
@@ -192,7 +191,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
             OnPropertyChanged();
         }
     }
-   
+
     public string Id
     {
         get { return IsJ1939 ? $"PGN: {PGN}" : $"CID: {IdMasked}"; }
@@ -285,7 +284,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
     public bool IsSelected { get; set; }
 
     internal Ahsoka.Services.Can.ValueType[] ValueTypes { get; init; } = Enum.GetValues<Ahsoka.Services.Can.ValueType>();
-    
+
     internal ByteOrder[] ByteOrders { get; init; } = Enum.GetValues<ByteOrder>();
 
     internal SignalModel SelectedSignalValue { get; set; }
@@ -382,7 +381,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
 
         if (definition == null)
         {
-            definition = new() { Name = "New Message", Id = 100, TransmitNodes = new int[] { NodeDisabled, NodeDisabled }, ReceiveNodes = new int[] { NodeDisabled, NodeDisabled } , UserDefined = true};
+            definition = new() { Name = "New Message", Id = 100, TransmitNodes = new int[] { NodeDisabled, NodeDisabled }, ReceiveNodes = new int[] { NodeDisabled, NodeDisabled }, UserDefined = true };
 
             foreach (var port in ParentViewModel.Ports.Where(x => x.IsEnabled))
             {
@@ -402,7 +401,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         }
 
         MessageDefinition = definition;
-       
+
         ValidatePorts(canViewModel, definition);
 
         MessageDefinition.Signals.Sort(delegate (MessageSignalDefinition x, MessageSignalDefinition y)
@@ -413,7 +412,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
 
         j1939Id = new(MessageDefinition.Id);
 
-        foreach(var item in  MessageDefinition.Signals)
+        foreach (var item in MessageDefinition.Signals)
             this.Signals.Add(new SignalViewModel(this, item));
 
         SelectedSignal = Signals.FirstOrDefault();
@@ -521,7 +520,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         }
 
         this.MessageDefinition.Signals.Add(signalDef);
-        this.Signals.Add(new SignalViewModel(this,signalDef));
+        this.Signals.Add(new SignalViewModel(this, signalDef));
     }
 
     internal async void RemoveItem()
@@ -541,7 +540,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
             for (int i = 0; i < 255; i++)
                 if (!this.SelectedSignal.Signal.Values.Any(x => x.Key == i))
                 {
-                    var signal = new SignalModel() { Key = i, Value = "New Value"};
+                    var signal = new SignalModel() { Key = i, Value = "New Value" };
                     this.SignalValues.Add(signal);
                     break;
                 }

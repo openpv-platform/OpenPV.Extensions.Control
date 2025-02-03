@@ -1,14 +1,12 @@
+using Ahsoka.Core;
+using Ahsoka.Core.Hardware;
+using Ahsoka.Core.Utility;
 using Ahsoka.Installer;
 using Ahsoka.Installer.Components;
-using Ahsoka.ServiceFramework;
 using Ahsoka.Services.Can;
 using Ahsoka.Services.Can.Messages;
 using Ahsoka.Services.Can.Platform;
 using Ahsoka.Services.IO;
-using Ahsoka.Services.Network;
-using Ahsoka.Services.System;
-using Ahsoka.System;
-using Ahsoka.System.Hardware;
 using Ahsoka.Test.Control.Properties;
 using Ahsoka.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -32,7 +30,7 @@ public class CanServiceTests : LinearTestBase
     readonly List<CanMessageData> messages = new();
 
 
-    internal static void GetParametersTests(PackageInformation info )
+    internal static void GetParametersTests(PackageInformation info)
     {
         var knownValues = AhsokaMessagesBase.GetAllSystemParameters(info);
 
@@ -143,11 +141,11 @@ public class CanServiceTests : LinearTestBase
         tsc1.HasRollCount = true;
         tsc1.MessageType = MessageType.J1939ExtendedFrame;
         tsc1.TransmitNodes = firstMessage.TransmitNodes;
-        tsc1.ReceiveNodes = new int[2] { -1, 2};
+        tsc1.ReceiveNodes = new int[2] { -1, 2 };
 
         // Write Config File
         if (File.Exists(configPath))
-           File.Delete(configPath);
+            File.Delete(configPath);
 
         using (FileStream output = File.OpenWrite(configPath))
             ProtoBuf.Serializer.Serialize(output, appConfig);
@@ -340,9 +338,9 @@ public class CanServiceTests : LinearTestBase
         packageInformation.ServiceInfo.RuntimeConfiguration.ExtensionInfo = new List<ExtensionInfo>() { new ExtensionInfo() { ExtensionName = "CAN Service Extension", ConfigurationFile = canConfigFile } };
 
         // Load Test Generator
-        Ahsoka.System.Extensions.AddPrivateExtension(Assembly.GetExecutingAssembly());
+        Ahsoka.Core.Extensions.AddPrivateExtension(Assembly.GetExecutingAssembly());
 
-        
+
         File.WriteAllText(canPackageInfoFile, JsonUtility.Serialize(packageInformation));
 
         packageInformation = PackageInformation.LoadPackageInformation(canPackageInfoFile);
@@ -355,7 +353,7 @@ public class CanServiceTests : LinearTestBase
         CanMetadataTools.GenerateMessageClasses(canPackageInfoFile, outputFileNameDotNet, "TestNameSpace", null, Installer.ApplicationType.Dotnet);
         string classFileContent = File.ReadAllText(outputFileNameDotNet);
         Assert.IsTrue(classFileContent.Length > 0);
-        
+
         Assert.IsTrue(classFileContent.Contains("/*ExtendHeader*/"));
         Assert.IsTrue(classFileContent.Contains("/*ExtendConstructor*/"));
         Assert.IsTrue(classFileContent.Contains("/*ExtendSetter*/"));
@@ -370,7 +368,7 @@ public class CanServiceTests : LinearTestBase
         Assert.IsTrue(classFileContent.Contains("/*ExtendMethods+Header*/"));
         Assert.IsTrue(classFileContent.Contains("/*ExtendAfterClassOutput*/"));
 
-        string cppFile = Path.Combine(Path.GetDirectoryName(outputFileNameCPP),Path.GetFileNameWithoutExtension(outputFileNameCPP) + ".cpp");
+        string cppFile = Path.Combine(Path.GetDirectoryName(outputFileNameCPP), Path.GetFileNameWithoutExtension(outputFileNameCPP) + ".cpp");
         classFileContent = File.ReadAllText(cppFile);
         Assert.IsTrue(classFileContent.Length > 0);
 
@@ -378,13 +376,13 @@ public class CanServiceTests : LinearTestBase
         Assert.IsTrue(classFileContent.Contains("/*ExtendConstructor*/"));
         Assert.IsTrue(classFileContent.Contains("/*ExtendSetter*/"));
         Assert.IsTrue(classFileContent.Contains("/*ExtendMethods+Impl*/"));
-       
-        
+
+
         // Generate Class File.
         File.Delete(outputFileNameDotNet);
         File.Delete(outputFileNameCPP);
         File.Delete(cppFile);
-     }
+    }
 
     [TestMethod]
     public void TestCanViewModel()
@@ -452,7 +450,7 @@ public class CanServiceTests : LinearTestBase
     {
         string file = "CANServiceConfiguration.json";
         File.WriteAllText(file, CanTestResources.CANServiceConfiguration);
-      
+
         var service = new CanService();
 
         var impl = new DesktopServiceImplementation();
@@ -486,7 +484,7 @@ public class CanServiceTests : LinearTestBase
         var output = handler.ConfirmAvailable(collection);
         Assert.IsTrue(output.Status == MessageStatus.Success);
 
-        foreach (var message in  collection.Messages)
+        foreach (var message in collection.Messages)
             handler.ProcessMessage(message);
 
         //Confirm processes ids are correct
@@ -518,7 +516,7 @@ public class CanServiceTests : LinearTestBase
         TestMultiPacket testMultiPacket = new() { Data1 = 12, Data2 = 2.4 };
         testMultiPacket.Protocol.SourceAddress = 40;
         testMultiPacket.Protocol.DestinationAddress = 255;
-        sendInfo = new() { messageData = testMultiPacket.CreateCanMessageData()  };
+        sendInfo = new() { messageData = testMultiPacket.CreateCanMessageData() };
         handler.SendPredefined(sendInfo);
 
         Thread.Sleep(1000);

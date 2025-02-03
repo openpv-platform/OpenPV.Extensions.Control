@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 
 namespace Ahsoka.Services.Can.Messages;
 internal class J1939PropertyDefinitions
@@ -104,7 +103,7 @@ internal class J1939PropertyDefinitions
 
         public void ExtractValues(uint newId)
         {
-            id[0] =  newId;
+            id[0] = newId;
         }
     }
 

@@ -1,5 +1,4 @@
-using Ahsoka.ServiceFramework;
-using Ahsoka.System;
+using Ahsoka.Core;
 
 namespace Ahsoka.Services.IO;
 
@@ -71,7 +70,7 @@ public class IOServiceClient : AhsokaClientBase<IOMessageTypes.Ids>
     /// <returns>DigitalInput Collection</returns>
     public void SetPollingInterval(PollingInterval message)
     {
-        SendMessageWithResponse(IOMessageTypes.Ids.SetPollInterval,message);
+        SendMessageWithResponse(IOMessageTypes.Ids.SetPollInterval, message);
     }
 
     /// <summary>

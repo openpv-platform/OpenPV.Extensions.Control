@@ -1,5 +1,4 @@
-﻿using Ahsoka.ServiceFramework;
-using Ahsoka.Services.Can.Platform;
+﻿using Ahsoka.Services.Can.Platform;
 using SocketCANSharp;
 using System;
 using System.Collections.Generic;
@@ -19,9 +18,9 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
     internal CanState CanState { get; init; } = new();
 
     internal J1939ProtocolHandler(CanHandler messageHandler, CanServiceImplementation service)
-        :base(messageHandler, service)
+        : base(messageHandler, service)
     {
-        if (!Enabled) 
+        if (!Enabled)
             return;
 
         lock (CanState)
@@ -48,7 +47,7 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
             var instance = Activator.CreateInstance(message, BindingFlags.Instance | BindingFlags.NonPublic, null,
                 new object[] { MessageHandler, this, Service }, null, null) as BaseMessageHandler;
             if (instance.Enabled)
-                Messages.Add(instance);           
+                Messages.Add(instance);
         }
     }
 
@@ -56,7 +55,7 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
     {
         if (Service.Self == null)
             return false;
-        
+
         return Service.PortConfig.MessageConfiguration.Messages.Any(x => x.MessageType == MessageType.J1939ExtendedFrame);
     }
 
@@ -108,10 +107,10 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
             var j1939id = new J1939PropertyDefinitions.Id(message.Id);
 
             if (messageInfo.Message.OverrideSourceAddress)
-                message.Id |= (CanState.CurrentAddress & 0xFF); 
+                message.Id |= (CanState.CurrentAddress & 0xFF);
             if (messageInfo.Message.OverrideDestinationAddress && j1939id.PDUF < PDU2Threshold)
                 message.Id |= (CanState.NodeAddresses[messageInfo.Message.ReceiveNodes[Service.Port]] & 0xFF) << 8;
-           
+
             if (Service.PortConfig.MessageConfiguration.Ports.First(x => x.Port == Service.Port).CanInterface == CanInterface.SocketCan)
                 message.Id |= (uint)CanIdFlags.CAN_EFF_FLAG;
 
@@ -143,15 +142,15 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
                 {
                     bool knownDestination = message.Message.ReceiveNodes[Service.Port] != -1;
 
-                    if ( (j1939Id.PDUF < PDU2Threshold) && !((received && (j1939Id.PDUS == CanState.CurrentAddress || message.Message.ReceiveNodes[Service.Port] == J1939PropertyDefinitions.BroadcastAddress))
+                    if ((j1939Id.PDUF < PDU2Threshold) && !((received && (j1939Id.PDUS == CanState.CurrentAddress || message.Message.ReceiveNodes[Service.Port] == J1939PropertyDefinitions.BroadcastAddress))
                             || (!received && knownDestination)))
                         available &= false;
                 }
 
-                if(message.Message.OverrideSourceAddress)
+                if (message.Message.OverrideSourceAddress)
                 {
                     if (!((received && (j1939Id.SourceAddress == CanState.NodeAddresses[message.Message.TransmitNodes[Service.Port]] || message.Message.TransmitNodes[Service.Port] == J1939PropertyDefinitions.BroadcastAddress))
-                            || !received ))
+                            || !received))
                         available &= false;
                 }
 
@@ -159,7 +158,7 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
                 {
                     result = message;
                     return true;
-                }                 
+                }
             }
 
             return false;

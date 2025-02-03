@@ -1,4 +1,4 @@
-﻿using Ahsoka.ServiceFramework;
+﻿using Ahsoka.Core;
 using static Ahsoka.Services.Can.SocketMessageEncoding;
 
 namespace Ahsoka.Services.Can
@@ -57,7 +57,7 @@ namespace Ahsoka.Services.Can
                         MessageFromCAN(item, out AhsokaClientMessage received, out bool isNotification);
 
                         if (received.Header.EndpointId == endPoint.EndPointId || received.Header.ClientId == endPoint.GetClientId())
-                        { 
+                        {
                             if (isNotification)
                                 endPoint.HandleNotification(received);
                             else

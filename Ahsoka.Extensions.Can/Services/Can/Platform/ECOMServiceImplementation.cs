@@ -1,5 +1,4 @@
-﻿using Ahsoka.ServiceFramework;
-using Ahsoka.Services.Can.Messages;
+﻿using Ahsoka.Core;
 using Ahsoka.Utility.ECOM;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -57,7 +56,7 @@ internal class ECOMServiceImplementation : CanServiceImplementation
             recurringMessageHandler = ProcessRecurringMessages(source);
 
             readEFFBackgroundTask = Task.Run(ReceiveEFFBackgroundThread);
-            readSFFBackgroundTask = Task.Run(ReceiveSFFBackgroundThread);           
+            readSFFBackgroundTask = Task.Run(ReceiveSFFBackgroundThread);
 
             isConnected = true;
             AhsokaLogging.LogMessage(AhsokaVerbosity.High, $"Connection to ECOM completed successfully");
@@ -125,7 +124,7 @@ internal class ECOMServiceImplementation : CanServiceImplementation
                         ECOMLibrary.GetFriendlyErrorMessage(returnError, errMsg, 400);
                         AhsokaLogging.LogMessage(AhsokaVerbosity.High, $"Message failed to send with error: {errMsg}");
                     }
-                }           
+                }
             }
         }
     }
@@ -212,7 +211,7 @@ internal class ECOMServiceImplementation : CanServiceImplementation
         msg.Dlc = 8;
         msg.Data = bytes;
         msgs.Messages.Add(msg);
-        
+
         return true;
     }
 }

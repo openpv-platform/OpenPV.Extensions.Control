@@ -1,5 +1,5 @@
-﻿using Ahsoka.Services.Can;
-using Ahsoka.Utility;
+﻿using Ahsoka.Core.Utility;
+using Ahsoka.Services.Can;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -21,7 +21,7 @@ internal class SignalViewModel : ChildViewModelBase<MessageViewModel>
     public uint BitLength
     {
         get { return Signal.BitLength; }
-        set 
+        set
         {
             double originalMin = GetMinValue(this.ValueType, this.BitLength);
             double originalMax = GetMaxValue(this.ValueType, this.BitLength);
@@ -37,7 +37,7 @@ internal class SignalViewModel : ChildViewModelBase<MessageViewModel>
                 this.MinimumValid = newMin;
 
 
-            OnPropertyChanged(); 
+            OnPropertyChanged();
         }
     }
 
@@ -46,7 +46,7 @@ internal class SignalViewModel : ChildViewModelBase<MessageViewModel>
     public Services.Can.ValueType ValueType
     {
         get { return Signal.ValueType; }
-        set 
+        set
         {
             double originalMin = GetMinValue(this.ValueType, this.BitLength);
             double originalMax = GetMaxValue(this.ValueType, this.BitLength);
@@ -61,8 +61,8 @@ internal class SignalViewModel : ChildViewModelBase<MessageViewModel>
             if (this.MinimumValid == originalMin || this.MinimumValid < newMin)
                 this.MinimumValid = newMin;
 
-            OnPropertyChanged(); 
-        
+            OnPropertyChanged();
+
         }
     }
 
@@ -78,23 +78,23 @@ internal class SignalViewModel : ChildViewModelBase<MessageViewModel>
     public double MinimumValid
     {
         get { return Signal.Minimum; }
-        set 
+        set
         {
             double newMin = GetMinValue(this.ValueType, this.BitLength);
             if (value < newMin)
                 throw new ValidationException($"Minimum value is {newMin}");
 
             Signal.Minimum = value;
-            
-            OnPropertyChanged(); 
+
+            OnPropertyChanged();
         }
     }
 
     [Range(double.MinValue, double.MaxValue)]
     public double MaximumValid
     {
-        get { return Signal.Maximum;  }
-        set 
+        get { return Signal.Maximum; }
+        set
         {
             var oldDefault = DefaultValid == MaximumValid;
 
@@ -104,7 +104,7 @@ internal class SignalViewModel : ChildViewModelBase<MessageViewModel>
 
             Signal.Maximum = value;
 
-            OnPropertyChanged(); 
+            OnPropertyChanged();
 
             if (oldDefault)
                 DefaultValid = Signal.Maximum;
@@ -183,7 +183,7 @@ internal class SignalViewModel : ChildViewModelBase<MessageViewModel>
         return 0;
     }
 
-   
+
 }
 
 public class ValidationException : Exception

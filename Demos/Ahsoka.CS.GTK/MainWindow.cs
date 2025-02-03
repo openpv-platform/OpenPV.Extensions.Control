@@ -1,10 +1,8 @@
-﻿using Ahsoka.Demo.GTK.Controllers;
-using Ahsoka.Dispatch;
-using Ahsoka.ServiceFramework;
+﻿using Ahsoka.Core.Dispatch;
+using Ahsoka.Demo.GTK.Controllers;
 using Ahsoka.Services.Data;
 using Ahsoka.Services.IO;
 using Ahsoka.Services.System;
-using Ahsoka.System;
 using Gtk;
 using Pango;
 
@@ -109,7 +107,7 @@ public class MainWindow : Window
 
         var buzzerController = new BuzzerController(ioService);
         buzzerController.InitPanel(buzzer);
-     
+
         Frame ioFrame = new("Discrete IO Current Values")
         {
             LabelXalign = .5f,
@@ -141,7 +139,7 @@ public class MainWindow : Window
 
         // Show in a Window on Windows and Full Screen on Linux / Others
         if (SystemInfo.CurrentPlatform is PlatformFamily.Windows64 or
-            PlatformFamily.MacosArm64)
+            PlatformFamily.MacOSArm64)
         {
             SetDefaultSize(screenWidth, screenHeight);
         }

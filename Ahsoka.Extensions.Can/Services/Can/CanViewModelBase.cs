@@ -1,6 +1,4 @@
-﻿using Ahsoka.Services.Can.Messages;
-using Ahsoka.Utility;
-using DbcParserLib.Model;
+﻿using Ahsoka.Core.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -182,7 +180,7 @@ public partial class MessageDefinition
 /// </summary>
 public partial class MessageSignalDefinition
 {
-   
+
 }
 
 public partial class NodeDefinition

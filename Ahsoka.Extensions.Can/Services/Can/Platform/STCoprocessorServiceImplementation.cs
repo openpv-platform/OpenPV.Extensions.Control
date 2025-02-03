@@ -1,16 +1,14 @@
-﻿using Ahsoka.ServiceFramework;
-using Ahsoka.Utility;
-using NetMQ;
-using NetMQ.Sockets;
+﻿using Ahsoka.Core;
+using Ahsoka.Core.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.IO.Hashing;
+using System.IO.Ports;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.IO.Hashing;
-using System.IO.Ports;
 
 
 
@@ -57,20 +55,20 @@ internal class STCoprocessorServiceImplementation : CanServiceImplementation
 
         // Read the IP Addresses
 
-       
+
         string physicalPath = PortConfig.MessageConfiguration.Ports.First(x => x.Port == Port).CanInterfacePath;
-        
+
         AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"Connecting to CAN Interface on tty {physicalPath}");
 
         coProcessorSocket.Connect(physicalPath, this);
-       
+
         // Send Message to CoProcessor to ensure its ready to start (ServiceIsReady)
         SendServiceReadyMessage();
 
         // Wait for CoProcessor Message (CoProcessorReady)
         AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"Waiting for CoProcessor Ready Message Port: {Port}");
         if (!isReadyHandle.WaitOne(5000)) // Disabled until CoProcessor App is Speaking Metmq
-            throw new TimeoutException("CoProcessor did not return ready signal");        
+            throw new TimeoutException("CoProcessor did not return ready signal");
 
         if (heartBeat == null)
         {
@@ -128,7 +126,7 @@ internal class STCoprocessorServiceImplementation : CanServiceImplementation
                 for (int i = canMessageDataCollection.Messages.Count - 1; i >= 0; i--)
                     if (!ProcessMessage(canMessageDataCollection.Messages[i]))
                         canMessageDataCollection.Messages.RemoveAt(i);
-                
+
                 // Prepare Response Message 
                 using MemoryStream headerStream = new();
                 ProtoBuf.Serializer.Serialize(headerStream, new AhsokaMessageHeader() { TransportId = CanMessageTypes.Ids.SendCanMessages.EnumToInt() });
@@ -157,7 +155,7 @@ internal class STCoprocessorServiceImplementation : CanServiceImplementation
                     ProtoBuf.Serializer.Serialize(dataStream, recurringMessage);
 
                     coProcessorSocket.SendMessage(headerStream.ToArray(), dataStream.ToArray());
-                }         
+                }
             }
     }
 
@@ -194,18 +192,18 @@ internal class STCoprocessorServiceImplementation : CanServiceImplementation
         // Decode Header
         AhsokaMessageHeader messageHeader = ProtoBuf.Serializer.Deserialize<AhsokaMessageHeader>(header);
         CanMessageTypes.Ids transportType = messageHeader.TransportId.IntToEnum<CanMessageTypes.Ids>();
-        
+
         // Pass Message On
         if (transportType == CanMessageTypes.Ids.CanMessagesReceived)
         {
             object messageObject = ProtoBuf.Serializer.Deserialize<CanMessageDataCollection>(objectData);
 
             CanMessageDataCollection collection = messageObject as CanMessageDataCollection;
-            
+
             if (collection.CanPort != Port)
                 return;
 
-            for (int i = collection.Messages.Count-1; i >= 0; i--)
+            for (int i = collection.Messages.Count - 1; i >= 0; i--)
             {
                 FilterIncomingMessage(collection.Messages[i], out var shouldSend);
                 if (!shouldSend)
@@ -231,8 +229,8 @@ internal class STCoprocessorServiceImplementation : CanServiceImplementation
         {
             heartBeatReceiveCount++;
             AhsokaLogging.LogMessage(AhsokaVerbosity.Low, $"CoprocessorHeartbeat Received Port: {Port}");
-        }      
-    } 
+        }
+    }
 }
 
 #region Framed Serial Socket
@@ -287,13 +285,13 @@ public sealed class FramedSerialSocket
 
     public static bool IsConnected { get => isConnected; set => isConnected = value; }
     // the port name should come from the config?
-   
+
     private static readonly List<IReceiveCallback> callbacks = [];
     private readonly object lockObject = new();
     private readonly object writeLock = new();
     private readonly FramedSocketMessageType messageType;
     private static UInt32 hashErrors;
- 
+
 
     // Still need to swap internal queue to a memory stream, for performance
     // and need to figure out a way to set the port name on the fly, and set the 
@@ -322,7 +320,7 @@ public sealed class FramedSerialSocket
         int bytesToRead = sp.BytesToRead;
         byte[] buffer = new byte[bytesToRead];
         sp.Read(buffer, 0, bytesToRead);
-        
+
         // Process the received binary data
         ProcessData(buffer);
     }
@@ -421,7 +419,7 @@ public sealed class FramedSerialSocket
     {
         List<byte> myList = [];
         var crc = new Crc32();
-        
+
         crc.Append(bytes);
         byte[] hash = crc.GetCurrentHash();
 
@@ -445,13 +443,13 @@ public sealed class FramedSerialSocket
             myList.Add(b);
         }
         myList.Add(FLAG_BYTE); // closing flag
-        
+
         return [.. myList];
     }
 
     internal void Connect(string PortName, STCoprocessorServiceImplementation impl)
     {
-        
+
         lock (lockObject)
         {
             if (!IsConnected)

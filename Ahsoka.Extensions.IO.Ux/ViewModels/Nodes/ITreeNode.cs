@@ -1,5 +1,4 @@
-﻿using Avalonia.Controls;
-using Material.Icons;
+﻿using Material.Icons;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 

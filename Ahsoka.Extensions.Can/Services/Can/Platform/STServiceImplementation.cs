@@ -1,4 +1,4 @@
-﻿using Ahsoka.ServiceFramework;
+﻿using Ahsoka.Core;
 using Ahsoka.Utility.SocketCAN;
 using SocketCANSharp;
 using System.Diagnostics.CodeAnalysis;
@@ -67,7 +67,7 @@ internal class STSocketCanServiceImplementation : CanServiceImplementation
         if (socketCAN.IsStarted)
         {
             foreach (var canMessage in canMessageDataCollection.Messages)
-            {        
+            {
                 if (ProcessMessage(canMessage))
                 {
                     // Protect SocketCAN from Incorrectly Set Messages
@@ -78,7 +78,7 @@ internal class STSocketCanServiceImplementation : CanServiceImplementation
 
                     socketCAN.QueueWriteMessage(frame);
                 }
-                
+
             }
         }
     }

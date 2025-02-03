@@ -1,13 +1,11 @@
-﻿using Ahsoka.Installer.Components;
-using Ahsoka.ServiceFramework;
+﻿using Ahsoka.Core;
+using Ahsoka.Core.Hardware;
+using Ahsoka.Installer.Components;
 using Ahsoka.Services.Can.Platform;
 using Ahsoka.Socket;
-using Ahsoka.System;
-using Ahsoka.System.Hardware;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace Ahsoka.Services.Can;
 
@@ -41,9 +39,7 @@ public class CanService : AhsokaServiceBase<CanMessageTypes.Ids>, IAhsokaGateway
                 else
                     return new DesktopServiceImplementation();
 
-            case PlatformFamily.MacosArm64:
-                return new DesktopServiceImplementation();
-
+            case PlatformFamily.MacOSArm64:
             case PlatformFamily.Ubuntu64:
                 return new DesktopServiceImplementation();
 
@@ -90,8 +86,8 @@ public class CanService : AhsokaServiceBase<CanMessageTypes.Ids>, IAhsokaGateway
                 AhsokaLogging.LogMessage(AhsokaVerbosity.High, $"Found / Loading Configuration File @ {path}");
                 configInfo = path;
                 break;
-            }                
-            
+            }
+
             calibration = CanMetadataTools.GenerateApplicationConfig(SystemInfo.HardwareInfo, configInfo, false);
         }
         else
@@ -215,10 +211,10 @@ public class CanService : AhsokaServiceBase<CanMessageTypes.Ids>, IAhsokaGateway
     {
         if (gatewayEnabled && canSocket.FilterMessage(messages.Messages[0]))
         {
-            foreach(var message in messages.Messages)       
+            foreach (var message in messages.Messages)
                 canSocket.SendToGateway(message);
         }
-         else   
+        else
             SendNotification(CanMessageTypes.Ids.CanMessagesReceived, messages);
     }
 

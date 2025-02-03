@@ -1,14 +1,12 @@
-﻿using Ahsoka.DeveloperTools.Core;
+﻿using Ahsoka.Core.Utility;
+using Ahsoka.DeveloperTools.Core;
 using Ahsoka.DeveloperTools.Views;
 using Ahsoka.Extensions.Can.UX.ViewModels.Nodes;
 using Ahsoka.Services.Can;
-using Ahsoka.Utility;
 using Avalonia.Controls;
-using Avalonia.Media;
 using Material.Icons;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Ahsoka.DeveloperTools;
@@ -25,7 +23,7 @@ internal class PortViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNo
     #region Props
     public bool IsSelected { get; set; }
 
-    public uint Port 
+    public uint Port
     {
         get { return portDefinition.Port; }
         set
@@ -119,7 +117,7 @@ internal class PortViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNo
 
     #region Methods
 
-    public PortViewModel( CanSetupViewModel setupViewModel, ICustomerToolViewModel viewModelRoot, PortDefinition definition)
+    public PortViewModel(CanSetupViewModel setupViewModel, ICustomerToolViewModel viewModelRoot, PortDefinition definition)
         : base(setupViewModel)
     {
         viewModelInterface = viewModelRoot;
@@ -127,7 +125,7 @@ internal class PortViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNo
         portDefinition = definition;
         RefreshPromiscuousDetails();
     }
-  
+
     public override string ToString()
     {
         return $"CAN Port {Port}";

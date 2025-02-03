@@ -1,6 +1,5 @@
-﻿using Ahsoka.ServiceFramework;
-using Ahsoka.System;
-using Ahsoka.Utility;
+﻿using Ahsoka.Core;
+using Ahsoka.Core.Utility;
 using Gtk;
 
 namespace Ahsoka.AnalogDemo.GTK;

@@ -1,9 +1,9 @@
 ﻿#pragma warning disable CS0618 // Type or member is obsolete
+using Ahsoka.Core;
+using Ahsoka.Core.Hardware;
+using Ahsoka.Core.Utility;
 using Ahsoka.Installer;
-using Ahsoka.ServiceFramework;
 using Ahsoka.Services.Can.Messages;
-using Ahsoka.System;
-using Ahsoka.System.Hardware;
 using Ahsoka.Utility;
 using DbcParserLib;
 using DbcParserLib.Model;
@@ -38,7 +38,7 @@ internal static class CanMetadataTools
     {
         var canInfo = CANHardwareInfoExtension.GetCanInfo(hardwareInfo.PlatformFamily);
 
-        CanApplicationConfiguration appConfig = new();       
+        CanApplicationConfiguration appConfig = new();
 
         CanPortConfiguration portConfiguration = new()
         {
@@ -91,7 +91,7 @@ internal static class CanMetadataTools
             }
         }
 
-        foreach(var dm in portConfiguration.DiagnosticEventConfiguration.DiagnosticEvents)
+        foreach (var dm in portConfiguration.DiagnosticEventConfiguration.DiagnosticEvents)
         {
             dm.Name = dm.Comment = null;
         }
@@ -114,7 +114,7 @@ internal static class CanMetadataTools
             PromiscuousTransmit = false,
             UserDefined = false,
 
-        });        
+        });
         configuration.RemoteIpAddress = "192.168.8.1";
         configuration.LocalIpAddress = "192.168.8.2";
         configuration.Version = VersionUtility.GetAppVersionString();
@@ -167,14 +167,14 @@ internal static class CanMetadataTools
                 MessageType = message.IsExtID ? MessageType.RawExtendedFrame : MessageType.RawStandardFrame,
                 Name = message.Name,
                 UserDefined = true,
-                TransmitNodes = nodeFound ? new int[] {-1, node.Id } : new int[] { -1, -1 },
+                TransmitNodes = nodeFound ? new int[] { -1, node.Id } : new int[] { -1, -1 },
                 ReceiveNodes = new int[] { -1, -1 },
                 OverrideSourceAddress = false
             };
 
             if (message.CycleTime(out int cycleTime))
                 messageDef.Rate = cycleTime;
-             
+
             if (message.IsExtID)
             {
                 bool isJ1939 = message.Signals.SelectMany(x => x.CustomProperties).Any(x => x.Key == "SPN");
@@ -286,8 +286,8 @@ internal static class CanMetadataTools
         Console.WriteLine($"Reading Package Info at {pathToPackageInfo}");
         Console.WriteLine();
 
-        var generatorExtensions = new GeneratorUtility("Ahsoka.Core.Can", type); 
-        
+        var generatorExtensions = new GeneratorUtility("Ahsoka.Core.Can", type);
+
         string pathToSearch = string.Empty;
         if (Environment.CurrentDirectory != Path.GetDirectoryName(pathToPackageInfo))
             pathToSearch = Path.GetDirectoryName(pathToPackageInfo);
@@ -367,7 +367,7 @@ internal static class CanMetadataTools
         StringBuilder metadataAccessors = new();
         StringBuilder metadataCreator = new();
 
-        
+
         var clientCalibration = ConfigurationFileLoader.LoadFile<CanClientConfiguration>(pathToCalibration);
         foreach (var item in clientCalibration.Messages)
         {
@@ -383,7 +383,7 @@ internal static class CanMetadataTools
                 throw new Exception(ex.Message);
             }
         }
-               
+
 
         outputFileDataCPP.AppendLine();
         outputFileDataCPP.AppendLine($"\t// Start of Class Implmentation for CanModelMetadata");
@@ -409,7 +409,7 @@ internal static class CanMetadataTools
         StringBuilder propBuilder = new();
         StringBuilder propEnumBuilder = new();
 
-       
+
         baseClass ??= "CanViewModelBase";
         definition.Id &= 0x1FFFFFFF;
 
@@ -417,7 +417,7 @@ internal static class CanMetadataTools
 
         outputFileDataCPP.AppendLine();
         outputFileDataCPP.AppendLine($"\t//Start of Class Implmentation for {className}");
-        if(definition.MessageType == MessageType.J1939ExtendedFrame)
+        if (definition.MessageType == MessageType.J1939ExtendedFrame)
         {
             outputFileDataCPP.AppendLine();
             outputFileDataCPP.AppendLine($"\tJ1939Helper*  {className}::GetProtocol() {{ if (protocol == NULL) {{protocol  = new J1939Helper(&message); }} return protocol; }}");
@@ -469,14 +469,14 @@ internal static class CanMetadataTools
             fileOutputBuilder.AppendLine();
             fileOutputBuilder.AppendLine($"\t\t\tJ1939Helper* GetProtocol();");
         }
-        
+
         // Extend Header Methods
         generatorExtensions.ExtendMethods(fileOutputBuilder, className, true);
 
         outputFileDataCPP.AppendLine();
         outputFileDataCPP.AppendLine($"\t{className}::{className}() : {baseClass}({definition.Id},{byteLength})  // CANID: 0x{definition.Id.ToString("x")}");
         outputFileDataCPP.AppendLine($"\t{{");
-        generatorExtensions.ExtendConstructor(outputFileDataCPP,className);
+        generatorExtensions.ExtendConstructor(outputFileDataCPP, className);
         outputFileDataCPP.AppendLine($"\t}}");
 
         outputFileDataCPP.AppendLine($"\t{className}::{className}(CanMessageData message) : {baseClass}(message)  // CANID: 0x{definition.Id.ToString("x")}");
@@ -491,7 +491,7 @@ internal static class CanMetadataTools
         if (propBuilder.Length > 0)
             fileOutputBuilder.AppendLine(propBuilder.ToString());
 
-       
+
         // Generate Property Enumeration
         metadataBuilder.AppendLine("");
         metadataAccessors.AppendLine($"\tstd::map<int, CanPropertyInfo>& {className}::GetMetadata() {{ return CanModelMetadata::CanMetadata()->GetMetadata({definition.Id}); }}");
@@ -504,7 +504,7 @@ internal static class CanMetadataTools
         // Finish Main
         fileOutputBuilder.AppendLine("\t};"); // End Class
 
-        generatorExtensions.ExtendAfterClassOutput(fileOutputBuilder,className);
+        generatorExtensions.ExtendAfterClassOutput(fileOutputBuilder, className);
     }
 
     private static void WriteMessagePropertyCPP(StringBuilder propEnum, StringBuilder propMethods, StringBuilder enumOutput, StringBuilder metadata, StringBuilder outputFileDataCPP, MessageSignalDefinition definition, string className, GeneratorUtility generatorUtility)
@@ -585,7 +585,7 @@ internal static class CanMetadataTools
     private static void GenerateDotNet(string nameSpace, string baseClass, string pathToCalibration, StringBuilder outputFileData, GeneratorUtility generatorExtensions)
     {
         // Add Header
-        outputFileData.AppendLine("using Ahsoka.System;");
+        outputFileData.AppendLine("using Ahsoka.Core;");
         outputFileData.AppendLine("using Ahsoka.Services.Can;");
         outputFileData.AppendLine("using Ahsoka.Services.Can.Messages;");
         outputFileData.AppendLine("using System.Collections.Generic;");
@@ -595,14 +595,14 @@ internal static class CanMetadataTools
 
         // Allow Plugin to Extend the Header Using / Import Statements
         generatorExtensions.ExtendHeader(outputFileData, nameSpace);
-       
+
         outputFileData.AppendLine();
         outputFileData.AppendLine($"namespace {nameSpace};"); //need generic solution here
         outputFileData.AppendLine();
 
         StringBuilder metadataBuilder = new();
         StringBuilder metadataItems = new();
-        
+
         var clientCalibration = ConfigurationFileLoader.LoadFile<CanClientConfiguration>(pathToCalibration);
 
         foreach (var item in clientCalibration.Messages)
@@ -617,7 +617,7 @@ internal static class CanMetadataTools
                 Console.WriteLine($"Error Importing Item: {item} with error {ex.Message}");
                 throw new Exception(ex.Message);
             }
-        }     
+        }
 
         // Generate Metadata Class
         outputFileData.AppendLine(Properties.CANResources.CSharpMetadataDictionary.Replace("%METADATA_BODY%", metadataItems.ToString()).Replace("%METADATA_BUILDER%", metadataBuilder.ToString()));
@@ -670,14 +670,14 @@ internal static class CanMetadataTools
         methodBuilder.AppendLine($"\tpublic {className}() : base(CanId, Dlc)");
         methodBuilder.AppendLine($"\t{{");
 
-        generatorExtensions.ExtendConstructor( methodBuilder, className); 
+        generatorExtensions.ExtendConstructor(methodBuilder, className);
 
         methodBuilder.AppendLine($"\t}} ");
         methodBuilder.AppendLine($"\tpublic {className}(CanMessageData message) : base(message) ");
         methodBuilder.AppendLine($"\t{{");
-        
+
         generatorExtensions.ExtendConstructor(methodBuilder, className);
-        
+
         methodBuilder.AppendLine($"\t}}\r\n");
 
         metadataBuilder.AppendLine($"\t\t\tcase {className}.CanId:");
@@ -703,7 +703,7 @@ internal static class CanMetadataTools
 
         // Finish Methods
         methodBuilder.AppendLine("\t#endregion");
-     
+
         // Add Methods to Main
         fileOutputBuilder.Append(methodBuilder);
 

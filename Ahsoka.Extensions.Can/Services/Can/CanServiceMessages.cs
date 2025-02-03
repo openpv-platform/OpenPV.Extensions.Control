@@ -1,11 +1,8 @@
-﻿using Ahsoka.Installer;
-using Ahsoka.ServiceFramework;
-using Ahsoka.Services.System;
-using Ahsoka.System;
+﻿using Ahsoka.Core;
+using Ahsoka.Installer;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace Ahsoka.Services.Can;
 
@@ -41,7 +38,7 @@ internal class CanServiceMessages : AhsokaMessagesBase
         result.Add("Ahsoka.Proto\\CanConfiguration.proto", Properties.CANResources.CanConfiguration);
         result.Add("Ahsoka.Proto\\CanService.proto", Properties.CANResources.CanService);
 
-        if (includeImplementation) 
+        if (includeImplementation)
             result.Add("inc\\services\\CanServiceClientExtensions.cxx", Properties.CANResources.CanServiceClientExtensionsCXX);
 
         return result;

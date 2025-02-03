@@ -1,5 +1,4 @@
-﻿using Ahsoka.ServiceFramework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -26,7 +25,7 @@ internal class CanHandler
         {
             // Raw must get processed first
             typeof(RawProtocolHandler),
-            typeof(J1939ProtocolHandler)           
+            typeof(J1939ProtocolHandler)
         };
     }
 
@@ -53,7 +52,7 @@ internal class CanHandler
         foreach (var protocol in protocols)
         {
             if (protocol.ProcessMessage(messageData, out bool shouldSend))
-                return shouldSend;            
+                return shouldSend;
         }
 
         return false;
@@ -112,7 +111,7 @@ internal class CanHandler
                 }
             }
         }
-            
+
 
         return returnMessage;
     }

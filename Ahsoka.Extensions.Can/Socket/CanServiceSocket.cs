@@ -1,6 +1,5 @@
-﻿using Ahsoka.ServiceFramework;
+﻿using Ahsoka.Core;
 using Ahsoka.Services.Can;
-using System;
 using static Ahsoka.Services.Can.SocketMessageEncoding;
 
 namespace Ahsoka.Socket

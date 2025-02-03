@@ -1,4 +1,4 @@
-﻿using Ahsoka.Utility;
+﻿using Ahsoka.Core.Utility;
 using Avalonia;
 using Avalonia.Svg.Skia;
 using System;

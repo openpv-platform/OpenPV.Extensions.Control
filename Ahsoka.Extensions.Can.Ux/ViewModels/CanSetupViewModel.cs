@@ -1,9 +1,10 @@
-﻿using Ahsoka.DeveloperTools.Core;
+﻿using Ahsoka.Core;
+using Ahsoka.Core.Hardware;
+using Ahsoka.Core.Utility;
+using Ahsoka.DeveloperTools.Core;
 using Ahsoka.DeveloperTools.Views;
 using Ahsoka.Extensions.Can.UX.ViewModels.Nodes;
 using Ahsoka.Services.Can;
-using Ahsoka.System;
-using Ahsoka.System.Hardware;
 using Ahsoka.Utility;
 using Avalonia.Controls;
 using Avalonia.Threading;
@@ -101,7 +102,7 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
         get { return selectedPort; }
         set { selectedPort = value; OnPropertyChanged(); }
     }
-    
+
     public string ErrorText
     {
         get { return errorText; }
@@ -358,13 +359,13 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
                 CanConfiguration = new(); // Create Default 
             }
         }
-       
+
         RootNodes.Clear();
         rootMessageNode = new() { NodeDescription = "Messages", Icon = MaterialIconKind.Folder, IsExpanded = true };
         rootNodeNode = new() { NodeDescription = "Nodes", Icon = MaterialIconKind.Folder, IsExpanded = true };
         rootPortNode = new() { NodeDescription = "Ports", Icon = MaterialIconKind.Folder, IsExpanded = true };
-        rootToolNode = new() { NodeDescription = "Can Tools",  Icon = MaterialIconKind.Toolbox, IsExpanded = true };
-        
+        rootToolNode = new() { NodeDescription = "Can Tools", Icon = MaterialIconKind.Toolbox, IsExpanded = true };
+
         // Add Hardware Ports - Do First for DropDowns
         AddHardwarePorts();
 
@@ -378,7 +379,7 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
 
         // Setup Tools
         rootToolNode.Children.Add(this);
-    
+
         // Add Nodes to Tree in Order
         RootNodes.Add(rootMessageNode);
         RootNodes.Add(rootNodeNode);
@@ -399,7 +400,7 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
     {
         var standardDefinitions = CanSystemInfo.StandardCanMessages;
         var standardNode = standardDefinitions.Nodes.First(x => x.Name == "ANY");
-        
+
         var node = Nodes.FirstOrDefault(x => x.Name == "ANY");
         var inList = node != null;
         if (!inList)

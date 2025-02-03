@@ -1,4 +1,4 @@
-﻿using Ahsoka.ServiceFramework;
+﻿using Ahsoka.Core;
 using Ahsoka.Utility;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
     enum SessionType
     {
         ReceiveCTS = 0,
-        ReceiveBAM = 1,      
+        ReceiveBAM = 1,
         TransmitCTS = 2,
         TransmitBAM = 3,
     }
@@ -67,14 +67,14 @@ internal class TPMessageHandler : J1939MessageHandlerBase
             return false;
 
         lock (sessions)
-        {  
+        {
             foreach (var sessionType in sessions)
             {
                 if (sessionType.Value.Count > 0)
                     if (sessionType.Value.First().HandleMessageReceive(messageData))
                         return true;
             }
-        
+
             if (j1939Id.PDUF == PDUF)
             {
                 var RTS = new J1939PropertyDefinitions.TPCM(BitConverter.ToUInt64(messageData.Data));
@@ -87,7 +87,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
 
                 if (RTS.ControlByte is J1939PropertyDefinitions.CMControl.RTS or J1939PropertyDefinitions.CMControl.BAM)
                 {
-                    
+
                     SessionType sessionType = j1939Id.PDUS == J1939PropertyDefinitions.BroadcastAddress ? SessionType.ReceiveBAM : SessionType.ReceiveCTS;
                     if (sessions[sessionType].Count() == 0 &&
                         Protocol.InAvailableMessages(RTSId.WriteToUint(), true))
@@ -114,11 +114,11 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                         Service.SendCanMessages(messageCollection);
                         AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"Multi-packet receive session aborted, already receiving");
                     }
-                    
+
                 }
             }
         }
-        
+
 
         return true;
     }
@@ -145,8 +145,8 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                     sessions[sessionType].First().StartTask();
                     result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"Multi-packet transmit session started" };
                 }
-            }                      
-                          
+            }
+
             AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"{result.Message}");
         }
         catch (Exception ex)
@@ -170,7 +170,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                 Thread.Sleep(10);
                 sessionList.First().StartTask();
             }
-        }  
+        }
     }
 
     private class TPSession
@@ -197,7 +197,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
 
         internal uint DestinationAddress { get; private set; } //for originator messages
         internal uint SourceAddress { get; private set; } //for originator messages
-        internal SessionType SessionType { get; private set; } 
+        internal SessionType SessionType { get; private set; }
         internal bool Transmitting { get { return SessionType > SessionType.ReceiveBAM; } }
 
         internal TPSession(TPMessageHandler handler, J1939ProtocolHandler protocol, CanServiceImplementation service, SessionType sessionType, CanMessageData messageData)
@@ -250,10 +250,10 @@ internal class TPMessageHandler : J1939MessageHandlerBase
             var PGN = (messageData.Id >> 8) & 0x3FFFF;
             DestinationAddress = j1939Id.PDUS;
             SourceAddress = protocol.CanState.CurrentAddress;
-           
-            sessionTask =  new Task(() =>
+
+            sessionTask = new Task(() =>
             {
-                
+
                 if (SessionType == SessionType.TransmitBAM)
                 {
                     AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Transmit BAM Started");
@@ -352,7 +352,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
             SourceAddress = j1939Id.SourceAddress;
 
             sessionTask = new Task(() =>
-            {             
+            {
                 var sequenceNumber = 1;
                 if (SessionType == SessionType.ReceiveBAM)
                 {
@@ -520,7 +520,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                             }
                         }
                     }
-                } 
+                }
             });
         }
 
@@ -550,7 +550,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
             if (messageCollection.Messages.Count > 0)
                 service.SendCanMessages(messageCollection);
 
-                TPEvent.Wait(Tr / 2);
+            TPEvent.Wait(Tr / 2);
         }
     }
 

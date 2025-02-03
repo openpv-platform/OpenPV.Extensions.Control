@@ -1,4 +1,4 @@
-﻿using Ahsoka.ServiceFramework;
+﻿using Ahsoka.Core;
 using SocketCANSharp;
 using System;
 using System.Collections.Concurrent;

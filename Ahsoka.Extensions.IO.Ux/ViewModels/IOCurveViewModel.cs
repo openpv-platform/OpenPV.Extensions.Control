@@ -1,8 +1,7 @@
-﻿using Ahsoka.DeveloperTools.Core;
+﻿using Ahsoka.Core.Utility;
+using Ahsoka.DeveloperTools.Core;
 using Ahsoka.Extensions.IO.UX.ViewModels.Nodes;
 using Ahsoka.Services.IO;
-using Ahsoka.Utility;
-using Avalonia.Controls;
 using Material.Icons;
 using System;
 using System.Collections.Generic;
@@ -22,7 +21,7 @@ internal class IOCurveViewModel : ChildViewModelBase<IOSetupViewModel>, ITreeNod
     #region Properties
     public CurveDefinition CurveDefinition { get; init; }
 
-    public string Name 
+    public string Name
     {
         get => CurveDefinition.Name;
         set
@@ -46,7 +45,7 @@ internal class IOCurveViewModel : ChildViewModelBase<IOSetupViewModel>, ITreeNod
     }
 
     public ObservableCollection<Coordinate> Coordinates
-    { 
+    {
         get => coordinates;
     }
 
@@ -76,7 +75,7 @@ internal class IOCurveViewModel : ChildViewModelBase<IOSetupViewModel>, ITreeNod
         CurveDefinition = curveDefinition;
 
         // Sort coordinates, first by X, then by Y
-        CurveDefinition.Coordinates.Sort(delegate(Coordinate a, Coordinate b)
+        CurveDefinition.Coordinates.Sort(delegate (Coordinate a, Coordinate b)
         {
             return a.X != b.X ? a.X.CompareTo(b.X) : a.Y.CompareTo(b.Y);
         });

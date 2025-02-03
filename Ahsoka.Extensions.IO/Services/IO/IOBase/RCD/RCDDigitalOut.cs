@@ -1,5 +1,3 @@
-using Ahsoka.ServiceFramework;
-using Ahsoka.Services.IO.RCD;
 using System.Collections.Generic;
 using System.Device.Gpio;
 using System.Device.Gpio.Drivers;
@@ -50,7 +48,7 @@ internal class RCDDigitalOutput : IDigitalOutputImplementation
         // Set the pin state. !!NOTE: RCD has Low Side Outputs so setting pv to HIGH
         // will actually set the output LOW and vice versa!!
         PinValue pv = (state == PinState.High) ? PinValue.High : PinValue.Low;
-        
+
         outputPin.controller.OpenPin(outputPin.pin, PinMode.Output);
         outputPin.controller.Write(outputPin.pin, pv);
         outputPin.controller.ClosePin(outputPin.pin);

@@ -1,5 +1,5 @@
+using Ahsoka.Core;
 using Ahsoka.Core.IO.Hardware;
-using Ahsoka.ServiceFramework;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
@@ -24,7 +24,7 @@ internal abstract class IOServiceImplementationBase
     private IDigitalInputImplementation digitalInputImplementation;
     private IDigitalOutputImplementation digitalOutputImplementation;
 
-    ConcurrentDictionary<int,GetInputResponse> latestAnalogValues = new();
+    ConcurrentDictionary<int, GetInputResponse> latestAnalogValues = new();
     ConcurrentDictionary<int, GetInputResponse> latestDigitalValues = new();
     #endregion
 
@@ -97,17 +97,17 @@ internal abstract class IOServiceImplementationBase
                     latestDigitalValues[item] = newValue;
                 }
             }
-            catch (IOException ex) 
-            { 
-                AhsokaLogging.LogMessage(AhsokaVerbosity.High, ex.ToString()); 
+            catch (IOException ex)
+            {
+                AhsokaLogging.LogMessage(AhsokaVerbosity.High, ex.ToString());
             }
         }
     }
 
     protected abstract void OnHandleInit(IOHardwareInfoExtension IOInfo,
-        out IAnalogInputImplementation analogInputImplementation, 
-        out IAnalogOutputImplementation analogOutputImplementation, 
-        out IDigitalInputImplementation digitalInputImplementation, 
+        out IAnalogInputImplementation analogInputImplementation,
+        out IAnalogOutputImplementation analogOutputImplementation,
+        out IDigitalInputImplementation digitalInputImplementation,
         out IDigitalOutputImplementation digitalOutputImplementation);
 
     // Functions to Retrieve IO Pins

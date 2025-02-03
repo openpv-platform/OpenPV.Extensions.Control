@@ -1,10 +1,6 @@
-﻿using Avalonia.Controls;
-using Material.Icons;
-using System.Collections;
+﻿using Material.Icons;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Reflection.Metadata.Ecma335;
-using System.ServiceModel.Description;
 
 namespace Ahsoka.Extensions.Can.UX.ViewModels.Nodes;
 

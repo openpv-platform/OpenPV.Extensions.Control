@@ -14,7 +14,7 @@ internal class CanGroupNode<T> : ICanTreeNode<T>
     } = new();
 
     public bool IsEnabled { get; set; } = true;
-   
+
     public bool IsSelected { get; set; } = false;
 
     public bool IsEditable { get; set; } = false;

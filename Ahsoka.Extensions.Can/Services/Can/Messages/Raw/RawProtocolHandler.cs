@@ -1,10 +1,5 @@
-﻿using Ahsoka.ServiceFramework;
-using SocketCANSharp;
-using System;
-using System.Collections.Generic;
+﻿using SocketCANSharp;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Ahsoka.Services.Can.CanServiceImplementation;
 
 namespace Ahsoka.Services.Can.Messages;
@@ -56,9 +51,9 @@ internal class RawProtocolHandler : BaseProtocolHandler
 
         if (GetAvailableMessage(message.Id, out AvailableMessage messageInfo))
         {
-            if (messageInfo.Message.MessageType == MessageType.RawExtendedFrame && 
+            if (messageInfo.Message.MessageType == MessageType.RawExtendedFrame &&
                     Service.PortConfig.MessageConfiguration.Ports.First(x => x.Port == Service.Port).CanInterface == CanInterface.SocketCan)
-                message.Id |= (uint)CanIdFlags.CAN_EFF_FLAG;           
+                message.Id |= (uint)CanIdFlags.CAN_EFF_FLAG;
         }
         return true;
     }

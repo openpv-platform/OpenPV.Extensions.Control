@@ -1,13 +1,7 @@
-using Ahsoka.Installer;
-using Ahsoka.ServiceFramework;
-using Ahsoka.Services.Can;
+using Ahsoka.Core;
 using Ahsoka.Services.IO;
-using Ahsoka.System;
-using Ahsoka.Test.Control.Properties;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.IO;
 using System;
-using Ahsoka.Services.System;
 using System.Linq;
 
 namespace Ahsoka.Test;
@@ -47,7 +41,7 @@ public class IOServiceTests : LinearTestBase
         IOServiceClient ioClient = new();
         ioClient.Start();
 
-      
+
         var buzzerConfig = ioClient.GetBuzzerConfig();
         ioClient.SetBuzzerConfig(buzzerConfig);
 
