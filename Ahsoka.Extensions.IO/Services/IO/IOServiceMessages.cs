@@ -99,7 +99,7 @@ public class IOServiceMessages : AhsokaMessagesBase
     public const string AnalogOutput_3 = $"{AnalogOutput_}3";
 
 
-    public IOServiceMessages()
+    public IOServiceMessages() : base(IOService.Name)
     {
         // Requests to Set Digital / Analog Outputs
         this.RegisterServiceRequest(IOMessageTypes.Ids.SetDigitalOutput, typeof(DigitalOutput), typeof(SetOutputResponse));

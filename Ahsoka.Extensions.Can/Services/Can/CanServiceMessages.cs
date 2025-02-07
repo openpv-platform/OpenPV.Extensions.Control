@@ -8,7 +8,7 @@ namespace Ahsoka.Services.Can;
 
 internal class CanServiceMessages : AhsokaMessagesBase
 {
-    public CanServiceMessages()
+    public CanServiceMessages() : base(CanService.Name)
     {
         this.RegisterServiceRequest(CanMessageTypes.Ids.OpenCommunicationChannel, typeof(EmptyNotification), typeof(CanApplicationConfiguration), false, false);
         this.RegisterServiceRequest(CanMessageTypes.Ids.CloseCommunicationChannel, typeof(EmptyNotification), typeof(EmptyNotification), false, false);
