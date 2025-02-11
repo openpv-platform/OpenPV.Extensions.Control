@@ -1,5 +1,6 @@
 using Ahsoka.Core;
 using Ahsoka.Installer;
+using Org.BouncyCastle.Crypto;
 using System.Collections.Generic;
 
 namespace Ahsoka.Services.IO;
@@ -130,9 +131,9 @@ public class IOServiceMessages : AhsokaMessagesBase
 
     }
 
-    public override Dictionary<string, byte[]> GetAdditionalClientResources(ApplicationType type, bool includeImplementation)
+    protected override Dictionary<string, byte[]> OnGetAdditionalClientResources(ApplicationType type, bool includeImplementation = true)
     {
-        var result = base.GetAdditionalClientResources(type);
+        var result = base.OnGetAdditionalClientResources(type);
         result.Add("Ahsoka.Proto\\IOService.proto", Properties.IOResources.IOService);
         return result;
     }

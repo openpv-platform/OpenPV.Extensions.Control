@@ -28,9 +28,9 @@ internal class CanServiceMessages : AhsokaMessagesBase
         this.RegisterServiceRequest(CanMessageTypes.Ids.CoprocessorHeartbeat, typeof(EmptyNotification), typeof(EmptyNotification), false, true);
     }
 
-    public override Dictionary<string, byte[]> GetAdditionalClientResources(ApplicationType type, bool includeImplementation)
+    protected override Dictionary<string, byte[]> OnGetAdditionalClientResources(ApplicationType type, bool includeImplementation = true)
     {
-        var result = base.GetAdditionalClientResources(type);
+        var result = base.OnGetAdditionalClientResources(type);
         result.Add("inc\\services\\CanServiceClientExtensions.h", Properties.CANResources.CanServiceClientExtensionsH);
         result.Add("inc\\services\\IHasCanData.h", Properties.CANResources.IHasCanData);
         result.Add("inc\\services\\CanServiceClientIncludes.h", Properties.CANResources.CanServiceClientIncludes);
