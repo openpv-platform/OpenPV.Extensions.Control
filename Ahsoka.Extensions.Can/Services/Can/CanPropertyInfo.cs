@@ -213,7 +213,7 @@ public class CanPropertyInfo
             iVal = (long)Math.Round(rawValue);
 
         // Pack signal
-        if (byteOrder == ByteOrder.LittleEndian) // Little endian 
+        if (byteOrder == ByteOrder.OrderLittleEndian) // Little endian 
             return (((ulong)iVal & bitMask) << StartBit);
         else // Big endian
             return MirrorMsg(((ulong)iVal & bitMask) << GetStartBitLE());
@@ -226,7 +226,7 @@ public class CanPropertyInfo
         ulong bitMask = BitMask();
 
         // Unpack signal
-        if (byteOrder == ByteOrder.LittleEndian) // Little endian 
+        if (byteOrder == ByteOrder.OrderLittleEndian) // Little endian 
             iVal = (long)((data >> StartBit) & bitMask);
         else // Big endian 
             iVal = (long)((MirrorMsg(data) >> GetStartBitLE()) & bitMask);

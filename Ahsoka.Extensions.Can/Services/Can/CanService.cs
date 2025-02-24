@@ -1,5 +1,6 @@
 ﻿using Ahsoka.Core;
 using Ahsoka.Core.Hardware;
+using Ahsoka.Core.Utility;
 using Ahsoka.Installer.Components;
 using Ahsoka.Services.Can.Platform;
 using Ahsoka.Socket;
@@ -34,7 +35,7 @@ public class CanService : AhsokaServiceBase<CanMessageTypes.Ids>, IAhsokaGateway
         switch (SystemInfo.CurrentPlatform)
         {
             case PlatformFamily.Windows64:
-                if (interfaceType == CanInterface.ECOMWindows)
+                if (interfaceType == CanInterface.EcomWindows)
                     return new ECOMServiceImplementation();
                 else
                     return new DesktopServiceImplementation();
@@ -70,6 +71,7 @@ public class CanService : AhsokaServiceBase<CanMessageTypes.Ids>, IAhsokaGateway
     public CanService(ServiceConfiguration config) :
         base(config, new CanServiceMessages())
     {
+
         // Load Configurations
         string coprocessorPath = SystemInfo.HardwareInfo.TargetPathInfo.GetInstallerPath(InstallerPaths.CoProcessorApplicationPath);
         string configPath = Path.Combine(coprocessorPath, CanInstallerComponent.applicationConfiguration);

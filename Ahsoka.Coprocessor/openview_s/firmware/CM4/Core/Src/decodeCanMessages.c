@@ -5,7 +5,6 @@
 #include "pb_decode.h"
 #include "pb_encode.h"
 #include "CanService.pb.h"
-#include "CanConfiguration.pb.h"
 #include "decodeCanMessages.h"
 #include "nodeList.h"
 #include "Services.pb.h"
@@ -178,8 +177,8 @@ void decodeAddCANFilter(uint8_t* buffer, uint32_t length)
 	AhsokaCAN_ClientCanFilter message = AhsokaCAN_ClientCanFilter_init_default;
 
 	// get port first
-	message.can_id_list.arg = NULL;
-	message.can_id_list.funcs.decode = NULL;
+	message.can_id_lists.arg = NULL;
+	message.can_id_lists.funcs.decode = NULL;
 
 	pb_istream_t stream = pb_istream_from_buffer(buffer, length);
 
@@ -188,8 +187,8 @@ void decodeAddCANFilter(uint8_t* buffer, uint32_t length)
 		return;
 	uint32_t port = message.can_port;
 
-	message.can_id_list.arg = (void*)port;
-	message.can_id_list.funcs.decode = decodeCANFilter;
+	message.can_id_lists.arg = (void*)port;
+	message.can_id_lists.funcs.decode = decodeCANFilter;
 
 	stream = pb_istream_from_buffer(buffer, length);
 

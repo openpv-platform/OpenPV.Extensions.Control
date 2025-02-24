@@ -17,14 +17,14 @@ internal class J1939PropertyDefinitions
 
     public class Name
     {
-        private CanPropertyInfo identityInfo = new(0, 21, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
-        private CanPropertyInfo manufacturerInfo = new(21, 11, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
-        private CanPropertyInfo ECUInfo = new(32, 3, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
-        private CanPropertyInfo functionInstanceInfo = new(35, 5, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
-        private CanPropertyInfo functionInfo = new(40, 8, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
-        private CanPropertyInfo vehicleInfo = new(49, 7, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
-        private CanPropertyInfo vehicleInstanceInfo = new(56, 4, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
-        private CanPropertyInfo industryInfo = new(60, 3, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
+        private CanPropertyInfo identityInfo = new(0, 21, ByteOrder.OrderLittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
+        private CanPropertyInfo manufacturerInfo = new(21, 11, ByteOrder.OrderLittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
+        private CanPropertyInfo ECUInfo = new(32, 3, ByteOrder.OrderLittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
+        private CanPropertyInfo functionInstanceInfo = new(35, 5, ByteOrder.OrderLittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
+        private CanPropertyInfo functionInfo = new(40, 8, ByteOrder.OrderLittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
+        private CanPropertyInfo vehicleInfo = new(49, 7, ByteOrder.OrderLittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
+        private CanPropertyInfo vehicleInstanceInfo = new(56, 4, ByteOrder.OrderLittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
+        private CanPropertyInfo industryInfo = new(60, 3, ByteOrder.OrderLittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
 
         public J1939NodeDefinition Definition { get; set; } = new();
 
@@ -45,7 +45,7 @@ internal class J1939PropertyDefinitions
             var input = new ulong[] { name };
 
             Definition.ManufacturerCode = manufacturerInfo.GetValue<uint>(input, false);
-            Definition.ECUinstance = ECUInfo.GetValue<uint>(input, false);
+            Definition.ECUInstance = ECUInfo.GetValue<uint>(input, false);
             Definition.FunctionInstance = functionInstanceInfo.GetValue<uint>(input, false);
             Definition.Function = functionInfo.GetValue<uint>(input, false);
             Definition.VehicleSystem = vehicleInfo.GetValue<uint>(input, false);
@@ -61,7 +61,7 @@ internal class J1939PropertyDefinitions
 
             identityInfo.SetValue(ref name, identityNumber, false);
             manufacturerInfo.SetValue(ref name, Definition.ManufacturerCode, false);
-            ECUInfo.SetValue(ref name, Definition.ECUinstance, false);
+            ECUInfo.SetValue(ref name, Definition.ECUInstance, false);
             functionInstanceInfo.SetValue(ref name, Definition.FunctionInstance, false);
             functionInfo.SetValue(ref name, Definition.Function, false);
             vehicleInfo.SetValue(ref name, Definition.VehicleSystem, false);
@@ -75,12 +75,12 @@ internal class J1939PropertyDefinitions
     public class Id
     {
         ulong[] id = { 0 };
-        CanPropertyInfo pgnInfo = new(8, 18, ByteOrder.LittleEndian, ValueType.Unsigned, 0, 0, 1, 0x3FFFF);
-        CanPropertyInfo sourceInfo = new(0, 8, ByteOrder.LittleEndian, ValueType.Unsigned, 0, 0, 1, 0xFF);
-        CanPropertyInfo specificInfo = new(8, 8, ByteOrder.LittleEndian, ValueType.Unsigned, 0, 0, 2, 0xFF);
-        CanPropertyInfo formatInfo = new(16, 8, ByteOrder.LittleEndian, ValueType.Unsigned, 0, 0, 3, 0xFF);
-        CanPropertyInfo pageInfo = new(24, 1, ByteOrder.LittleEndian, ValueType.Unsigned, 0, 0, 4, 0x01);
-        CanPropertyInfo priorityInfo = new(26, 3, ByteOrder.LittleEndian, ValueType.Unsigned, 0, 0, 5, 0x07);
+        CanPropertyInfo pgnInfo = new(8, 18, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 0, 0, 1, 0x3FFFF);
+        CanPropertyInfo sourceInfo = new(0, 8, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 0, 0, 1, 0xFF);
+        CanPropertyInfo specificInfo = new(8, 8, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 0, 0, 2, 0xFF);
+        CanPropertyInfo formatInfo = new(16, 8, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 0, 0, 3, 0xFF);
+        CanPropertyInfo pageInfo = new(24, 1, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 0, 0, 4, 0x01);
+        CanPropertyInfo priorityInfo = new(26, 3, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 0, 0, 5, 0x07);
 
         public uint SourceAddress { get { return sourceInfo.GetValue<uint>(id, false); } set { sourceInfo.SetValue(ref id, value, false); } }
         public uint PDUS { get { return specificInfo.GetValue<uint>(id, false); } set { specificInfo.SetValue(ref id, value, false); } }
@@ -111,24 +111,24 @@ internal class J1939PropertyDefinitions
     {
         ulong[] data = { 0 };
         //RTS
-        private CanPropertyInfo controlInfo = new(0, 8, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
-        private CanPropertyInfo messageInfo = new(8, 16, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
-        private CanPropertyInfo packetInfo = new(24, 8, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
-        private CanPropertyInfo responseInfo = new(32, 8, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0, -1, 0xFF);
-        private CanPropertyInfo pgnInfo = new(40, 24, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
+        private CanPropertyInfo controlInfo = new(0, 8, ByteOrder.OrderLittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
+        private CanPropertyInfo messageInfo = new(8, 16, ByteOrder.OrderLittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
+        private CanPropertyInfo packetInfo = new(24, 8, ByteOrder.OrderLittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
+        private CanPropertyInfo responseInfo = new(32, 8, ByteOrder.OrderLittleEndian, Services.Can.ValueType.Unsigned, 0, 0, -1, 0xFF);
+        private CanPropertyInfo pgnInfo = new(40, 24, ByteOrder.OrderLittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
 
         //CTS
-        private CanPropertyInfo sendInfo = new(8, 8, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
-        private CanPropertyInfo sequenceInfo = new(16, 8, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
-        private CanPropertyInfo reservedCTS = new(24, 16, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
+        private CanPropertyInfo sendInfo = new(8, 8, ByteOrder.OrderLittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
+        private CanPropertyInfo sequenceInfo = new(16, 8, ByteOrder.OrderLittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
+        private CanPropertyInfo reservedCTS = new(24, 16, ByteOrder.OrderLittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
 
         //BAM
-        private CanPropertyInfo reservedBAM = new(32, 8, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
+        private CanPropertyInfo reservedBAM = new(32, 8, ByteOrder.OrderLittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
 
         //Abort
-        private CanPropertyInfo reasonInfo = new(8, 8, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
-        private CanPropertyInfo roleInfo = new(16, 2, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
-        private CanPropertyInfo reservedAbort = new(18, 22, ByteOrder.LittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
+        private CanPropertyInfo reasonInfo = new(8, 8, ByteOrder.OrderLittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
+        private CanPropertyInfo roleInfo = new(16, 2, ByteOrder.OrderLittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
+        private CanPropertyInfo reservedAbort = new(18, 22, ByteOrder.OrderLittleEndian, Services.Can.ValueType.Unsigned, 0, 0);
 
         public CMControl ControlByte { get { return controlInfo.GetValue<CMControl>(data, false); } set { controlInfo.SetValue(ref data, value, false); } }
         public uint MessageSize { get { return messageInfo.GetValue<uint>(data, false); } set { messageInfo.SetValue(ref data, value, false); } }

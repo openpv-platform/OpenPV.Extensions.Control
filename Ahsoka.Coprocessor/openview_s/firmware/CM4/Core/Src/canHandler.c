@@ -615,7 +615,7 @@ crcFunc getChecksumFunc(uint32_t type)
 {
 	switch(type)
 	{
-		case AhsokaCAN_CrcType_CheckSum:
+		case AhsokaCAN_CrcType_CHECK_SUM:
 			return &checksum;
 			break;
 		case AhsokaCAN_CrcType_TSC1:

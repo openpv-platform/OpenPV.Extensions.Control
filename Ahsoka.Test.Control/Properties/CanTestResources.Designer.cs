@@ -93,7 +93,7 @@ namespace Ahsoka.Test.Control.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to {
-        ///  &quot;version&quot;: &quot;4.0.1.10066&quot;,
+        ///  &quot;version&quot;: &quot;4.0.1.20095&quot;,
         ///  &quot;applicationType&quot;: &quot;Dotnet&quot;,
         ///  &quot;execCommand&quot;: &quot;Ahsoka.CS.CAN&quot;,
         ///  &quot;packageName&quot;: &quot;Ahsoka.CS.CAN&quot;,
@@ -102,12 +102,12 @@ namespace Ahsoka.Test.Control.Properties {
         ///  &quot;packageApplicationFolder&quot;: &quot;publish&quot;,
         ///  &quot;packageOutputDirectory&quot;: &quot;../PackageOutput&quot;,
         ///  &quot;licenses&quot;: [],
-        ///  &quot;optimizedServiceManager&quot;: true,
+        ///  &quot;optimizedServiceManager&quot;: false,
         ///  &quot;customPackageInfo&quot;: {
         ///    &quot;includeApplication&quot;: false,
         ///    &quot;includeBootLogo&quot;: false,
         ///    &quot;includeInstallerUI&quot;: false,
-        ///    &quot;includeFirmwareUpdate&quot;:  [rest of string was truncated]&quot;;.
+        ///    &quot;includeFirmwareUpdate&quot;: [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string OpenLinuxST_PackageInfo {
             get {
@@ -133,12 +133,12 @@ namespace Ahsoka.Test.Control.Properties {
         ///  ],
         ///  &quot;nodes&quot;: [
         ///    {
-        ///      &quot;idValid&quot;: 0,
-        ///      &quot;port&quot;: 1,
         ///      &quot;id&quot;: 0,
         ///      &quot;name&quot;: &quot;DBG&quot;,
         ///      &quot;comment&quot;: &quot;&quot;,
-        ///      &quot;nodeType&quot;: &quot;UserDefined [rest of string was truncated]&quot;;.
+        ///      &quot;nodeType&quot;: &quot;UserDefined&quot;,
+        ///      &quot;transportProtocol&quot;: &quot;Raw&quot;,
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string STDemoPackage_1_cancalibration {
             get {

@@ -2,7 +2,6 @@
 #define __CANHANDLER_H__
 
 #include "CanService.pb.h"
-#include "CanConfiguration.pb.h"
 
 #define TIMER_RESOLUTION  1
 #define MAX_PORTS 2

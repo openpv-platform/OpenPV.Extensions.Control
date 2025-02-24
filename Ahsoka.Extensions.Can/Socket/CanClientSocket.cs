@@ -28,7 +28,7 @@ namespace Ahsoka.Services.Can
             }
         }
 
-        void IAhsokaClientSocket.Connect(IAhsokaClientEndPoint endPoint)
+        bool IAhsokaClientSocket.Connect(IAhsokaClientEndPoint endPoint)
         {
             this.endPoint = endPoint as IAhsokaClientEndPoint;
             if (canClient.Calibrations == null)
@@ -36,6 +36,7 @@ namespace Ahsoka.Services.Can
 
             canClient.NotificationReceived += CanClient_NotificationReceived;
             IsConnected = true;
+            return IsConnected;
         }
 
         void IAhsokaClientSocket.Disconnect()

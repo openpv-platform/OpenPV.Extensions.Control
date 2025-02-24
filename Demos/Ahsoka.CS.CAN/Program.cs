@@ -8,7 +8,6 @@ namespace Ahsoka.CS.CAN;
 
 public class Program
 {
-    static readonly Ahsoka.Core.Drawing.Utility.DrawUI basicUI = new();
     static uint lastSpeed = 0;
     static readonly uint speedDirection = 1000;
 
@@ -31,9 +30,8 @@ public class Program
         // Open the Channel After the System has Started the Services
         Dispatcher.Default.InvokeDispatcher(IntializeCAN, EventArgs.Empty, canClient);
 
-        // Start a Basic UI.  This function will start our UI 
-        // as well as run the Dispatcher in its Main Thread
-        basicUI.StartAndRun(Dispatcher.Default, "OpenPV CAN Demo");
+        // Start a Basic UI and run in the Dispatcher's Main Thread
+        Dispatcher.Default.StartAndRun();
 
         // Execute Shutdown
         ApplicationContext.Exit();

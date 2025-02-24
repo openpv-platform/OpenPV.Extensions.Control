@@ -2,7 +2,6 @@
 #define  __NODELIST_H__
 
 #include "CanService.pb.h"
-#include "CanConfiguration.pb.h"
 #include "canHandler.h"
 #include "nodeList.h"
 

@@ -73,23 +73,13 @@ namespace Ahsoka.Properties {
         ///done
         ///
         ///#Start Application
-        ///slattach -p slip -L -m ${InterfacePath} &amp;
-        ///ifconfig sl0 ${IpAddressLocal} pointtopoint ${IpAddressRemote} up
+        ///#slattach -p slip -L -m ${InterfacePath} &amp;
+        ///#ifconfig sl0 ${IpAddressLocal} pointtopoint ${IpAddressRemote} up
         ///.
         /// </summary>
         internal static string Ahsoka_Can_Start {
             get {
                 return ResourceManager.GetString("Ahsoka_Can_Start", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] CanConfiguration {
-            get {
-                object obj = ResourceManager.GetObject("CanConfiguration", resourceCulture);
-                return ((byte[])(obj));
             }
         }
         
@@ -150,16 +140,6 @@ namespace Ahsoka.Properties {
         internal static string CANProtocolHelper {
             get {
                 return ResourceManager.GetString("CANProtocolHelper", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] CanService {
-            get {
-                object obj = ResourceManager.GetObject("CanService", resourceCulture);
-                return ((byte[])(obj));
             }
         }
         

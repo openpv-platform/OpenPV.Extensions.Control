@@ -253,10 +253,10 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNo
     [Range(0, 7)]
     public uint ECUInstance
     {
-        get { return NodeDefinition.J1939Info.ECUinstance; }
+        get { return NodeDefinition.J1939Info.ECUInstance; }
         set
         {
-            NodeDefinition.J1939Info.ECUinstance = value;
+            NodeDefinition.J1939Info.ECUInstance = value;
             OnPropertyChanged();
         }
     }

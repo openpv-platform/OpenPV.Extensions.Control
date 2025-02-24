@@ -3,10 +3,8 @@ using Ahsoka.Core;
 using Ahsoka.Core.Hardware;
 using Ahsoka.Core.IO.Hardware;
 using Ahsoka.Core.Utility;
-using Ahsoka.Installer;
 using Ahsoka.Services.IO.Platform;
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -57,11 +55,6 @@ public class IOService : AhsokaServiceBase<IOMessageTypes.Ids>
         if (Environment.ProcessPath.ToLower().StartsWith(currentAppPath.ToLower()))
         {
             string appTypeFile = SystemInfo.HardwareInfo.TargetPathInfo.GetInstallerPath(InstallerPaths.ApplicationType);
-            if (File.Exists(appTypeFile) && File.ReadAllText(appTypeFile) == ApplicationType.CODESYS.ToString())
-            {
-                AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, "ERROR - IO Service is not Supported on CODESYS Targets");
-                throw new ApplicationException("ERROR - IO Service is not Supported on CODESYS Targets");
-            }
         }
 
         // If Hardware Enabled Start Ignition Thread

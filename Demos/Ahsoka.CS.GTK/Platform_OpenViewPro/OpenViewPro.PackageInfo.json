@@ -7,14 +7,14 @@
   "packageDescription": "GTK IO Demo",
   "applicationVersion": "1.0",
   "packageApplicationFolder": "publish",
-  "packageOutputDirectory": "../PackageOutput",
+  "packageOutputDirectory": "../../PackageOutput",
   "startupLogoPath": "EnovLogo.png",
   "includeInstallerUI": false,
   "includeFirmwareUpdate": false,
   "licenses": [],
   "dotNetInfo": {
     "projectPath": "Ahsoka.CS.GTK.csproj",
-    "publishProfile": "Properties/PublishProfiles/LinuxProfile.pubxml"
+    "publishProfile": "Properties/PublishProfiles/LinuxProfilePro.pubxml"
   },
   "serviceInfo": {
     "runtimeConfiguration": {
@@ -66,8 +66,8 @@
   },
   "packageType": "opvEncrypted",
   "packageStructureVersion": 1,
-  "platformFamily": "OpenViewLinux",
-  "platformQualifier": "S70",
+  "platformFamily": "OpenViewLinuxPro",
+  "platformQualifier": "GenericArm64",
   "securityMode": "None",
   "applicationId": "00000000-0000-0000-0000-000000000000",
   "components": []

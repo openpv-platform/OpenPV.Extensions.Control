@@ -42,9 +42,9 @@
 		<None Remove=".gitignore" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Avalonia.Controls.DataGrid" Version="11.2.2" />
-		<PackageReference Include="Avalonia.Desktop" Version="11.2.2" />
-		<PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.2" />
+		<PackageReference Include="Avalonia.Controls.DataGrid" Version="11.2.3" />
+		<PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
+		<PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.3" />
 		<PackageReference Include="Packaging.Targets" Version="0.1.226">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>

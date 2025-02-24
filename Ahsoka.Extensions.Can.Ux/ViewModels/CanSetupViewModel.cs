@@ -165,7 +165,7 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
 
     public CanSetupViewModel()
     {
-
+        
     }
 
     protected override UserControl OnGetView()

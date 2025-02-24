@@ -44,13 +44,11 @@ internal static class CanMetadataTools
         {
             CommunicationConfiguration = new(),
             MessageConfiguration = new(),
-            DiagnosticEventConfiguration = new(),
         };
 
         portConfiguration.MessageConfiguration.Ports.AddRange(clientConfiguration.Ports);
         portConfiguration.MessageConfiguration.Nodes.AddRange(clientConfiguration.Nodes);
         portConfiguration.MessageConfiguration.Messages.AddRange(clientConfiguration.Messages);
-        portConfiguration.DiagnosticEventConfiguration.DiagnosticEvents.AddRange(clientConfiguration.DiagnosticEvents);
 
         CanHandler.Generate(portConfiguration);
 
@@ -89,11 +87,6 @@ internal static class CanMetadataTools
                 message.Comment = message.Name = null;
                 message.Signals.Clear();
             }
-        }
-
-        foreach (var dm in portConfiguration.DiagnosticEventConfiguration.DiagnosticEvents)
-        {
-            dm.Name = dm.Comment = null;
         }
 
         appConfig.CanPortConfiguration = portConfiguration;
@@ -197,7 +190,7 @@ internal static class CanMetadataTools
                 {
                     BitLength = signal.Length,
                     StartBit = signal.StartBit,
-                    ByteOrder = signal.ByteOrder == 0 ? ByteOrder.BigEndian : ByteOrder.LittleEndian,
+                    ByteOrder = signal.ByteOrder == 0 ? ByteOrder.OrderBigEndian : ByteOrder.OrderLittleEndian,
                     DefaultValue = signal.InitialValue,
                     Id = signal.ID,
                     Maximum = signal.Maximum,
@@ -520,7 +513,7 @@ internal static class CanMetadataTools
         if (definition.Values.Count > 0)
         {
             // Generate an Enum
-            canType = "ValueType::Enum";
+            canType = "ValueType::ENUM";
             type = propName + "Values";
 
             enumOutput.AppendLine();
@@ -544,20 +537,20 @@ internal static class CanMetadataTools
             switch (definition.ValueType)
             {
                 case ValueType.Unsigned:
-                    canType = "ValueType::Unsigned";
+                    canType = "ValueType::UNSIGNED";
                     type = "uint";
                     break;
                 case ValueType.Float:
-                    canType = "ValueType::Float";
+                    canType = "ValueType::FLOAT";
                     type = "float";
                     break;
                 case ValueType.Double:
-                    canType = "ValueType::Double";
+                    canType = "ValueType::DOUBLE";
                     type = "double";
                     break;
                 case ValueType.Signed:
                 default:
-                    canType = "ValueType::Signed";
+                    canType = "ValueType::SIGNED";
                     type = "int";
                     break;
             }
@@ -576,7 +569,7 @@ internal static class CanMetadataTools
         outputFileDataCPP.AppendLine("}");
 
         // Add Metadata to Static Dictionary.
-        string endianness = definition.ByteOrder == ByteOrder.LittleEndian ? "ByteOrder::LittleEndian" : "ByteOrder::BigEndian";
+        string endianness = definition.ByteOrder == ByteOrder.OrderLittleEndian ? "ByteOrder::ORDER_LITTLE_ENDIAN" : "ByteOrder::ORDER_BIG_ENDIAN";
         metadata.Append($"\t\t{className.AsIdentifier()}Props[{className.AsIdentifier()}::Properties::{propName}] =  CanPropertyInfo({definition.StartBit}, {definition.BitLength}, {endianness}, {canType}, {definition.Scale}, {definition.Offset}, {definition.Id}, {definition.DefaultValue}, {definition.Minimum}, {definition.Maximum});\r\n");
     }
     #endregion
@@ -782,7 +775,7 @@ internal static class CanMetadataTools
         generatorExtensions.ExtendSetter(setBuilder, propName.AsIdentifier(), type);
         setBuilder.Append($" }}");
 
-        string endianNess = definition.ByteOrder == ByteOrder.LittleEndian ? "ByteOrder.LittleEndian" : "ByteOrder.BigEndian";
+        string endianNess = definition.ByteOrder == ByteOrder.OrderLittleEndian ? "ByteOrder.LittleEndian" : "ByteOrder.BigEndian";
 
         // Add Property
         mainOutput.AppendLine($"\r\n\tpublic {type} {propName.AsIdentifier()} \r\n\t{{\r\n\t\t{getValue}\r\n\t\t{setBuilder.ToString()} \r\n\t}}");

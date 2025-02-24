@@ -407,7 +407,7 @@ public class CanServiceTests : LinearTestBase
         Assert.IsTrue(data.Id == 500);
         Assert.IsTrue(data.Dlc == 17);
 
-        CanPropertyInfo info = new CanPropertyInfo(0, 32, ByteOrder.LittleEndian, ValueType.Unsigned, 1000, 0, 0);
+        CanPropertyInfo info = new CanPropertyInfo(0, 32, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 1000, 0, 0);
 
         var candata = new byte[8] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
         var result = info.GetValue<uint>(candata, true);
@@ -454,7 +454,7 @@ public class CanServiceTests : LinearTestBase
         var service = new CanService();
 
         var impl = new DesktopServiceImplementation();
-        var config = CanMetadataTools.GenerateApplicationConfig(SystemInfo.HardwareInfo, JsonUtility.Deserialize<CanClientConfiguration>(CanTestResources.CANServiceConfiguration), false);
+        var config = CanMetadataTools.GenerateApplicationConfig(SystemInfo.HardwareInfo, ConfigurationFileLoader.LoadFile<CanClientConfiguration>(file), false);
         impl.Open(service, config.CanPortConfiguration, 1);
 
         var handler = new CanHandler(impl);
@@ -519,7 +519,7 @@ public class CanServiceTests : LinearTestBase
         sendInfo = new() { messageData = testMultiPacket.CreateCanMessageData() };
         handler.SendPredefined(sendInfo);
 
-        Thread.Sleep(1000);
+        Thread.Sleep(3000);
 
         //Test AC receive from higher priority node
         //Shuts off J1939 transmission
@@ -552,38 +552,38 @@ public static class CanModelMetadata
         // TestCanModel Metadata - 500
         metaData.Add(500, new Dictionary<string, CanPropertyInfo>()
         {
-            { "TestEnum", new(4, 8, ByteOrder.LittleEndian, ValueType.Enum, 1, 0, 1,uniqueId: 1) },
-            { "TestUnsigned", new(12, 8, ByteOrder.LittleEndian, ValueType.Unsigned, 2, 0, 2,uniqueId: 2) },
-            { "TestSigned", new(20, 8, ByteOrder.LittleEndian, ValueType.Signed, 1, 0, 3, 3,uniqueId:3 ) },
-            { "TestFloat", new(32, 32, ByteOrder.LittleEndian, ValueType.Float, 1, 0, 4, 4,uniqueId:4 ) },
-            { "TestDouble", new(64, 64, ByteOrder.LittleEndian, ValueType.Double, 1, 0, 5, 5,uniqueId:5 ) },
-            { "TestBit", new(64 + 64, 1, ByteOrder.LittleEndian, ValueType.Unsigned, 1, 0, 6, 1,uniqueId: 1) },
+            { "TestEnum", new(4, 8, ByteOrder.OrderLittleEndian, ValueType.Enum, 1, 0, 1,uniqueId: 1) },
+            { "TestUnsigned", new(12, 8, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 2, 0, 2,uniqueId: 2) },
+            { "TestSigned", new(20, 8, ByteOrder.OrderLittleEndian, ValueType.Signed, 1, 0, 3, 3,uniqueId:3 ) },
+            { "TestFloat", new(32, 32, ByteOrder.OrderLittleEndian, ValueType.Float, 1, 0, 4, 4,uniqueId:4 ) },
+            { "TestDouble", new(64, 64, ByteOrder.OrderLittleEndian, ValueType.Double, 1, 0, 5, 5,uniqueId:5 ) },
+            { "TestBit", new(64 + 64, 1, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 1, 0, 6, 1,uniqueId: 1) },
         });
 
         // Decode Info for TestOverride 2818048
         metaData.Add(2818048, new Dictionary<string, CanPropertyInfo>()
         {
-            {nameof(TestOverride.Test), new( 0, 64, ByteOrder.LittleEndian, ValueType.Double, 1, 0, 0, 0, 0, 0, 1259925567)},
+            {nameof(TestOverride.Test), new( 0, 64, ByteOrder.OrderLittleEndian, ValueType.Double, 1, 0, 0, 0, 0, 0, 1259925567)},
         });
 
         // Decode Info for TestRaw 14856156
         metaData.Add(14856156, new Dictionary<string, CanPropertyInfo>()
         {
-            {nameof(TestRaw.Test), new( 0, 24, ByteOrder.LittleEndian, ValueType.Unsigned, 1, 0, 0, 0, 0, 0, 997346722)},
+            {nameof(TestRaw.Test), new( 0, 24, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 1, 0, 0, 0, 0, 0, 997346722)},
         });
 
         // Decode Info for TestStatic 3932160
         metaData.Add(3932160, new Dictionary<string, CanPropertyInfo>()
         {
-            {nameof(TestStatic.NewSignal), new( 0, 24, ByteOrder.LittleEndian, ValueType.Unsigned, 1, 0, 0, 0, 0, 0, 2063764300)},
+            {nameof(TestStatic.NewSignal), new( 0, 24, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 1, 0, 0, 0, 0, 0, 2063764300)},
         });
 
         // Decode Info for TestMultiPacket 204800000
         metaData.Add(204800000, new Dictionary<string, CanPropertyInfo>()
         {
-            {nameof(TestMultiPacket.Crc), new( 0, 8, ByteOrder.LittleEndian, ValueType.Unsigned, 1, 0, 0, 0, 0, 0, 3329861171)},
-            {nameof(TestMultiPacket.Data1), new( 8, 56, ByteOrder.LittleEndian, ValueType.Double, 1, 0, 1, 0, 0, 0, 1715044506)},
-            {nameof(TestMultiPacket.Data2), new( 64, 64, ByteOrder.LittleEndian, ValueType.Double, 1, 0, 2, 0, 0, 0, 3289022618)},
+            {nameof(TestMultiPacket.Crc), new( 0, 8, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 1, 0, 0, 0, 0, 0, 3329861171)},
+            {nameof(TestMultiPacket.Data1), new( 8, 56, ByteOrder.OrderLittleEndian, ValueType.Double, 1, 0, 1, 0, 0, 0, 1715044506)},
+            {nameof(TestMultiPacket.Data2), new( 64, 64, ByteOrder.OrderLittleEndian, ValueType.Double, 1, 0, 2, 0, 0, 0, 3289022618)},
         });
     }
 }

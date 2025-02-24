@@ -19,6 +19,12 @@
 	</Target>
 	
 	<Target Name="BuildCoprocessorFirmware" AfterTargets="PostBuildEvent" Condition="!Exists('$(CAN_Source_Root)Ahsoka.Core.CAN\Resources\OpenViewLinux_TargetSupport_firmware_CM4.elf')">
+		<Message Text="Generate Proto Files" Importance="high" />
+		<MakeDir Directories="$(CAN_Source_Root)\Ahsoka.Coprocessor\TempProto" />
+		<Exec ContinueOnError="false" WorkingDirectory="$(CAN_Source_Root)" Command="dotnet build -p:IGNORE_PREREQS=YES  $(CAN_Source_Root)\Ahsoka.CreateProto\Ahsoka.CreateProto.csproj " />
+		<Exec ContinueOnError="true" WorkingDirectory="$(CAN_Source_Root)" Command="dotnet run --no-build --project $(CAN_Source_Root)\Ahsoka.CreateProto\Ahsoka.CreateProto.csproj --GenerateProto CanService $(CAN_Source_Root)\Ahsoka.Coprocessor\TempProto\CanService.proto" />
+		<Exec ContinueOnError="true" WorkingDirectory="$(CAN_Source_Root)" Command="dotnet run --no-build --project $(CAN_Source_Root)\Ahsoka.CreateProto\Ahsoka.CreateProto.csproj --GenerateProto Services $(CAN_Source_Root)\Ahsoka.Coprocessor\TempProto\Services.proto" />
+		
 		
 		<Message Text="Stopping Containers" Importance="high" />
 		<Exec ContinueOnError="true" IgnoreExitCode="true" WorkingDirectory="$(CAN_Source_Root)" Command="docker kill Ahsoka.CoProcessorBuilder" />

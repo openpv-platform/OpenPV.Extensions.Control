@@ -1,5 +1,5 @@
 {
-  "version": "4.0.1.10066",
+  "version": "4.0.1.20095",
   "applicationType": "Dotnet",
   "execCommand": "Ahsoka.CS.CAN",
   "packageName": "Ahsoka.CS.CAN",
@@ -8,7 +8,7 @@
   "packageApplicationFolder": "publish",
   "packageOutputDirectory": "../PackageOutput",
   "licenses": [],
-  "optimizedServiceManager": true,
+  "optimizedServiceManager": false,
   "customPackageInfo": {
     "includeApplication": false,
     "includeBootLogo": false,
@@ -30,13 +30,15 @@
         {
           "extensionName": "CAN Service Extension",
           "configurationFile": "CANServiceConfiguration.json"
+        },
+        {
+          "extensionName": "IO Service Extension"
         }
       ],
       "startupDelay": 0,
       "requireChallenge": "NotRequired",
       "services": [
         {
-          "socketType": "TcpSocket",
           "serviceName": "CanService",
           "tcpListenAddress": "*",
           "tcpConnectionAddress": "localhost",
@@ -45,12 +47,19 @@
           "behaviors": "AutoStart"
         },
         {
-          "socketType": "TcpSocket",
           "serviceName": "SystemService",
           "tcpListenAddress": "*",
           "tcpConnectionAddress": "localhost",
           "dataChannel": 5001,
           "isExtension": false,
+          "behaviors": "AutoStart"
+        },
+        {
+          "serviceName": "IOService",
+          "tcpListenAddress": "localhost",
+          "tcpConnectionAddress": "localhost",
+          "dataChannel": 6106,
+          "isExtension": true,
           "behaviors": "AutoStart"
         }
       ]
@@ -60,8 +69,8 @@
   "screenConfiguration": {
     "showUnknownSurfaces": false,
     "bootLogoPath": "EnovLogo.png",
-    "orientation": "DefaultOrientation",
-    "surfaceSetups": []
+    "orientation": 0,
+    "surfaceSetup": []
   },
   "hardwareConfiguration": {
     "hardwareItems": [],

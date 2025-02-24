@@ -397,3 +397,4 @@ Ahsoka.Core.Can/Resources/OpenViewLinux_TargetSupport_firmware_CM4.elf
 DemoOutputs/*
 Demos/PackageOutput/*
 Ahsoka.Extensions.Can/Resources/OpenViewLinux_TargetSupport_firmware_CM4.elf
+Ahsoka.Coprocessor/TempProto/

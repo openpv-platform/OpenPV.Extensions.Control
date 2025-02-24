@@ -1,18 +1,23 @@
 {
-  "version": "3.3.1.20005",
+  "version": "4.1.1.10003",
   "applicationType": "Cpp",
-  "systemOrientation": "DefaultOrientation",
   "execCommand": "Ahsoka.QT.CAN",
   "packageName": "Ahsoka.QT.CAN",
   "packageDescription": "CAN Starter project for using QT with OpenPV",
   "applicationVersion": "1.0",
-  "packageApplicationFolder": "Outputs",
-  "packageOutputDirectory": "..\\PackageOutput",
-  "includeInstallerUI": false,
-  "includeFirmwareUpdate": false,
+  "packageApplicationFolder": "..\\Outputs",
+  "packageOutputDirectory": "..\\..\\PackageOutput",
   "licenses": [],
+  "optimizedServiceManager": false,
+  "customPackageInfo": {
+    "includeApplication": false,
+    "includeBootLogo": false,
+    "includeInstallerUI": false,
+    "includeFirmwareUpdate": false
+  },
   "cppInfo": {
-    "projectPath": "."
+    "projectPath": "..",
+    "projectType": "QT"
   },
   "serviceInfo": {
     "runtimeConfiguration": {
@@ -28,21 +33,17 @@
       "requireChallenge": "NotRequired",
       "services": [
         {
-          "socketType": "TcpSocket",
           "serviceName": "SystemService",
           "tcpListenAddress": "*",
           "tcpConnectionAddress": "localhost",
-          "bleServiceUuidBase": "96730000-8f5d-4cef-8289-744c8faa1a66",
           "dataChannel": 5001,
           "isExtension": false,
           "behaviors": "AutoStart"
         },
         {
-          "socketType": "TcpSocket",
           "serviceName": "CanService",
           "tcpListenAddress": "*",
           "tcpConnectionAddress": "localhost",
-          "bleServiceUuidBase": "96730000-8f5d-4cef-8289-744c8faa1a66",
           "dataChannel": 5007,
           "isExtension": true,
           "behaviors": "AutoStart"
@@ -50,6 +51,17 @@
       ]
     },
     "environmentValues": []
+  },
+  "screenConfiguration": {
+    "showUnknownSurfaces": false,
+    "bootLogoPath": "",
+    "orientation": 0,
+    "surfaceSetup": []
+  },
+  "hardwareConfiguration": {
+    "hardwareItems": [],
+    "usbStartStatePrimary": "Default",
+    "usbStartStateSecondary": "Default"
   },
   "packageType": "opvEncrypted",
   "packageStructureVersion": 1,

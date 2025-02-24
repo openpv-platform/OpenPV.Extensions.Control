@@ -47,12 +47,12 @@ namespace AhsokaCAN
             }
 
         private:
-            CanPropertyInfo pgnInfo = CanPropertyInfo(8, 18, ByteOrder::LittleEndian, ValueType::Unsigned, 0, 0, 1, 0x3FFFF);
-            CanPropertyInfo sourceInfo = CanPropertyInfo(0, 8, ByteOrder::LittleEndian, ValueType::Unsigned, 0, 0, 1, 0xFF);
-            CanPropertyInfo specificInfo = CanPropertyInfo(8, 8, ByteOrder::LittleEndian, ValueType::Unsigned, 0, 0, 2, 0xFF);
-            CanPropertyInfo formatInfo = CanPropertyInfo(16, 8, ByteOrder::LittleEndian, ValueType::Unsigned, 0, 0, 3, 0xFF);
-            CanPropertyInfo pageInfo = CanPropertyInfo(24, 1, ByteOrder::LittleEndian, ValueType::Unsigned, 0, 0, 4, 0x01);
-            CanPropertyInfo priorityInfo = CanPropertyInfo(26, 3, ByteOrder::LittleEndian, ValueType::Unsigned, 0, 0, 5, 0x07);
+            CanPropertyInfo pgnInfo = CanPropertyInfo(8, 18, ByteOrder::ORDER_LITTLE_ENDIAN, ValueType::UNSIGNED, 0, 0, 1, 0x3FFFF);
+            CanPropertyInfo sourceInfo = CanPropertyInfo(0, 8, ByteOrder::ORDER_LITTLE_ENDIAN, ValueType::UNSIGNED, 0, 0, 1, 0xFF);
+            CanPropertyInfo specificInfo = CanPropertyInfo(8, 8, ByteOrder::ORDER_LITTLE_ENDIAN, ValueType::UNSIGNED, 0, 0, 2, 0xFF);
+            CanPropertyInfo formatInfo = CanPropertyInfo(16, 8, ByteOrder::ORDER_LITTLE_ENDIAN, ValueType::UNSIGNED, 0, 0, 3, 0xFF);
+            CanPropertyInfo pageInfo = CanPropertyInfo(24, 1, ByteOrder::ORDER_LITTLE_ENDIAN, ValueType::UNSIGNED, 0, 0, 4, 0x01);
+            CanPropertyInfo priorityInfo = CanPropertyInfo(26, 3, ByteOrder::ORDER_LITTLE_ENDIAN, ValueType::UNSIGNED, 0, 0, 5, 0x07);
 
             uint64_t id[1] = { 0 };
     };

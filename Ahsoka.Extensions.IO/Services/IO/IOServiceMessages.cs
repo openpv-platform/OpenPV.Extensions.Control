@@ -1,5 +1,6 @@
 using Ahsoka.Core;
 using Ahsoka.Installer;
+using Ahsoka.Services.System;
 using Org.BouncyCastle.Crypto;
 using System.Collections.Generic;
 
@@ -134,10 +135,17 @@ public class IOServiceMessages : AhsokaMessagesBase
     protected override Dictionary<string, byte[]> OnGetAdditionalClientResources(ApplicationType type, bool includeImplementation = true)
     {
         var result = base.OnGetAdditionalClientResources(type);
-        result.Add("Ahsoka.Proto\\IOService.proto", Properties.IOResources.IOService);
+        result.Add("Ahsoka.Proto\\IOService.proto", GetProtoMessageFile());
         return result;
     }
 
+    /// <InheritDoc/>
+    public override byte[] GetProtoMessageFile()
+    {
+        return this.GenerateProtoFile("AhsokaIO", typeof(SystemMessageTypes.Ids),
+            typeof(IOApplicationConfiguration),
+            typeof(IOConfiguration));
+    }
 
     protected override void OnGetParameters(out string service, List<ParameterData> values, PackageInformation packageInfo)
     {

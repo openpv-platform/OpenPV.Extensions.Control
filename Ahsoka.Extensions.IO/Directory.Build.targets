@@ -23,7 +23,6 @@
 		<RemoveDir ContinueOnError="true" Directories="$(DemoRoot)\DemoOutputs\Ahsoka.CS.GTK\.vs\" />
 		<ZipDirectory Overwrite="true" SourceDirectory="$(DemoRoot)\DemoOutputs\Ahsoka.CS.GTK\" DestinationFile="$(DemoRoot)\DemoOutputs\Ahsoka.CS.GTK.zip" />
 		
-		<ZipDirectory Overwrite="true" SourceDirectory="$(DemoRoot)\Demos\Ahsoka.Codesys.IO\" DestinationFile="$(DemoRoot)\DemoOutputs\Ahsoka.Codesys.IO.zip" />
 
 	</Target>
 
