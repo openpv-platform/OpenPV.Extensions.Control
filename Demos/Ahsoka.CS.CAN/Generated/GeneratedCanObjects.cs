@@ -446,7 +446,7 @@ public class CanModelMetadata : ICanMetadata
 		// Decode Info for DriverHeartbeat 100
 		metadata.Add(100, new Dictionary<string, CanPropertyInfo>()
 		{
-			{nameof(DriverHeartbeat.Cmd), new( 0, 8, ByteOrder.OrderLittleEndian, ValueType.Enum, 1, 0, 0, 0, 0, 0, 1243343334)},
+			{nameof(DriverHeartbeat.Cmd), new( 0, 8, ByteOrder.OrderLittleEndian , ValueType.Enum, 1, 0, 0, 0, 0, 0, 1243343334)},
 		});
 
 		// Decode Info for IoDebug 500

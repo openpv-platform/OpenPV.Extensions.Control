@@ -8,6 +8,7 @@
 		<DebugType>portable</DebugType>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 	</PropertyGroup>
 
 
@@ -20,7 +21,7 @@
 	</PropertyGroup>
 
 	<ItemGroup Label="Debugging Source Support">
-		<PackageReference Include="Ahsoka.Core" Version="4.1.1-zzz-develop.2" />
+		<PackageReference Include="Ahsoka.Core" Version="4.*-*" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.1" />
 		<PackageReference Include="Microsoft.SourceLink.AzureRepos.Git" Version="8.0.0">
 			<PrivateAssets>all</PrivateAssets>

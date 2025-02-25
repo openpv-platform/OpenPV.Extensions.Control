@@ -154,9 +154,6 @@
   <data name="J1939Helper" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Services\J1939Helper.h;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
-  <data name="OpenViewLinux_TargetSupport_firmware_CM4" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\OpenViewLinux_TargetSupport_firmware_CM4.elf;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="StandardCanDefinitions" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\StandardCanDefinitions.json;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>

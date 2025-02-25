@@ -1035,5 +1035,5 @@
   "generatorNamespace": "Ahsoka.CS.CAN",
   "generatorOutputFile": "../Generated/GeneratedCanObjects.cs",
   "generatorBaseClass": "CanViewModelBase",
-  "version": "4.1.1.20001"
+  "version": "4.1.1.20004"
 }

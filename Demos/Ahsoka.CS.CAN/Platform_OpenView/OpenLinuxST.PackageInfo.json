@@ -1,5 +1,5 @@
 {
-  "version": "4.0.1.20095",
+  "version": "4.1.1.20004",
   "applicationType": "Dotnet",
   "execCommand": "Ahsoka.CS.CAN",
   "packageName": "Ahsoka.CS.CAN",
@@ -30,9 +30,6 @@
         {
           "extensionName": "CAN Service Extension",
           "configurationFile": "CANServiceConfiguration.json"
-        },
-        {
-          "extensionName": "IO Service Extension"
         }
       ],
       "startupDelay": 0,
@@ -52,14 +49,6 @@
           "tcpConnectionAddress": "localhost",
           "dataChannel": 5001,
           "isExtension": false,
-          "behaviors": "AutoStart"
-        },
-        {
-          "serviceName": "IOService",
-          "tcpListenAddress": "localhost",
-          "tcpConnectionAddress": "localhost",
-          "dataChannel": 6106,
-          "isExtension": true,
           "behaviors": "AutoStart"
         }
       ]

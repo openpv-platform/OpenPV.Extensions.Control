@@ -102,7 +102,7 @@ internal class CanInstallerComponent : InstallEngineComponent
                 AddFileToArchive(archive, coprocessorConfiguration + ".json", jsonData);
 
                 // Fetch Application Binary from Support Folder
-                var appData = new MemoryStream(Properties.CANResources.OpenViewLinux_TargetSupport_firmware_CM4);
+                var appData = new MemoryStream(File.ReadAllBytes("AhsokaResources/OpenViewLinux_Coprocessor.elf"));
 
                 ModifyApp(coProcessorConfigData, appData);
 

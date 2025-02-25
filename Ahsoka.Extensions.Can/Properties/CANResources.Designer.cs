@@ -325,16 +325,6 @@ namespace Ahsoka.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] OpenViewLinux_TargetSupport_firmware_CM4 {
-            get {
-                object obj = ResourceManager.GetObject("OpenViewLinux_TargetSupport_firmware_CM4", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to {
         ///	&quot;name&quot;: &quot;StandardCanDefinitions&quot;,
         ///	&quot;canPort&quot;: &quot;can1&quot;,

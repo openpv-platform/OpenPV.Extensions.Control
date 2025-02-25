@@ -775,7 +775,7 @@ internal static class CanMetadataTools
         generatorExtensions.ExtendSetter(setBuilder, propName.AsIdentifier(), type);
         setBuilder.Append($" }}");
 
-        string endianNess = definition.ByteOrder == ByteOrder.OrderLittleEndian ? "ByteOrder.LittleEndian" : "ByteOrder.BigEndian";
+        string endianNess = definition.ByteOrder == ByteOrder.OrderLittleEndian ? "ByteOrder.OrderLittleEndian" : "ByteOrder.OrderBigEndian";
 
         // Add Property
         mainOutput.AppendLine($"\r\n\tpublic {type} {propName.AsIdentifier()} \r\n\t{{\r\n\t\t{getValue}\r\n\t\t{setBuilder.ToString()} \r\n\t}}");
