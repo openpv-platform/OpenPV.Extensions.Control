@@ -32,13 +32,13 @@
 
 		<ItemGroup Label="Native Libraries For Core" Condition="$(IGNORE_PREREQS) != 'YES' and '$(OS)' != 'Unix'">
 			<Content Include="Resources\OpenViewLinux_TargetSupport_firmware_CM4.elf">
-				<Link>AhsokaResources\OpenViewLinux_Coprocessor.elf</Link>
-				<PackagePath>contentFiles/any/any/AhsokaResources/OpenViewLinux_Coprocessor.elf</PackagePath>
+				<Link>platform/OpenViewLinux/Coprocessor_Firmware.elf</Link>
+				<PackagePath>platform/OpenViewLinux/Coprocessor_Firmware.elf</PackagePath>
 				<PackageCopyToOutput>true</PackageCopyToOutput>
 				<IncludeInPackage>true</IncludeInPackage>
-				<Pack>true</Pack>
-				<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-				<Visible>true</Visible>
+				<Private>true</Private>
+				<CopyToOutputDirectory>None</CopyToOutputDirectory>
+				<Visible>false</Visible>
 			</Content>
 		</ItemGroup>
 
