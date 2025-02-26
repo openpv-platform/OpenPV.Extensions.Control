@@ -49,11 +49,11 @@ public class CanClientConfiguration
 [ProtoContract]
 public class CanPortConfiguration
 {
-    [ProtoMember(1)]
-    public CommunicationConfiguration CommunicationConfiguration { get; set; }
+    [ProtoMember(1, IsRequired = true)]
+    public CommunicationConfiguration CommunicationConfiguration { get; set; } = new();
 
-    [ProtoMember(2)]
-    public MessageConfiguration MessageConfiguration { get; set; }
+    [ProtoMember(2, IsRequired = true)]
+    public MessageConfiguration MessageConfiguration { get; set; } = new();
 }
 
 // Information about Communicating with the Main Processor (Ports, Addressees)

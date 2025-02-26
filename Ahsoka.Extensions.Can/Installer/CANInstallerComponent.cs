@@ -24,6 +24,7 @@ internal class CanInstallerComponent : InstallEngineComponent
     public const string startScriptName = "start_can_helper.sh";
 
     public const string PackageName = "CANApplication";
+    private const string CanExtensionName = "CAN Service Extension";
     public static readonly Guid CanApplicationComponentType = new("FB25736F-B9B7-4581-89D4-10238FC1CA71");
 
     public override Guid ComponentType => CanApplicationComponentType;
@@ -42,7 +43,7 @@ internal class CanInstallerComponent : InstallEngineComponent
         if (hardwareDef == null)
             return null;
 
-        string config = info.ServiceInfo.RuntimeConfiguration.ExtensionInfo.FirstOrDefault(x => x.ExtensionName == "CAN Service Extension")?.ConfigurationFile;
+        string config = info.ServiceInfo.RuntimeConfiguration.ExtensionInfo.FirstOrDefault(x => x.ExtensionName == CanExtensionName)?.ConfigurationFile;
         if (!File.Exists(config))
         {
             string error = "A configuration file was not found for the CAN Service Extension.";
@@ -102,7 +103,7 @@ internal class CanInstallerComponent : InstallEngineComponent
                 AddFileToArchive(archive, coprocessorConfiguration + ".json", jsonData);
 
                 // Fetch Application Binary from Support Folder
-                var appData = new MemoryStream(File.ReadAllBytes(Path.Combine(info.GetPlatformExtensionFolder(info.PlatformFamily), "Coprocessor_Firmware.elf")));
+                var appData = new MemoryStream(File.ReadAllBytes(Path.Combine(info.GetPlatformExtensionFolder(info.PlatformFamily, CanExtensionName), "Coprocessor_Firmware.elf")));
 
                 ModifyApp(coProcessorConfigData, appData);
 
