@@ -2,6 +2,7 @@
 #include "cmsis_os.h"
 #include "FreeRTOS.h"
 #include "semphr.h"
+#include "timers.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -24,11 +25,14 @@ bool coprocessorReady = false;
 void txTimerTask(void* argument);
 
 void rxCanTask(void* argument);
+void timerCallback(TimerHandle_t xTimer);
 
 extern FDCAN_HandleTypeDef hfdcan1;
 extern FDCAN_HandleTypeDef hfdcan2;
 extern uint32_t rxCanMessages;
 extern SemaphoreHandle_t rxCanSem[2];
+extern SemaphoreHandle_t txCanSem[2];
+extern xTimerHandle txCanTimer[2];
 extern nodeList_t* txNode[MAX_PORTS];
 #define NUM_RX_MESSAGES 10
 
@@ -113,11 +117,15 @@ void txTimerTask(void* argument)
     uint32_t port = (uint32_t)argument;
 
     log_info("tx can task started\r\n");
+    xTimerStart(txCanTimer[port], portMAX_DELAY);
+
     while(1)
     {
 
         // delay for time period in ticks / ms.
-        osDelay(TIMER_RESOLUTION);
+        //osDelay(TIMER_RESOLUTION);
+        // wait for timer to expire.
+        xSemaphoreTake(txCanSem[port], portMAX_DELAY);
         xSemaphoreTake(timerListMutex[port], portMAX_DELAY);
         if(timerList[port])
         {
@@ -237,44 +245,71 @@ canMessageTimerList_t* createCanMessageTimer(void)
 }
 void rescheduleCanMessageTimer(canMessageTimerList_t** list, canMessageTimerList_t* node)
 {
-    // this function is used from the timer thread, so don't need to take semaphores
+    static uint32_t offsetCnt = 0;
 
-    node->ticksLeft = node->msg->rate / TIMER_RESOLUTION;
-    node->scheduled = true;
+	// this function is used from the timer thread, so don't need to take semaphores
 
-    if(*list == NULL)
-    {
-        // list is empty, easy
-    	*list = node;
-    }
-    else if((*list)->ticksLeft >= node->ticksLeft)
-    {
-    	//log_info("add to top of list\r\n");
-        // new node will expire first, so make it front of list, and adjust the timeouts of the old first.
-        (*list)->ticksLeft -= node->ticksLeft;
-        (*list)->timeoutTicks -= node->ticksLeft;
-        node->nextTimer = *list;
-        *list = node;
-    }
-    else
-    {
-    	canMessageTimerList_t* temp = *list;
-        // need to keep walking down the list.
-        temp = *list;
-        while(temp && ((temp)->ticksLeft < node->ticksLeft))
+        // if the node has already been scheduled, don't adjust for offset.  Else, adjust for offset.
+        if(node->scheduled)
         {
-            node->ticksLeft -= (temp)->ticksLeft;
-            node->timeoutTicks -= (temp)->ticksLeft;
-            if(temp->nextTimer)
-            	temp = temp->nextTimer;
-            else    // found the end of the list!
-            {
-            	break;
-            }
+	        node->ticksLeft = node->msg->rate / TIMER_RESOLUTION;
         }
-        // temp will point to the record that we should be inserted after.
-        temp->nextTimer = node;
-    }
+        else
+        {
+            uint32_t temp = (node->msg->rate / 10) * offsetCnt; 
+            node->ticksLeft = (node->msg->rate + temp)/TIMER_RESOLUTION;
+            node->scheduled = true;
+            offsetCnt++;
+            offsetCnt %=10; // keep offset in range of 0-9 
+        }
+
+	    if (*list == NULL)
+	    {
+	        // list is empty, easy
+	        *list = node;
+	    }
+	    else
+	    {
+	        canMessageTimerList_t* temp = *list;  // start walking down the list.
+	        canMessageTimerList_t* prev = NULL;
+	        bool insert = false;
+	        while (temp)
+	        {
+	            if (node->ticksLeft <= temp->ticksLeft)
+	            {
+	                temp->ticksLeft -= node->ticksLeft;
+	                temp->timeoutTicks -= node->ticksLeft;
+	                // insert the timer in front of temp
+	                if (prev == NULL)
+	                {
+	                    // at front of list.
+	                    node->nextTimer = *list;
+	                    *list = node;
+
+
+	                }
+	                else
+	                {
+	                    // insert the node.
+	                    prev->nextTimer = node;
+	                    node->nextTimer = temp;
+	                }
+	                insert = true;
+	                break; // found the insertion point.
+	            }
+	            else
+	            {
+	                node->ticksLeft -= temp->ticksLeft;
+	                node->timeoutTicks -= temp->ticksLeft;
+	            }
+	            prev = temp;
+	            temp = temp->nextTimer;
+	        }
+	        if (!insert)
+	        {
+	            prev->nextTimer = node; // put at end of list.
+	        }
+	    }
 }
 void updateCanMessageTimerValues( canMessageTimerList_t* node, AhsokaCAN_RecurringCanMessage message)
 {
@@ -309,6 +344,7 @@ canMessageTimerList_t* findCanTxMessage(uint32_t port, canMessageTimerList_t* li
 	{
 		foundNode = createCanMessageTimer();
 		foundNode->msg->id = id;
+		foundNode->msg->msgType = AhsokaCAN_MessageType_RAW_EXTENDED_FRAME;
 		foundNode->msg->overrideDestination = 1;
 		foundNode->msg->overrideSource = 1;
 		foundNode->msg->crc = 0;
@@ -318,40 +354,43 @@ canMessageTimerList_t* findCanTxMessage(uint32_t port, canMessageTimerList_t* li
 		return foundNode;
 	}
 
+	canMessageTimerList_t* listStart = list;
+
 	while(list != NULL)
 	{
-		if((list->msg->id & 0x1FFFFFFF) == id)
-			break;
-		else if(list->msg->msgType == AhsokaCAN_MessageType_J1939_EXTENDED_FRAME && (list->msg->id == (id & list->msg->idMask)))
+		if( ((list->msg->id & 0x1FFFFFFF) == (id & 0x1FFFFFFF)) && (list->msg->msgType != AhsokaCAN_MessageType_J1939_EXTENDED_FRAME) )
 		{
-			bool knownDestination = findNode(port, list->msg->receiverNodeId)->staticAddress;
-			int32_t destination = (id >> 8) & 0xFF;
-
-			bool available = true;
-			if(!list->msg->overrideDestination)
-			{
-				if( ((list->msg->id & 0x00FF0000) < PDU2_THRESHOLD) && !(destination == findNode(port, list->msg->receiverNodeId)->address || !knownDestination) )
-					available &= false;
-			}
-
-			if(!list->msg->overrideSource)
-			{
-				if( !(list->msg->transmitNodeId == txNode[port]->id || list->msg->transmitNodeId == 255) )
-					available &= false;
-			}
-
-
-			if(available)
-				break;
+			foundNode = list;
+			foundNode->msg->id = id;
+			return foundNode;
 		}
 		list = list->nextMsg;
 	}
 
-    if(list)
-    {
-    	foundNode = list;
-    	foundNode->msg->id = id;
-    }
+    list = listStart;
+	while(list != NULL)
+	{
+		int32_t mask = (list->msg->id & 0x00FF0000) >= PDU2_THRESHOLD ? 0x3FFFF00 : 0x3FF0000;
+		if( ((list->msg->id & mask) == (id & mask)) && (list->msg->msgType == AhsokaCAN_MessageType_J1939_EXTENDED_FRAME) )
+		{
+			bool knownDestination = findNode(port, list->msg->receiverNodeId)->address != -1;
+
+			bool available = true;
+			if(list->msg->overrideDestination)
+			{
+				if( ((list->msg->id & 0x00FF0000) < PDU2_THRESHOLD) && !knownDestination )
+					available &= false;
+			}
+
+			if(available)
+			{
+				foundNode = list;
+				foundNode->msg->id = id;
+				return foundNode;
+			}
+		}
+		list = list->nextMsg;
+	}
 
     return foundNode; 
 }
@@ -392,40 +431,48 @@ canMessage_t* findCanMessage(uint32_t port, uint32_t id, bool isExtended, bool p
 		return foundMsg;
 	}
 
-    while(list != NULL)
-    {
+    canMessageList_t* listStart = list;
 
-    	if(list->msg->id == id)
-    	{
-    		foundMsg = list->msg;
-    		break;
-    	}
-    	else if((list->msg->msgType == AhsokaCAN_MessageType_J1939_EXTENDED_FRAME) && (isExtended) && (list->msg->id == (id & list->msg->idMask)))
-    	{
+	while(list != NULL)
+	{
+		if( ((list->msg->id & 0x1FFFFFFF) == (id & 0x1FFFFFFF)) && (list->msg->msgType != AhsokaCAN_MessageType_J1939_EXTENDED_FRAME) )
+		{
+			foundMsg = list->msg;
+			return foundMsg;
+		}
+		list = list->next;
+	}
+
+	list = listStart;
+	while(list != NULL)
+	{
+		int32_t mask = (list->msg->id & 0x00FF0000) >= PDU2_THRESHOLD ? 0x3FFFF00 : 0x3FF0000;
+		if( ((list->msg->id & mask) == (id & mask)) && isExtended && (list->msg->msgType == AhsokaCAN_MessageType_J1939_EXTENDED_FRAME) )
+		{
     		int32_t source = id & 0xFF;
     		int32_t destination = (id >> 8) & 0xFF;
 
     		bool available = true;
-    		if(!list->msg->overrideDestination)
+    		if(list->msg->overrideDestination)
     		{
     			if( ((list->msg->id & 0x00FF0000) < PDU2_THRESHOLD) && !(destination == txNode[port]->address || list->msg->receiverNodeId == 255) )
 					available &= false;
     		}
 
-    		if(!list->msg->overrideSource)
+    		if(list->msg->overrideSource)
     		{
     			if(!(source == findNode(port, list->msg->transmitNodeId)->address || list->msg->transmitNodeId == 255))
     				available &= false;
     		}
 
-    		if(available)
-    		{
-    			foundMsg = list->msg;
-    			break;
-    		}
-    	}
-    	list=list->next;
-    }
+			if(available)
+			{
+				foundMsg = list->msg;
+				return foundMsg;
+			}
+		}
+		list = list->next;
+	}
     return foundMsg; 
 }
 
@@ -473,13 +520,16 @@ void sendCan(uint32_t port, canMessage_t* msg)
 	FDCAN_TxHeaderTypeDef header;
     header.DataLength = (msg->dlc << 16);
 
+
+    if(msg->msgType == AhsokaCAN_MessageType_J1939_EXTENDED_FRAME)
+    {
+    	if(msg->overrideSource == 1)
+    	    msg->id |= txNode[port]->address;
+
+		if(msg->overrideDestination == 1 && (( msg->id & 0x00FF0000) < PDU2_THRESHOLD))
+			 msg->id |= findNode(port, msg->receiverNodeId)->address << 8;
+    }
     header.Identifier = msg->id;
-    if(msg->overrideSource == 0)
-    	header.Identifier = msg->id | txNode[port]->address;
-
-    if(msg->overrideDestination == 0 && ((header.Identifier & 0x00FF0000) < PDU2_THRESHOLD))
-    	header.Identifier |= findNode(port, msg->receiverNodeId)->address << 8;
-
 
     header.IdType = (msg->msgType != AhsokaCAN_MessageType_RAW_STANDARD_FRAME) ? FDCAN_EXTENDED_ID : FDCAN_STANDARD_ID;
     header.TxFrameType = FDCAN_DATA_FRAME;
@@ -565,7 +615,7 @@ crcFunc getChecksumFunc(uint32_t type)
 {
 	switch(type)
 	{
-		case AhsokaCAN_CrcType_CheckSum:
+		case AhsokaCAN_CrcType_CHECK_SUM:
 			return &checksum;
 			break;
 		case AhsokaCAN_CrcType_TSC1:
@@ -576,4 +626,17 @@ crcFunc getChecksumFunc(uint32_t type)
 			break;
 
 	}
+}
+
+
+void timerCallback(xTimerHandle xTimer)
+{
+    void* timerId;
+    uint32_t timerIndex;
+    // get the timer index from handle,
+    timerId = pvTimerGetTimerID(xTimer);
+    timerIndex = (uint32_t)timerId;
+    // verhoog the semaphore
+    if(xSemaphoreGive(txCanSem[timerIndex]) != pdPASS)
+        log_info("semaphore failed to give\n");
 }

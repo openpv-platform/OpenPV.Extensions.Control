@@ -1,5 +1,4 @@
-﻿using Ahsoka.ServiceFramework;
-using Ahsoka.System;
+﻿using Ahsoka.Core;
 using Ahsoka.Utility;
 using System;
 using System.IO;
@@ -40,21 +39,20 @@ internal class ACMessageHandler : J1939MessageHandlerBase
         }
     }
 
-    protected override void OnInit()
+    internal override void OnInit()
     {
         protocol = (J1939ProtocolHandler)Protocol;
+        protocol.transmittingJ1939 = false;
 
-        if (Enabled)
-            Task.Run(() =>
-            {
-                InitializeAddressClaim();
-            }).ContinueWith(result =>
-            {
-                if (protocol.transmittingJ1939)
-                    protocol.ReleaseStartupQueue();
-            });
-        else
-            protocol.transmittingJ1939 = true;
+        Task.Run(() =>
+        { 
+            InitializeAddressClaim();
+        }).ContinueWith(result =>
+        {
+            AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"J1939 Address Claim Initialization Finished");
+            if (protocol.transmittingJ1939)
+                protocol.ReleaseStartupQueue();
+        });
     }
 
     internal override bool OnReceive(CanMessageData messageData)
@@ -91,6 +89,7 @@ internal class ACMessageHandler : J1939MessageHandlerBase
                     }
                     else
                     {
+                        AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"External J1939 Node has priority for address");
                         protocol.CanState.CurrentAddress = J1939PropertyDefinitions.NullAddress;
                         protocol.CanState.NodeAddresses[Service.Self.Id] = protocol.CanState.CurrentAddress;
                         response.Id = CreateMessageId(J1939PropertyDefinitions.NullAddress, J1939PropertyDefinitions.BroadcastAddress);
@@ -98,6 +97,7 @@ internal class ACMessageHandler : J1939MessageHandlerBase
                             ACEvent.Set();
                         else
                         {
+                            AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"J1939 transmission shutting down");
                             protocol.transmittingJ1939 = false;
                             messageCollection.Messages.Add(response);
                             Service.SendCanMessages(messageCollection);
@@ -156,6 +156,8 @@ internal class ACMessageHandler : J1939MessageHandlerBase
 
     private void InitializeAddressClaim()
     {
+        AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"Beginning J1939 Address Claim");
+
         uint identity;
         using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(SystemInfo.HardwareInfo.FactoryInfo.SerialNumber)))
         {
@@ -168,7 +170,6 @@ internal class ACMessageHandler : J1939MessageHandlerBase
         J1939PropertyDefinitions.ParseAddresses(Service.Self.J1939Info.Addresses, out var minAddress, out var maxAddress);
 
         bool addressClaimed = false;
-        protocol.transmittingJ1939 = false;
         while (!addressClaimed)
         {
             var response = new CanMessageData();
@@ -181,6 +182,7 @@ internal class ACMessageHandler : J1939MessageHandlerBase
             response.Data = BitConverter.GetBytes(Service.Self.J1939Info.Name);
             if (minAddress > maxAddress)
             {
+                AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"Unable to claim a J1939 address");
                 response.Id = CreateMessageId(J1939PropertyDefinitions.NullAddress, J1939PropertyDefinitions.BroadcastAddress);
                 messageCollection.Messages.Add(response);
                 Service.SendCanMessages(messageCollection);
@@ -191,6 +193,7 @@ internal class ACMessageHandler : J1939MessageHandlerBase
             }
             else
             {
+                AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"Claiming J1939 address {minAddress}");
                 response.Id = CreateMessageId(minAddress, J1939PropertyDefinitions.BroadcastAddress);
                 messageCollection.Messages.Add(response);
                 Service.SendCanMessages(messageCollection);
@@ -199,12 +202,16 @@ internal class ACMessageHandler : J1939MessageHandlerBase
                 lock (protocol.CanState)
                     if (protocol.CanState.CurrentAddress != J1939PropertyDefinitions.NullAddress || protocol.CanState.CurrentAddress != J1939PropertyDefinitions.BroadcastAddress)
                     {
+                        AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"Claimed J1939 address");
                         protocol.CanState.CurrentAddress = minAddress;
                         protocol.transmittingJ1939 = true;
                         addressClaimed = true;
                     }
                     else
+                    {
+                        AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"J1939 address could not be claimed");
                         minAddress++;
+                    }
             }
         }
 

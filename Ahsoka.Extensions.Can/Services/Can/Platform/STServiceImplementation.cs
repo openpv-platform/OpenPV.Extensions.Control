@@ -1,4 +1,4 @@
-﻿using Ahsoka.ServiceFramework;
+﻿using Ahsoka.Core;
 using Ahsoka.Utility.SocketCAN;
 using SocketCANSharp;
 using System.Diagnostics.CodeAnalysis;
@@ -68,9 +68,17 @@ internal class STSocketCanServiceImplementation : CanServiceImplementation
         {
             foreach (var canMessage in canMessageDataCollection.Messages)
             {
-                var modifiedID = ProcessMessage(canMessage);
-                CanFrame frame = new(modifiedID, canMessage.Data);
-                socketCAN.QueueWriteMessage(frame);
+                if (ProcessMessage(canMessage))
+                {
+                    // Protect SocketCAN from Incorrectly Set Messages
+                    if (canMessage.Id > 0x07FF)
+                        canMessage.Id |= (uint)CanIdFlags.CAN_EFF_FLAG;
+
+                    CanFrame frame = new(canMessage.Id, canMessage.Data);
+
+                    socketCAN.QueueWriteMessage(frame);
+                }
+
             }
         }
     }

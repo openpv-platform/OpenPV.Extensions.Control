@@ -23,7 +23,6 @@
 		<RemoveDir ContinueOnError="true" Directories="$(DemoRoot)\DemoOutputs\Ahsoka.CS.GTK\.vs\" />
 		<ZipDirectory Overwrite="true" SourceDirectory="$(DemoRoot)\DemoOutputs\Ahsoka.CS.GTK\" DestinationFile="$(DemoRoot)\DemoOutputs\Ahsoka.CS.GTK.zip" />
 		
-		<ZipDirectory Overwrite="true" SourceDirectory="$(DemoRoot)\Demos\Ahsoka.Codesys.IO\" DestinationFile="$(DemoRoot)\DemoOutputs\Ahsoka.Codesys.IO.zip" />
 
 	</Target>
 
@@ -34,16 +33,8 @@
 			<PackageCopyToOutput>true</PackageCopyToOutput>
 			<IncludeInPackage>true</IncludeInPackage>
 			<Pack>true</Pack>
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<Visible>true</Visible>
-		</Content>
-		<Content Include="$(DemoRoot)DemoOutputs\Ahsoka.Codesys.IO.zip">
-			<Link>Demos\Ahsoka.Codesys.IO.zip</Link>
-			<PackagePath>demos/Ahsoka.Codesys.IO.zip</PackagePath>
-			<PackageCopyToOutput>true</PackageCopyToOutput>
-			<IncludeInPackage>true</IncludeInPackage>
-			<Pack>true</Pack>
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Private>true</Private>
+			<CopyToOutputDirectory>None</CopyToOutputDirectory>
 			<Visible>true</Visible>
 		</Content>
 	</ItemGroup>

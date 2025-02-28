@@ -13,12 +13,11 @@ internal abstract class BaseMessageHandler
         this.Service = service;
         this.Enabled = IsEnabled();
 
-        OnInit();
     }
 
     protected abstract bool IsEnabled();
 
-    protected abstract void OnInit();
+    internal abstract void OnInit();
 
     internal abstract bool OnSend(SendInformation sendInfo, out CanMessageResult result);
 

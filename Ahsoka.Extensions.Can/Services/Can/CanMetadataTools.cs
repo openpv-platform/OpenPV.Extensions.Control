@@ -1,9 +1,9 @@
 ﻿#pragma warning disable CS0618 // Type or member is obsolete
+using Ahsoka.Core;
+using Ahsoka.Core.Hardware;
+using Ahsoka.Core.Utility;
 using Ahsoka.Installer;
-using Ahsoka.ServiceFramework;
 using Ahsoka.Services.Can.Messages;
-using Ahsoka.System;
-using Ahsoka.System.Hardware;
 using Ahsoka.Utility;
 using DbcParserLib;
 using DbcParserLib.Model;
@@ -24,77 +24,73 @@ internal static class CanMetadataTools
 
     internal static CanApplicationConfiguration GenerateApplicationConfig(HardwareInfo hardwareInfo, string config, bool trimStrings)
     {
-        var canInfo = CANHardwareInfoExtension.GetCanInfo(hardwareInfo.PlatformFamily);
-
-        CanApplicationConfiguration appConfig = new();
         try
         {
             var clientConfiguration = ConfigurationFileLoader.LoadFile<CanClientConfiguration>(config);
+            return GenerateApplicationConfig(hardwareInfo, clientConfiguration, trimStrings);
+        }
+        catch { Console.WriteLine($"Unable to read can calibration {config}"); }
 
-            CanPortConfiguration portConfiguration = new()
-            {
-                CommunicationConfiguration = new(),
-                MessageConfiguration = new(),
-                DiagnosticEventConfiguration = new(),
-            };
+        return null;
+    }
 
-            portConfiguration.MessageConfiguration.Ports.AddRange(clientConfiguration.Ports);
-            portConfiguration.MessageConfiguration.Nodes.AddRange(clientConfiguration.Nodes);
-            portConfiguration.MessageConfiguration.Messages.AddRange(clientConfiguration.Messages);
-            portConfiguration.DiagnosticEventConfiguration.DiagnosticEvents.AddRange(clientConfiguration.DiagnosticEvents);
+    internal static CanApplicationConfiguration GenerateApplicationConfig(HardwareInfo hardwareInfo, CanClientConfiguration clientConfiguration, bool trimStrings)
+    {
+        var canInfo = CANHardwareInfoExtension.GetCanInfo(hardwareInfo.PlatformFamily);
 
-            CanHandler.Generate(portConfiguration);
+        CanApplicationConfiguration appConfig = new();
 
-            // Set Interface Specific Items (CoProcessor is on an IP Path with TTY Path as the Interface.
-            if (clientConfiguration.Ports.First().CanInterface == CanInterface.Coprocessor)
-            {
-                portConfiguration.MessageConfiguration.Ports.First().CanInterfacePath = canInfo.CANPorts.First().CoprocessorSerialPath;
-                portConfiguration.CommunicationConfiguration.LocalIpAddress = clientConfiguration.LocalIpAddress ?? "192.168.0.2";
-                portConfiguration.CommunicationConfiguration.RemoteIpAddress = clientConfiguration.RemoteIpAddress ?? "192.168.0.1";
-            }
+        CanPortConfiguration portConfiguration = new()
+        {
+            CommunicationConfiguration = new(),
+            MessageConfiguration = new(),
+        };
 
-            if (trimStrings)
-            {
-                foreach (var node in portConfiguration.MessageConfiguration.Nodes)
-                {
-                    node.Comment = node.Name = null;
-                    switch (node.TransportProtocol)
-                    {
-                        case TransportProtocol.Raw:
-                            node.J1939Info = null;
-                            node.IsoInfo = null;
-                            break;
+        portConfiguration.MessageConfiguration.Ports.AddRange(clientConfiguration.Ports);
+        portConfiguration.MessageConfiguration.Nodes.AddRange(clientConfiguration.Nodes);
+        portConfiguration.MessageConfiguration.Messages.AddRange(clientConfiguration.Messages);
 
-                        case TransportProtocol.IsoTp:
-                            node.J1939Info = null;
-                            break;
+        CanHandler.Generate(portConfiguration);
 
-                        case TransportProtocol.J1939:
-                            node.IsoInfo = null;
-                            break;
-                    }
-                }
-
-                foreach (var message in portConfiguration.MessageConfiguration.Messages)
-                {
-                    message.Comment = message.Name = null;
-                    message.Signals.Clear();
-                }
-            }
-
-            foreach(var dm in portConfiguration.DiagnosticEventConfiguration.DiagnosticEvents)
-            {
-                dm.Name = dm.Comment = null;
-            }
-
-            appConfig.CanPortConfiguration = portConfiguration;
+        // Set Interface Specific Items (CoProcessor is on an IP Path with TTY Path as the Interface.
+        if (clientConfiguration.Ports.First().CanInterface == CanInterface.Coprocessor)
+        {
+            portConfiguration.MessageConfiguration.Ports.First().CanInterfacePath = canInfo.CANPorts.First().CoprocessorSerialPath;
+            portConfiguration.CommunicationConfiguration.LocalIpAddress = clientConfiguration.LocalIpAddress ?? "192.168.0.2";
+            portConfiguration.CommunicationConfiguration.RemoteIpAddress = clientConfiguration.RemoteIpAddress ?? "192.168.0.1";
         }
 
-        catch { Console.WriteLine($"Unable to read can calibration {config}"); }
-        
+        if (trimStrings)
+        {
+            foreach (var node in portConfiguration.MessageConfiguration.Nodes)
+            {
+                node.Comment = node.Name = null;
+                switch (node.TransportProtocol)
+                {
+                    case TransportProtocol.Raw:
+                        node.J1939Info = null;
+                        node.IsoInfo = null;
+                        break;
 
+                    case TransportProtocol.IsoTp:
+                        node.J1939Info = null;
+                        break;
+
+                    case TransportProtocol.J1939:
+                        node.IsoInfo = null;
+                        break;
+                }
+            }
+
+            foreach (var message in portConfiguration.MessageConfiguration.Messages)
+            {
+                message.Comment = message.Name = null;
+                message.Signals.Clear();
+            }
+        }
+
+        appConfig.CanPortConfiguration = portConfiguration;
         return appConfig;
-
     }
 
     internal static void GenerateCalibrationFromDBC(string canDBCFile, string canConfigurationOutputPath)
@@ -111,7 +107,7 @@ internal static class CanMetadataTools
             PromiscuousTransmit = false,
             UserDefined = false,
 
-        });        
+        });
         configuration.RemoteIpAddress = "192.168.8.1";
         configuration.LocalIpAddress = "192.168.8.2";
         configuration.Version = VersionUtility.GetAppVersionString();
@@ -164,14 +160,14 @@ internal static class CanMetadataTools
                 MessageType = message.IsExtID ? MessageType.RawExtendedFrame : MessageType.RawStandardFrame,
                 Name = message.Name,
                 UserDefined = true,
-                TransmitNodes = nodeFound ? new int[] {-1, node.Id } : new int[] { -1, -1 },
+                TransmitNodes = nodeFound ? new int[] { -1, node.Id } : new int[] { -1, -1 },
                 ReceiveNodes = new int[] { -1, -1 },
                 OverrideSourceAddress = false
             };
 
             if (message.CycleTime(out int cycleTime))
                 messageDef.Rate = cycleTime;
-             
+
             if (message.IsExtID)
             {
                 bool isJ1939 = message.Signals.SelectMany(x => x.CustomProperties).Any(x => x.Key == "SPN");
@@ -194,7 +190,7 @@ internal static class CanMetadataTools
                 {
                     BitLength = signal.Length,
                     StartBit = signal.StartBit,
-                    ByteOrder = signal.ByteOrder == 0 ? ByteOrder.BigEndian : ByteOrder.LittleEndian,
+                    ByteOrder = signal.ByteOrder == 0 ? ByteOrder.OrderBigEndian : ByteOrder.OrderLittleEndian,
                     DefaultValue = signal.InitialValue,
                     Id = signal.ID,
                     Maximum = signal.Maximum,
@@ -283,8 +279,8 @@ internal static class CanMetadataTools
         Console.WriteLine($"Reading Package Info at {pathToPackageInfo}");
         Console.WriteLine();
 
-        var generatorExtensions = new GeneratorUtility("Ahsoka.Core.Can", type); 
-        
+        var generatorExtensions = new GeneratorUtility("Ahsoka.Core.Can", type);
+
         string pathToSearch = string.Empty;
         if (Environment.CurrentDirectory != Path.GetDirectoryName(pathToPackageInfo))
             pathToSearch = Path.GetDirectoryName(pathToPackageInfo);
@@ -342,6 +338,7 @@ internal static class CanMetadataTools
         outputFileData.AppendLine("#include <string>");
         outputFileData.AppendLine("#include \"AhsokaServices.h\"");
         outputFileData.AppendLine("#include \"CanViewModelBase.h\"");
+        outputFileData.AppendLine("#include \"J1939Helper.h\"");
 
         // Allow Plugin to Extend the Header Using / Import Statements
         generatorExtensions.ExtendHeader(outputFileData, nameSpace, true);
@@ -363,7 +360,7 @@ internal static class CanMetadataTools
         StringBuilder metadataAccessors = new();
         StringBuilder metadataCreator = new();
 
-        
+
         var clientCalibration = ConfigurationFileLoader.LoadFile<CanClientConfiguration>(pathToCalibration);
         foreach (var item in clientCalibration.Messages)
         {
@@ -379,7 +376,7 @@ internal static class CanMetadataTools
                 throw new Exception(ex.Message);
             }
         }
-               
+
 
         outputFileDataCPP.AppendLine();
         outputFileDataCPP.AppendLine($"\t// Start of Class Implmentation for CanModelMetadata");
@@ -405,7 +402,7 @@ internal static class CanMetadataTools
         StringBuilder propBuilder = new();
         StringBuilder propEnumBuilder = new();
 
-       
+
         baseClass ??= "CanViewModelBase";
         definition.Id &= 0x1FFFFFFF;
 
@@ -413,10 +410,10 @@ internal static class CanMetadataTools
 
         outputFileDataCPP.AppendLine();
         outputFileDataCPP.AppendLine($"\t//Start of Class Implmentation for {className}");
-        if(definition.MessageType == MessageType.J1939ExtendedFrame)
+        if (definition.MessageType == MessageType.J1939ExtendedFrame)
         {
             outputFileDataCPP.AppendLine();
-            outputFileDataCPP.AppendLine($"\tJ1939Helper& TestMessage::GetProtocol() {{ return protocol; }}");
+            outputFileDataCPP.AppendLine($"\tJ1939Helper*  {className}::GetProtocol() {{ if (protocol == NULL) {{protocol  = new J1939Helper(&message); }} return protocol; }}");
         }
 
         metadataBuilder.AppendLine($"\t\t//Add Props for {className} - CANID: {definition.Id}");
@@ -463,16 +460,16 @@ internal static class CanMetadataTools
         if (definition.MessageType == MessageType.J1939ExtendedFrame)
         {
             fileOutputBuilder.AppendLine();
-            fileOutputBuilder.AppendLine($"\t\t\tJ1939Helper& GetProtocol();");
+            fileOutputBuilder.AppendLine($"\t\t\tJ1939Helper* GetProtocol();");
         }
-        
+
         // Extend Header Methods
         generatorExtensions.ExtendMethods(fileOutputBuilder, className, true);
 
         outputFileDataCPP.AppendLine();
         outputFileDataCPP.AppendLine($"\t{className}::{className}() : {baseClass}({definition.Id},{byteLength})  // CANID: 0x{definition.Id.ToString("x")}");
         outputFileDataCPP.AppendLine($"\t{{");
-        generatorExtensions.ExtendConstructor(outputFileDataCPP,className);
+        generatorExtensions.ExtendConstructor(outputFileDataCPP, className);
         outputFileDataCPP.AppendLine($"\t}}");
 
         outputFileDataCPP.AppendLine($"\t{className}::{className}(CanMessageData message) : {baseClass}(message)  // CANID: 0x{definition.Id.ToString("x")}");
@@ -487,19 +484,20 @@ internal static class CanMetadataTools
         if (propBuilder.Length > 0)
             fileOutputBuilder.AppendLine(propBuilder.ToString());
 
-       
+
         // Generate Property Enumeration
         metadataBuilder.AppendLine("");
         metadataAccessors.AppendLine($"\tstd::map<int, CanPropertyInfo>& {className}::GetMetadata() {{ return CanModelMetadata::CanMetadata()->GetMetadata({definition.Id}); }}");
 
         fileOutputBuilder.AppendLine("\t\tprotected:");
-        fileOutputBuilder.AppendLine("\r\n\t\t\tJ1939Helper protocol = J1939Helper(message);");
+        if (definition.MessageType == MessageType.J1939ExtendedFrame)
+            fileOutputBuilder.AppendLine("\r\n\t\t\tJ1939Helper* protocol = NULL;");
         fileOutputBuilder.AppendLine("\t\t\tstd::map<int, CanPropertyInfo>& GetMetadata();");
 
         // Finish Main
         fileOutputBuilder.AppendLine("\t};"); // End Class
 
-        generatorExtensions.ExtendAfterClassOutput(fileOutputBuilder,className);
+        generatorExtensions.ExtendAfterClassOutput(fileOutputBuilder, className);
     }
 
     private static void WriteMessagePropertyCPP(StringBuilder propEnum, StringBuilder propMethods, StringBuilder enumOutput, StringBuilder metadata, StringBuilder outputFileDataCPP, MessageSignalDefinition definition, string className, GeneratorUtility generatorUtility)
@@ -515,7 +513,7 @@ internal static class CanMetadataTools
         if (definition.Values.Count > 0)
         {
             // Generate an Enum
-            canType = "ValueType::Enum";
+            canType = "ValueType::ENUM";
             type = propName + "Values";
 
             enumOutput.AppendLine();
@@ -539,20 +537,20 @@ internal static class CanMetadataTools
             switch (definition.ValueType)
             {
                 case ValueType.Unsigned:
-                    canType = "ValueType::Unsigned";
+                    canType = "ValueType::UNSIGNED";
                     type = "uint";
                     break;
                 case ValueType.Float:
-                    canType = "ValueType::Float";
+                    canType = "ValueType::FLOAT";
                     type = "float";
                     break;
                 case ValueType.Double:
-                    canType = "ValueType::Double";
+                    canType = "ValueType::DOUBLE";
                     type = "double";
                     break;
                 case ValueType.Signed:
                 default:
-                    canType = "ValueType::Signed";
+                    canType = "ValueType::SIGNED";
                     type = "int";
                     break;
             }
@@ -571,7 +569,7 @@ internal static class CanMetadataTools
         outputFileDataCPP.AppendLine("}");
 
         // Add Metadata to Static Dictionary.
-        string endianness = definition.ByteOrder == ByteOrder.LittleEndian ? "ByteOrder::LittleEndian" : "ByteOrder::BigEndian";
+        string endianness = definition.ByteOrder == ByteOrder.OrderLittleEndian ? "ByteOrder::ORDER_LITTLE_ENDIAN" : "ByteOrder::ORDER_BIG_ENDIAN";
         metadata.Append($"\t\t{className.AsIdentifier()}Props[{className.AsIdentifier()}::Properties::{propName}] =  CanPropertyInfo({definition.StartBit}, {definition.BitLength}, {endianness}, {canType}, {definition.Scale}, {definition.Offset}, {definition.Id}, {definition.DefaultValue}, {definition.Minimum}, {definition.Maximum});\r\n");
     }
     #endregion
@@ -580,7 +578,7 @@ internal static class CanMetadataTools
     private static void GenerateDotNet(string nameSpace, string baseClass, string pathToCalibration, StringBuilder outputFileData, GeneratorUtility generatorExtensions)
     {
         // Add Header
-        outputFileData.AppendLine("using Ahsoka.System;");
+        outputFileData.AppendLine("using Ahsoka.Core;");
         outputFileData.AppendLine("using Ahsoka.Services.Can;");
         outputFileData.AppendLine("using Ahsoka.Services.Can.Messages;");
         outputFileData.AppendLine("using System.Collections.Generic;");
@@ -590,14 +588,14 @@ internal static class CanMetadataTools
 
         // Allow Plugin to Extend the Header Using / Import Statements
         generatorExtensions.ExtendHeader(outputFileData, nameSpace);
-       
+
         outputFileData.AppendLine();
         outputFileData.AppendLine($"namespace {nameSpace};"); //need generic solution here
         outputFileData.AppendLine();
 
         StringBuilder metadataBuilder = new();
         StringBuilder metadataItems = new();
-        
+
         var clientCalibration = ConfigurationFileLoader.LoadFile<CanClientConfiguration>(pathToCalibration);
 
         foreach (var item in clientCalibration.Messages)
@@ -612,7 +610,7 @@ internal static class CanMetadataTools
                 Console.WriteLine($"Error Importing Item: {item} with error {ex.Message}");
                 throw new Exception(ex.Message);
             }
-        }     
+        }
 
         // Generate Metadata Class
         outputFileData.AppendLine(Properties.CANResources.CSharpMetadataDictionary.Replace("%METADATA_BODY%", metadataItems.ToString()).Replace("%METADATA_BUILDER%", metadataBuilder.ToString()));
@@ -665,14 +663,14 @@ internal static class CanMetadataTools
         methodBuilder.AppendLine($"\tpublic {className}() : base(CanId, Dlc)");
         methodBuilder.AppendLine($"\t{{");
 
-        generatorExtensions.ExtendConstructor( methodBuilder, className); 
+        generatorExtensions.ExtendConstructor(methodBuilder, className);
 
         methodBuilder.AppendLine($"\t}} ");
         methodBuilder.AppendLine($"\tpublic {className}(CanMessageData message) : base(message) ");
         methodBuilder.AppendLine($"\t{{");
-        
+
         generatorExtensions.ExtendConstructor(methodBuilder, className);
-        
+
         methodBuilder.AppendLine($"\t}}\r\n");
 
         metadataBuilder.AppendLine($"\t\t\tcase {className}.CanId:");
@@ -698,7 +696,7 @@ internal static class CanMetadataTools
 
         // Finish Methods
         methodBuilder.AppendLine("\t#endregion");
-     
+
         // Add Methods to Main
         fileOutputBuilder.Append(methodBuilder);
 
@@ -777,7 +775,7 @@ internal static class CanMetadataTools
         generatorExtensions.ExtendSetter(setBuilder, propName.AsIdentifier(), type);
         setBuilder.Append($" }}");
 
-        string endianNess = definition.ByteOrder == ByteOrder.LittleEndian ? "ByteOrder.LittleEndian" : "ByteOrder.BigEndian";
+        string endianNess = definition.ByteOrder == ByteOrder.OrderLittleEndian ? "ByteOrder.OrderLittleEndian" : "ByteOrder.OrderBigEndian";
 
         // Add Property
         mainOutput.AppendLine($"\r\n\tpublic {type} {propName.AsIdentifier()} \r\n\t{{\r\n\t\t{getValue}\r\n\t\t{setBuilder.ToString()} \r\n\t}}");

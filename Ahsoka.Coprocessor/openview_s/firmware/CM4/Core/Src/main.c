@@ -23,8 +23,8 @@
 #include "resmgr_utility.h"
 #include "openamp_log.h"
 #include "virt_uart.h"
-#include "lwip.h"
 #include "FreeRTOS.h"
+#include "timers.h"
 #include "stream_buffer.h"
 #include "canHandler.h"
 
@@ -69,8 +69,10 @@ volatile uint32_t intCounter = 0;
 uint16_t VirtUart0ChannelRxSize = 0;
 uint16_t VirtUart1ChannelRxSize = 0;
 SemaphoreHandle_t rxCanSem[2];
-
-extern void zmq_init(void);
+SemaphoreHandle_t txCanSem[2];
+TimerHandle_t txCanTimer[2];
+extern void timerCallback(xTimerHandle);
+extern void hdlc_init(void);
 
 /* USER CODE END PV */
 
@@ -179,7 +181,7 @@ int main(void)
 	}
 
 
-	MX_LWIP_Init();
+	//MX_LWIP_Init();
 
 	/* USER CODE END 2 */
 
@@ -218,6 +220,16 @@ int main(void)
 
 	rxCanSem[0] = xSemaphoreCreateCounting( 32, 0 );
 	rxCanSem[1] = xSemaphoreCreateCounting( 32, 0 );
+    txCanSem[0] = xSemaphoreCreateCounting( 32, 0 );
+    txCanSem[1] = xSemaphoreCreateCounting( 32, 0 );
+
+    txCanTimer[0] = xTimerCreate ("tim0", pdMS_TO_TICKS(TIMER_RESOLUTION), pdTRUE, (void*) 0, timerCallback );
+    //txCanTimer[0] = xTimerCreate ("tim0", 5, pdTRUE, (void*) 0, timerCallback );
+    // set timer id to timer index
+    vTimerSetTimerID(txCanTimer[0], (void *) 0);
+    txCanTimer[1] = xTimerCreate ("tim1", pdMS_TO_TICKS(TIMER_RESOLUTION), pdTRUE, (void*) 0, timerCallback );
+    //txCanTimer[1] = xTimerCreate ("tim1", 5, pdTRUE, (void*) 0, timerCallback );
+    vTimerSetTimerID(txCanTimer[1], (void *) 1);
 	FDCAN_FilterTypeDef sFilterConfig;
 	/* Configure Rx filter */
 	sFilterConfig.IdType = FDCAN_STANDARD_ID|FDCAN_EXTENDED_ID;
@@ -253,12 +265,7 @@ int main(void)
 
     /* USER CODE BEGIN RTOS_THREADS */
 	/* add threads, ... */
-#if 0
-    const osThreadAttr_t t0_attr = { .name = "T0", .priority =
-    			(osPriority_t) osPriorityHigh, .stack_size = 512 };
-    	t0_TaskHandle = osThreadNew(t0Task, NULL, &t0_attr);
-#endif
-    zmq_init();
+    hdlc_init();
 	/* USER CODE END RTOS_THREADS */
 
 	/* USER CODE BEGIN RTOS_EVENTS */
@@ -580,16 +587,6 @@ void StartDefaultTask(void *argument) {
 	/* USER CODE END 5 */
 }
 
-
-
-void t0Task(void *argument)
-{
-	// this is a dummy task for testing, start more tasks and build the rest of the code!
-
-
-		osDelay(10);
-
-}
 /**
  * @brief  Period elapsed callback in non blocking mode
  * @note   This function is called  when TIM6 interrupt took place, inside
@@ -623,25 +620,7 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
     	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
     	xSemaphoreGiveFromISR( rxCanSem[portNum], &xHigherPriorityTaskWoken );
-#if 0
-    	canMessage_t data;
-        // pull the message out of the queue
-        FDCAN_RxHeaderTypeDef RxHeader;
-        uint8_t RxData[8];
-        // Receive FDCAN1
-        HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &RxHeader, RxData);
 
-        uint8_t dataLen = (RxHeader.DataLength >> 16) & 0xff;
-
-        // need to convert to correct format and send as message.
-        data.id = RxHeader.Identifier;
-        data.isExtended = (FDCAN_EXTENDED_ID == RxHeader.IdType) ? 1 : 0;
-        data.dlc = RxHeader.DataLength >> 16;
-        if(data.dlc > 8)
-            data.dlc = 8;
-
-        memcpy(data.data, RxData, sizeof(RxData));
-#endif
         rxCanMessages++;
     }
 }

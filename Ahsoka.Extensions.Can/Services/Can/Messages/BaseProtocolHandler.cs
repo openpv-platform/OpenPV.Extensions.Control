@@ -1,5 +1,4 @@
-﻿using Ahsoka.ServiceFramework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using static Ahsoka.Services.Can.CanServiceImplementation;
@@ -20,7 +19,15 @@ internal abstract class BaseProtocolHandler
         this.Enabled = IsEnabled();
     }
 
-    internal virtual bool ConfirmAvailable(CanMessageData messageData, object info, out CanMessageResult result )
+    internal void Init()
+    {
+        foreach (var message in Messages)
+        {
+            message.OnInit();
+        }
+    }
+
+    internal virtual bool ConfirmAvailable(CanMessageData messageData, object info, out CanMessageResult result)
     {
         result = new CanMessageResult();
 
@@ -29,16 +36,16 @@ internal abstract class BaseProtocolHandler
             result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"CAN message not found in configuration with Id: {messageData.Id}" };
             return false;
         }
-            
+
         if (!messageInfo.Message.TransmitNodes.Contains(Service.Self.Id) && !messageInfo.Message.TransmitNodes.Contains(255))
             result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"CAN message not set to transmit from node {Service.Self.Id} with message Id: {messageData.Id}" };
 
         return true;
     }
 
-    internal virtual bool ProcessMessage(CanMessageData message, out uint modifiedId)
+    internal virtual bool ProcessMessage(CanMessageData message, out bool shouldSend)
     {
-        modifiedId = message.Id;
+        shouldSend = true;
 
         lock (Service.AvailableMessages)
         {
@@ -71,7 +78,7 @@ internal abstract class BaseProtocolHandler
                     checksumProperty.SetValue(ref val, (uint)checksum, false);
                     Array.Copy(BitConverter.GetBytes(val[0]), 0, message.Data, wordIndex, sizeof(ulong));
                 }
-                else if (messageInfo.Message.CrcType == CrcType.CheckSum) 
+                else if (messageInfo.Message.CrcType == CrcType.CheckSum)
                 {
                     var sum = 0;
                     foreach (var data in message.Data)
@@ -148,7 +155,8 @@ internal abstract class BaseProtocolHandler
 
     internal virtual bool InAvailableMessages(uint id, bool received = false)
     {
-        return Service.AvailableMessages.ContainsKey(id);
+        AvailableMessage message;
+        return GetAvailableMessage(id, out message, received);
     }
 
     internal virtual bool GetAvailableMessage(uint id, out AvailableMessage message, bool received = false)
@@ -160,5 +168,5 @@ internal abstract class BaseProtocolHandler
         return found;
     }
 
-    protected abstract bool IsEnabled();  
+    protected abstract bool IsEnabled();
 }

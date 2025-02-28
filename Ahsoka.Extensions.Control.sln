@@ -15,6 +15,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7AD69EA6-1926-4A19-A2EA-A74D403E1281}"
 	ProjectSection(SolutionItems) = preProject
 		Ahsoka.Extensions.Control.yml = Ahsoka.Extensions.Control.yml
+		codecoverage.runsettings = codecoverage.runsettings
+		Demos\Demo.Build.props = Demos\Demo.Build.props
 		Directory.Build.props = Directory.Build.props
 		GitVersion.yml = GitVersion.yml
 	EndProjectSection
@@ -28,6 +30,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ahsoka.CS.CAN", "Demos\Ahsoka.CS.CAN\Ahsoka.CS.CAN.csproj", "{6ED0298C-DB10-4579-9053-6EA213B3F01D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ahsoka.CS.GTK", "Demos\Ahsoka.CS.GTK\Ahsoka.CS.GTK.csproj", "{FBF20838-7D94-438A-9B59-A88E3F4BD068}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ahsoka.Extensions.IO.UX", "Ahsoka.Extensions.IO.Ux\Ahsoka.Extensions.IO.UX.csproj", "{DC2EF19E-D6F2-47D4-A93D-0F3457F268A6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ahsoka.CreateProto", "Ahsoka.CreateProto\Ahsoka.CreateProto.csproj", "{F144CF50-6A5E-425B-B55A-61A0AB9F9875}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,6 +99,22 @@ Global
 		{FBF20838-7D94-438A-9B59-A88E3F4BD068}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FBF20838-7D94-438A-9B59-A88E3F4BD068}.Release|x64.ActiveCfg = Release|x64
 		{FBF20838-7D94-438A-9B59-A88E3F4BD068}.Release|x64.Build.0 = Release|x64
+		{DC2EF19E-D6F2-47D4-A93D-0F3457F268A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC2EF19E-D6F2-47D4-A93D-0F3457F268A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC2EF19E-D6F2-47D4-A93D-0F3457F268A6}.Debug|x64.ActiveCfg = Debug|x64
+		{DC2EF19E-D6F2-47D4-A93D-0F3457F268A6}.Debug|x64.Build.0 = Debug|x64
+		{DC2EF19E-D6F2-47D4-A93D-0F3457F268A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC2EF19E-D6F2-47D4-A93D-0F3457F268A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC2EF19E-D6F2-47D4-A93D-0F3457F268A6}.Release|x64.ActiveCfg = Release|x64
+		{DC2EF19E-D6F2-47D4-A93D-0F3457F268A6}.Release|x64.Build.0 = Release|x64
+		{F144CF50-6A5E-425B-B55A-61A0AB9F9875}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F144CF50-6A5E-425B-B55A-61A0AB9F9875}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F144CF50-6A5E-425B-B55A-61A0AB9F9875}.Debug|x64.ActiveCfg = Debug|x64
+		{F144CF50-6A5E-425B-B55A-61A0AB9F9875}.Debug|x64.Build.0 = Debug|x64
+		{F144CF50-6A5E-425B-B55A-61A0AB9F9875}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F144CF50-6A5E-425B-B55A-61A0AB9F9875}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F144CF50-6A5E-425B-B55A-61A0AB9F9875}.Release|x64.ActiveCfg = Release|x64
+		{F144CF50-6A5E-425B-B55A-61A0AB9F9875}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

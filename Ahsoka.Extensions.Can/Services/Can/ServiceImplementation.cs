@@ -1,11 +1,10 @@
-﻿using Ahsoka.ServiceFramework;
+﻿using Ahsoka.Core;
 using Ahsoka.Services.Can.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Ahsoka.Services.Can;
 
@@ -31,7 +30,7 @@ internal abstract class CanServiceImplementation
         this.Service = service;
         this.PortConfig = portConfig;
         this.Port = port;
-     
+
         // Create Data Service Handler
         dataHandler = new CanDataServicHandler(service);
 
@@ -61,6 +60,7 @@ internal abstract class CanServiceImplementation
 
         OnOpen();
         canHandler = new CanHandler(this);
+        canHandler.Init();
     }
 
     internal void Close()
@@ -115,11 +115,11 @@ internal abstract class CanServiceImplementation
         return new CanMessageResult() { Status = MessageStatus.Success };
     }
 
-    internal uint ProcessMessage(CanMessageData messageData)
+    internal bool ProcessMessage(CanMessageData messageData)
     {
         if (!promiscuousTransmit)
             return canHandler.ProcessMessage(messageData);
-        return messageData.Id;
+        return true;
     }
 
     internal void FilterIncomingMessage(CanMessageData messageData, out bool shouldSend)
@@ -188,7 +188,7 @@ internal abstract class CanServiceImplementation
                             else if (datetime >= item.Value.NextTransmit)
                             {
                                 item.Value.NextTransmit = datetime.AddMilliseconds(item.Value.Message.TransmitIntervalInMs);
-                                
+
                                 // Set Next Send Intervals.
                                 var messageCollection = new CanMessageDataCollection
                                 {

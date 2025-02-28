@@ -1,5 +1,4 @@
-﻿using Ahsoka.System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Ahsoka.Core.IO.Hardware;
 
@@ -13,13 +12,13 @@ public partial class IOHardwareInfoExtension
     /// </summary>
     /// <param name="family"></param>
     /// <returns></returns>
-    public static IOHardwareInfoExtension GetIOInfo(PlatformFamily family)
+    public static IOHardwareInfoExtension GetIOInfo(PlatformFamily family, string qualifier)
     {
         switch (family)
         {
             case PlatformFamily.Windows64:
             case PlatformFamily.Ubuntu64:
-            case PlatformFamily.MacosArm64:
+            case PlatformFamily.MacOSArm64:
                 return new IOHardwareInfoExtension()
                 {
                     AnalogInputs = [1, 2],
@@ -29,13 +28,26 @@ public partial class IOHardwareInfoExtension
                 };
 
             case PlatformFamily.OpenViewLinux:
-                return new IOHardwareInfoExtension()
+                switch (qualifier)
                 {
-                    AnalogInputs = [1, 2],
-                    AnalogOutputs = [],
-                    DigitalInputs = [1, 2],
-                    DigitalOutputs = [1, 2],
-                };
+                    case "Atlas":
+                        return new IOHardwareInfoExtension()
+                        {
+                            AnalogInputs = [1, 2],
+                            AnalogOutputs = [],
+                            DigitalInputs = [1, 2, 3],
+                            DigitalOutputs = [1, 2, 3, 4],
+                        };
+                    default:
+                        return new IOHardwareInfoExtension()
+                        {
+                            AnalogInputs = [1, 2],
+                            AnalogOutputs = [],
+                            DigitalInputs = [1, 2],
+                            DigitalOutputs = [1, 2,],
+                        };
+                }
+
 
             case PlatformFamily.OpenViewLinuxPro:
                 return new IOHardwareInfoExtension()

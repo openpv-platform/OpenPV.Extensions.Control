@@ -1,6 +1,5 @@
 using Ahsoka.Core.IO.Hardware;
 using Ahsoka.Services.IO.RCD;
-using Ahsoka.System.Hardware;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;

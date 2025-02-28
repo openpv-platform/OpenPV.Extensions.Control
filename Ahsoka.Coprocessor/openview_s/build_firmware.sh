@@ -4,15 +4,12 @@ rm -r /workspaces/Ahsoka.Coprocessor/openview_s/firmware/CM4/Middlewares/Third_P
 mkdir /workspaces/Ahsoka.Coprocessor/openview_s/firmware/CM4/Middlewares/Third_Party/proto
 cp /opt/nanopb/nanopb-0.4.7-linux-x86/*.h /workspaces/Ahsoka.Coprocessor/openview_s/firmware/CM4/Middlewares/Third_Party/proto
 cp /opt/nanopb/nanopb-0.4.7-linux-x86/*.c /workspaces/Ahsoka.Coprocessor/openview_s/firmware/CM4/Middlewares/Third_Party/proto
-mkdir /workspaces/Ahsoka.Proto/output
-cp /workspaces/Ahsoka.Proto/*.proto /workspaces/Ahsoka.Proto/output
-find /workspaces/Ahsoka.Proto/output/*.proto -exec sed -i -s -e 's/ *\[.*protobuf_net.*\];/;/g' -e '/import "protobuf-net/d' {} \;
-cd /workspaces/Ahsoka.Proto/output
-find /workspaces/Ahsoka.Proto/output/*.proto -exec /opt/nanopb/nanopb-0.4.7-linux-x86/generator-bin/nanopb_generator -I /workspaces/Ahsoka.Proto/output {} \;
+
+cd /workspaces/Ahsoka.Coprocessor/TempProto
+find /workspaces/Ahsoka.Coprocessor/TempProto/*.proto -exec /opt/nanopb/nanopb-0.4.7-linux-x86/generator-bin/nanopb_generator -I /workspaces/Ahsoka.Coprocessor/TempProto/ {} \;
 cp *.c /workspaces/Ahsoka.Coprocessor/openview_s/firmware/CM4/Middlewares/Third_Party/proto
 cp *.h /workspaces/Ahsoka.Coprocessor/openview_s/firmware/CM4/Middlewares/Third_Party/proto
 cd /workspaces
-rm -rf /workspaces/Ahsoka.Proto/output
 
 AHSOKA_COPROCESSOR_PROJECT_PATH=./Ahsoka.Coprocessor/openview_s/firmware
 /opt/st/stm32cubeide*/headless-build.sh -data ~/stm32ws -importAll $AHSOKA_COPROCESSOR_PROJECT_PATH -build firmware_CM4/Release

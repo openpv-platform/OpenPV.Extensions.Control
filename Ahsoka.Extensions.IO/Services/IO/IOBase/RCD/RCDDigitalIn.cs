@@ -1,4 +1,7 @@
 using Ahsoka.Services.IO.RCD;
+using System.Collections.Generic;
+using System.Device.Gpio;
+using System.Device.Gpio.Drivers;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Ahsoka.Services.IO;
@@ -6,6 +9,16 @@ namespace Ahsoka.Services.IO;
 [ExcludeFromCodeCoverage]
 internal class RCDDigitalInput : IDigitalInputImplementation
 {
+    readonly Dictionary<int, PinConfig> outputPins = new();
+    GpioController controller3;
+
+    public RCDDigitalInput()
+    {
+        controller3 = new(PinNumberingScheme.Logical, new LibGpiodDriver(6)); // Chip 6
+
+        outputPins.Add(3, new PinConfig() { controller = controller3, pin = 14 });
+    }
+
     /*
         NOTE: voltage divider value obtained by solving the basic circuit equation:
             Vout = Vin(VoltageDivider) 
@@ -25,16 +38,27 @@ internal class RCDDigitalInput : IDigitalInputImplementation
             the appropriate values for reading the input raw volatge
             Digital Input 1 is defined by index 6, input 2 is defined by index 7.
         */
-        ADCInput adcInput = pin == 1 ? ADCInput.DIN1 : ADCInput.DIN2;
-
         var response = new GetInputResponse();
-        // Once Mux Selects are set, we can read from in_voltage5_raw sysfs file
-        float RawValue = ADCUtils.GetVoltsRawValue(adcInput);
+        if (pin < 3)
+        {
+            ADCInput adcInput = pin == 1 ? ADCInput.DIN1 : ADCInput.DIN2;
 
-        // calculate volts at the input pin by multiplying with inverse of voltage divider
-        response.Value = RawValue * _dinVoltageDivider;
-        response.Ret = ReturnCode.Success;
+            // Once Mux Selects are set, we can read from in_voltage5_raw sysfs file
+            float RawValue = ADCUtils.GetVoltsRawValue(adcInput);
+
+            // calculate volts at the input pin by multiplying with inverse of voltage divider
+            response.Value = RawValue * _dinVoltageDivider;
+            response.Ret = ReturnCode.Success;
+        }
+        else
+        {
+            var outputPin = outputPins[pin];
+            outputPin.controller.OpenPin(outputPin.pin, PinMode.InputPullUp);
+            var state = outputPin.controller.Read(outputPin.pin);
+            outputPin.controller.ClosePin(outputPin.pin);
+            response.Value = state == PinValue.High ? 5.0 : 0.0;
+            response.Ret = ReturnCode.Success;
+        }
         return response;
     }
-
 }

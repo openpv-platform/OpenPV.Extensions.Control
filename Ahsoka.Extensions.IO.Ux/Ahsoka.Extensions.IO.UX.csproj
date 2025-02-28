@@ -1,0 +1,127 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<RuntimeIdentifiers>win-x64;linux-arm;linux-x64;osx-arm64</RuntimeIdentifiers>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<SignAssembly>False</SignAssembly>
+		<TrimMode>copyused</TrimMode>
+		<UseRidGraph>true</UseRidGraph>
+		<DebugType>portable</DebugType>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+	</PropertyGroup>
+
+
+	<PropertyGroup Label="Debugging Support">
+		<DebugSymbols>true</DebugSymbols>
+		<EmbedAllSources>true</EmbedAllSources>
+		<DebugType>portable</DebugType>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+	</PropertyGroup>
+
+
+	<PropertyGroup>
+		<UxInputPath>$([System.IO.Path]::GetFullPath('$(SolutionDir)\Ahsoka.Extensions.IO.Ux\bin\$(Configuration)\$(TargetFramework)\'))</UxInputPath>
+		<UxPath>$([System.IO.Path]::GetFullPath('$(USERPROFILE)\AppData\Local\AhsokaData\3.0\Extensions\IO Service Extension\ux\'))</UxPath>
+	</PropertyGroup>
+
+	<Target Name="ControlBuild" AfterTargets="PostBuildEvent">
+		<Message Text="Copy UX Files to Extensions Folder @ $(UxPath)" Importance="high" />
+		<Copy SourceFiles="$(UxInputPath)Ahsoka.Extensions.IO.UX.dll" DestinationFiles="$(UxPath)Ahsoka.Extensions.IO.UX.dll" />
+	</Target>
+
+	<ItemGroup Label="Debugging Source Support">
+		<PackageReference Include="Microsoft.SourceLink.AzureRepos.Git" Version="8.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<PropertyGroup Label="Suppress Errors for GPIO Project">
+		<SuppressWindowsPlatformTargetingRequiredError>true</SuppressWindowsPlatformTargetingRequiredError>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="LICENSE.txt" Pack="true" PackagePath="\" />
+		<None Include="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Remove=".gitignore" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Avalonia.Controls.DataGrid" Version="11.2.3" />
+		<PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
+		<PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.3" />
+		<PackageReference Include="Packaging.Targets" Version="0.1.226">
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Ahsoka.DeveloperTools.Core" Version="4.*-*" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<AvaloniaResource Include="..\Ahsoka.Shared\UX\Styles\Styles.axaml" Link="Styles\Styles.axaml" />
+		<AvaloniaResource Include="..\Ahsoka.Shared\UX\Styles\UserInputStyles.axaml" Link="Styles\UserInputStyles.axaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Ahsoka.Extensions.IO\Ahsoka.Extensions.IO.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="App.axaml.cs">
+	    <DependentUpon>%(Filename)</DependentUpon>
+	  </Compile>
+	  <Compile Update="Properties\Resources.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Resources.resx</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\IOFrequencyInputEditView.axaml.cs">
+	    <DependentUpon>IOFrequencyInputEditView.axaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\IOGenerateEditView.axaml.cs">
+	    <DependentUpon>IOGenerateEditView.axaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\IOCurveEditView.axaml.cs">
+	    <DependentUpon>IOCurveEditView.axaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\IOFrequencyOutputEditView.axaml.cs">
+	    <DependentUpon>IOFrequencyOutputEditView.axaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\IODigitalOutputEditView.axaml.cs">
+	    <DependentUpon>IODigitalOutputEditView.axaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\IODigitalInputEditView.axaml.cs">
+	    <DependentUpon>IODigitalInputEditView.axaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\IOAnalogOutputEditView.axaml.cs">
+	    <DependentUpon>IOAnalogOutputEditView.axaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\IOAnalogInputEditView.axaml.cs">
+	    <DependentUpon>IOAnalogInputEditView.axaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\IOSetupView.axaml.cs">
+	    <DependentUpon>IOSetupView.axaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+</Project>

@@ -5,10 +5,11 @@
 #include "CanService.pb.h"
 #include "Services.pb.h"
 #include "encodeCanMessages.h"
-#include "zmq_message_list.h"
 
-zmtp_msg_t* encodeCanMessageType(AhsokaCAN_CanMessageTypes_Ids type)
+
+uint32_t encodeCanMessageType(AhsokaCAN_CanMessageTypes_Ids type, uint8_t *data, uint32_t max_length)
 {
+	uint32_t size = 0;
 	AhsokaServiceFramework_AhsokaMessageHeader message = AhsokaServiceFramework_AhsokaMessageHeader_init_default;
 
 
@@ -21,21 +22,24 @@ zmtp_msg_t* encodeCanMessageType(AhsokaCAN_CanMessageTypes_Ids type)
 
 	bool status = pb_encode(&sizeStream, AhsokaServiceFramework_AhsokaMessageHeader_fields, &message);
 
-    // create a new frame with size, sizeStream.bytes_written, since this is for
-	// can message, we know that the more flag needs to be set.
-    zmtp_msg_t* frame = zmtp_msg_new(ZMTP_MSG_MORE, sizeStream.bytes_written);
+    // check to see if encoded size will fit.
 
-    if(frame != NULL)
+    if(status && (sizeStream.bytes_written <= max_length))
     {
         // create stream from buffer
-        pb_ostream_t stream = pb_ostream_from_buffer(frame->data, frame->size);
+        pb_ostream_t stream = pb_ostream_from_buffer(data, sizeStream.bytes_written);
         status = pb_encode(&stream, AhsokaServiceFramework_AhsokaMessageHeader_fields, &message);
         if(!status)
         {
             log_info("encoding failed\r\n");
+            size = 0;
+        }
+        else
+        {
+        	size = stream.bytes_written;
         }
     } 
-    return frame;
+    return size;
 }
 
 static bool write_data(pb_ostream_t *stream, const pb_field_iter_t *field, void * const *arg)
@@ -86,8 +90,10 @@ static bool encodeCanMessage(pb_ostream_t *stream, const pb_field_iter_t *field,
 }
 // this will encode an array of simple can messages (canMessageSimple_t), the number of messages is passed in numMessages.
 
-zmtp_msg_t* encodeCanMessageCollection(canMessageSimple_t* canMessages, uint32_t numMessages)
+uint32_t encodeCanMessageCollection(canMessageSimple_t* canMessages, uint32_t numMessages, uint8_t *data, uint32_t max_length)
 {
+	uint32_t size = 0;
+
 	AhsokaCAN_CanMessageDataCollection message = AhsokaCAN_CanMessageDataCollection_init_default;
 	message.can_port = canMessages->port;
 	message.messages.funcs.encode = encodeCanMessage;
@@ -97,30 +103,25 @@ zmtp_msg_t* encodeCanMessageCollection(canMessageSimple_t* canMessages, uint32_t
 
 	message.messages.arg = &collection;
 
-	zmtp_msg_t* frame = NULL;
+
 	pb_ostream_t sizeStream = {0};
 	bool status = pb_encode(&sizeStream, AhsokaCAN_CanMessageDataCollection_fields, &message);
 
-	if(status)
+	if((status) && (sizeStream.bytes_written <= max_length))
 	{
+		pb_ostream_t stream = pb_ostream_from_buffer(data, sizeStream.bytes_written);
+		status = pb_encode(&stream, AhsokaCAN_CanMessageDataCollection_fields, &message);
 
-		frame = zmtp_msg_new(0, sizeStream.bytes_written);
-		if(frame)
+		if(!status)
 		{
-
-			pb_ostream_t stream = pb_ostream_from_buffer(frame->data, frame->size);
-			status = pb_encode(&stream, AhsokaCAN_CanMessageDataCollection_fields, &message);
-
-			if(!status)
-			{
-				// destroy frame, and return false!
-				free(frame->data);
-				free(frame);
-				log_info("encode error\r\n");
-				return NULL;
-			}
+			log_info("encode error\r\n");
+			size = 0;
+		}
+		else
+		{
+			size = stream.bytes_written;
 		}
 	}
 
-	return frame;
+	return size;
 }

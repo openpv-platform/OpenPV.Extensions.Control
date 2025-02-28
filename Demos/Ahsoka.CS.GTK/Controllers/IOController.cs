@@ -1,7 +1,6 @@
-﻿using Ahsoka.Dispatch;
+﻿using Ahsoka.Core.Dispatch;
 using Ahsoka.Services.Data;
 using Ahsoka.Services.IO;
-using Ahsoka.Services.System;
 using Gtk;
 using System;
 using System.Collections.Generic;
@@ -59,7 +58,7 @@ internal class IOController
                 HeightRequest = 50
             };
             fixedPanel.Add(tempLabel);
-           
+
             // Init Latest Values
             latestValues[IOServiceMessages.DigitalInput_ + item.Pin.ToString()] = 0.0f;
 

@@ -73,23 +73,13 @@ namespace Ahsoka.Properties {
         ///done
         ///
         ///#Start Application
-        ///slattach -p slip -L -m ${InterfacePath} &amp;
-        ///ifconfig sl0 ${IpAddressLocal} pointtopoint ${IpAddressRemote} up
+        ///#slattach -p slip -L -m ${InterfacePath} &amp;
+        ///#ifconfig sl0 ${IpAddressLocal} pointtopoint ${IpAddressRemote} up
         ///.
         /// </summary>
         internal static string Ahsoka_Can_Start {
             get {
                 return ResourceManager.GetString("Ahsoka_Can_Start", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] CanConfiguration {
-            get {
-                object obj = ResourceManager.GetObject("CanConfiguration", resourceCulture);
-                return ((byte[])(obj));
             }
         }
         
@@ -136,30 +126,20 @@ namespace Ahsoka.Properties {
         ///{
         ///    class CANProtocolHelper
         ///    {
-        ///    public:
-        ///        CANProtocolHelper(CanMessageData data)
-        ///        {
-        ///            messageData = data;
-        ///        }
+        ///        public:
+        ///            CANProtocolHelper(CanMessageData* data)
+        ///            {
+        ///                messageData = data;
+        ///            }
         ///
-        ///    protected:
-        ///        CanMessageData messageData;
+        ///        protected:
+        ///            CanMessageData* messageData;
         ///    };
         ///}.
         /// </summary>
         internal static string CANProtocolHelper {
             get {
                 return ResourceManager.GetString("CANProtocolHelper", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] CanService {
-            get {
-                object obj = ResourceManager.GetObject("CanService", resourceCulture);
-                return ((byte[])(obj));
             }
         }
         
@@ -212,11 +192,12 @@ namespace Ahsoka.Properties {
         ///        public: 
         ///
         ///            uint GetId() { return message.id(); } 
-        ///            void SetId(uint value) { message.set_id(value); } 
         ///
         ///            CanViewModelBase(uint canID, int dlc)
         ///            {
-        ///                message.set_dlc((uin [rest of string was truncated]&quot;;.
+        ///                message.set_dlc((uint)dlc);
+        ///                message.set_id(canID);
+        ///                 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string CanViewModelBase {
             get {
@@ -318,37 +299,28 @@ namespace Ahsoka.Properties {
         ///#include &lt;functional&gt;
         ///#include &quot;AhsokaServices.h&quot;
         ///#include &quot;CANProtocolHelper.h&quot;
+        ///#include &quot;CanPropertyInfo.h&quot;
         ///
         ///namespace AhsokaCAN
         ///{
         ///    class J1939Id
         ///    {
-        ///    public:
-        ///        J1939Id() {}
+        ///        public:
+        ///            J1939Id() {}
         ///
-        ///        J1939Id(uint id)
-        ///        {
-        ///            ExtractValues(id);
-        ///        }
+        ///            J1939Id(uint id)
+        ///            {
+        ///                ExtractValues(id);
+        ///            }
         ///
-        ///        uint GetSourceAddress() { return sourceInfo.GetValue&lt;uint&gt;(id, false); }
-        ///        void SetSourceAddress(uint value) { sourceInfo.SetValue&lt;uint&gt;(id, value, false); }
+        ///            uint GetSourceAddress() { return sourceInfo.GetValue&lt;uint&gt;(id, false); }
+        ///            void SetSourceAddress(uint value) { sourceInfo.SetValue&lt;uint&gt;(id, value, false); }
         ///
-        ///        uint GetPDUS() { return specificInfo.G [rest of string was truncated]&quot;;.
+        ///        [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string J1939Helper {
             get {
                 return ResourceManager.GetString("J1939Helper", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] OpenViewLinux_TargetSupport_firmware_CM4 {
-            get {
-                object obj = ResourceManager.GetObject("OpenViewLinux_TargetSupport_firmware_CM4", resourceCulture);
-                return ((byte[])(obj));
             }
         }
         

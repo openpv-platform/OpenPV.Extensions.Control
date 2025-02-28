@@ -1,5 +1,4 @@
-﻿using Ahsoka.System;
-using Ahsoka.Utility;
+﻿using Ahsoka.Utility;
 using System;
 using System.Linq;
 
@@ -33,7 +32,7 @@ internal class RQSTMessageHandler : J1939MessageHandlerBase
         }
     }
 
-    protected override void OnInit()
+    internal override void OnInit()
     {
         return;
     }

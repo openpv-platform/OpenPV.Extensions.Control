@@ -25,7 +25,7 @@ internal class CanHandler
         {
             // Raw must get processed first
             typeof(RawProtocolHandler),
-            typeof(J1939ProtocolHandler)           
+            typeof(J1939ProtocolHandler)
         };
     }
 
@@ -39,16 +39,23 @@ internal class CanHandler
             method?.Invoke(null, new object[] { config });
         }
     }
-
-    internal uint ProcessMessage(CanMessageData messageData)
+    internal void Init()
     {
         foreach (var protocol in protocols)
         {
-            if (protocol.ProcessMessage(messageData, out var modifiedId))
-                return modifiedId;            
+            protocol.Init();
+        }
+    }
+
+    internal bool ProcessMessage(CanMessageData messageData)
+    {
+        foreach (var protocol in protocols)
+        {
+            if (protocol.ProcessMessage(messageData, out bool shouldSend))
+                return shouldSend;
         }
 
-        return 0;
+        return false;
     }
 
     internal CanMessageResult SendPredefined(SendInformation sendInfo)
@@ -92,6 +99,7 @@ internal class CanHandler
 
         var returnMessage = new CanMessageResult() { Status = MessageStatus.Success, Message = "" };
         foreach (var message in messages)
+        {
             foreach (var protocol in protocols)
             {
                 if (protocol.ConfirmAvailable(message, data, out CanMessageResult result))
@@ -99,8 +107,11 @@ internal class CanHandler
                     if (result.Status == MessageStatus.Error)
                         returnMessage.Status = MessageStatus.Error;
                     returnMessage.Message += $"{result.Message}/n";
-                }                  
+                    break;
+                }
             }
+        }
+
 
         return returnMessage;
     }

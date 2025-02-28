@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ahsoka.Services.Can.Messages
+﻿namespace Ahsoka.Services.Can.Messages
 {
     public class J1939Helper : CANProtocolHelper
     {
@@ -14,6 +8,8 @@ namespace Ahsoka.Services.Can.Messages
         {
             id = new J1939PropertyDefinitions.Id(data.Id);
         }
+
+        public uint PGN { get { return id.PGN; } }
 
         public uint Priority
         {

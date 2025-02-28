@@ -1,5 +1,6 @@
-using Ahsoka.System;
+using Ahsoka.Core;
 using Ahsoka.Services.Can;
+using Ahsoka.Services.Can.Messages;
 using System.Collections.Generic;
 using System;
 using System.Linq;
@@ -242,6 +243,17 @@ public partial class TSC1 : CanViewModelBase
 	public const uint CanId = 0; // CANID: 0x0
 	public const int Dlc = 8;
 	#region Auto Generated Properties
+	J1939Helper protocol;
+	public J1939Helper Protocol
+	{
+		get
+		{
+			if (protocol == null)
+				protocol = new J1939Helper(message);
+			return protocol;
+		}
+	}
+
 
 	public EngineOverrideControlModeValues EngineOverrideControlMode 
 	{
@@ -434,60 +446,60 @@ public class CanModelMetadata : ICanMetadata
 		// Decode Info for DriverHeartbeat 100
 		metadata.Add(100, new Dictionary<string, CanPropertyInfo>()
 		{
-			{nameof(DriverHeartbeat.Cmd), new( 0, 8, ByteOrder.LittleEndian, ValueType.Enum, 1, 0, 0, 0, 0, 0)},
+			{nameof(DriverHeartbeat.Cmd), new( 0, 8, ByteOrder.OrderLittleEndian, ValueType.Enum, 1, 0, 0, 0, 0, 0, 1243343334)},
 		});
 
 		// Decode Info for IoDebug 500
 		metadata.Add(500, new Dictionary<string, CanPropertyInfo>()
 		{
-			{nameof(IoDebug.TestUnsigned), new( 0, 8, ByteOrder.LittleEndian, ValueType.Unsigned, 1, 0, 0, 0, 0, 0)},
-			{nameof(IoDebug.TestEnum), new( 8, 8, ByteOrder.LittleEndian, ValueType.Enum, 1, 0, 0, 0, 0, 0)},
-			{nameof(IoDebug.TestSigned), new( 16, 8, ByteOrder.LittleEndian, ValueType.Signed, 1, 0, 0, 0, 0, 0)},
-			{nameof(IoDebug.TestFloat), new( 24, 8, ByteOrder.LittleEndian, ValueType.Unsigned, 0.5, 0, 0, 0, 0, 0)},
+			{nameof(IoDebug.TestUnsigned), new( 0, 8, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 1, 0, 0, 0, 0, 0, 2538080523)},
+			{nameof(IoDebug.TestEnum), new( 8, 8, ByteOrder.OrderLittleEndian, ValueType.Enum, 1, 0, 0, 0, 0, 0, 1922947961)},
+			{nameof(IoDebug.TestSigned), new( 16, 8, ByteOrder.OrderLittleEndian, ValueType.Signed, 1, 0, 0, 0, 0, 0, 4165418399)},
+			{nameof(IoDebug.TestFloat), new( 24, 8, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 0.5, 0, 0, 0, 0, 0, 4292783587)},
 		});
 
 		// Decode Info for MotorCmd 101
 		metadata.Add(101, new Dictionary<string, CanPropertyInfo>()
 		{
-			{nameof(MotorCmd.Steer), new( 0, 4, ByteOrder.LittleEndian, ValueType.Signed, 1, -5, 0, 0, -5, 5)},
-			{nameof(MotorCmd.Drive), new( 4, 4, ByteOrder.LittleEndian, ValueType.Unsigned, 1, 0, 0, 0, 0, 9)},
+			{nameof(MotorCmd.Steer), new( 0, 4, ByteOrder.OrderLittleEndian, ValueType.Signed, 1, -5, 0, 0, -5, 5, 4239993765)},
+			{nameof(MotorCmd.Drive), new( 4, 4, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 1, 0, 0, 0, 0, 9, 442808169)},
 		});
 
 		// Decode Info for MotorStatus 400
 		metadata.Add(400, new Dictionary<string, CanPropertyInfo>()
 		{
-			{nameof(MotorStatus.WheelError), new( 0, 1, ByteOrder.LittleEndian, ValueType.Unsigned, 1, 0, 0, 0, 0, 0)},
-			{nameof(MotorStatus.SpeedKph), new( 8, 16, ByteOrder.LittleEndian, ValueType.Unsigned, 0.001, 0, 0, 0, 0, 0)},
+			{nameof(MotorStatus.WheelError), new( 0, 1, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 1, 0, 0, 0, 0, 0, 2480137974)},
+			{nameof(MotorStatus.SpeedKph), new( 8, 16, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 0.001, 0, 0, 0, 0, 0, 1066340515)},
 		});
 
 		// Decode Info for SensorSonars 200
 		metadata.Add(200, new Dictionary<string, CanPropertyInfo>()
 		{
-			{nameof(SensorSonars.Mux), new( 0, 4, ByteOrder.LittleEndian, ValueType.Unsigned, 1, 0, 0, 0, 0, 0)},
-			{nameof(SensorSonars.ErrCount), new( 4, 12, ByteOrder.LittleEndian, ValueType.Unsigned, 1, 0, 0, 0, 0, 0)},
-			{nameof(SensorSonars.Left), new( 16, 12, ByteOrder.LittleEndian, ValueType.Unsigned, 0.1, 0, 0, 0, 0, 0)},
-			{nameof(SensorSonars.NoFiltLeft), new( 16, 12, ByteOrder.LittleEndian, ValueType.Unsigned, 0.1, 0, 0, 0, 0, 0)},
-			{nameof(SensorSonars.Middle), new( 28, 12, ByteOrder.LittleEndian, ValueType.Unsigned, 0.1, 0, 0, 0, 0, 0)},
-			{nameof(SensorSonars.NoFiltMiddle), new( 28, 12, ByteOrder.LittleEndian, ValueType.Unsigned, 0.1, 0, 0, 0, 0, 0)},
-			{nameof(SensorSonars.Right), new( 40, 12, ByteOrder.LittleEndian, ValueType.Unsigned, 0.1, 0, 0, 0, 0, 0)},
-			{nameof(SensorSonars.NoFiltRight), new( 40, 12, ByteOrder.LittleEndian, ValueType.Unsigned, 0.1, 0, 0, 0, 0, 0)},
-			{nameof(SensorSonars.Rear), new( 52, 12, ByteOrder.LittleEndian, ValueType.Unsigned, 0.1, 0, 0, 0, 0, 0)},
-			{nameof(SensorSonars.NoFiltRear), new( 52, 12, ByteOrder.LittleEndian, ValueType.Unsigned, 0.1, 0, 0, 0, 0, 0)},
+			{nameof(SensorSonars.Mux), new( 0, 4, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 1, 0, 0, 0, 0, 0, 4195371219)},
+			{nameof(SensorSonars.ErrCount), new( 4, 12, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 1, 0, 0, 0, 0, 0, 1612209030)},
+			{nameof(SensorSonars.Left), new( 16, 12, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 0.1, 0, 0, 0, 0, 0, 131997842)},
+			{nameof(SensorSonars.NoFiltLeft), new( 16, 12, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 0.1, 0, 0, 0, 0, 0, 202713697)},
+			{nameof(SensorSonars.Middle), new( 28, 12, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 0.1, 0, 0, 0, 0, 0, 3387452885)},
+			{nameof(SensorSonars.NoFiltMiddle), new( 28, 12, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 0.1, 0, 0, 0, 0, 0, 1883030579)},
+			{nameof(SensorSonars.Right), new( 40, 12, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 0.1, 0, 0, 0, 0, 0, 4191157421)},
+			{nameof(SensorSonars.NoFiltRight), new( 40, 12, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 0.1, 0, 0, 0, 0, 0, 187021029)},
+			{nameof(SensorSonars.Rear), new( 52, 12, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 0.1, 0, 0, 0, 0, 0, 2845092881)},
+			{nameof(SensorSonars.NoFiltRear), new( 52, 12, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 0.1, 0, 0, 0, 0, 0, 1365644182)},
 		});
 
 		// Decode Info for TSC1 0
 		metadata.Add(0, new Dictionary<string, CanPropertyInfo>()
 		{
-			{nameof(TSC1.EngineOverrideControlMode), new( 0, 2, ByteOrder.LittleEndian, ValueType.Enum, 1, 0, 695, 0, 0, 3)},
-			{nameof(TSC1.EngineRequestedSpeedControlConditions), new( 2, 2, ByteOrder.LittleEndian, ValueType.Enum, 1, 0, 696, 0, 0, 3)},
-			{nameof(TSC1.OverrideControlModePriority), new( 4, 2, ByteOrder.LittleEndian, ValueType.Enum, 1, 0, 897, 0, 0, 3)},
-			{nameof(TSC1.EngineRequestedSpeedSpeedLimit), new( 8, 16, ByteOrder.LittleEndian, ValueType.Unsigned, 0.125, 0, 898, 0, 0, 8031.88)},
-			{nameof(TSC1.EngineRequestedTorqueTorqueLimit), new( 24, 8, ByteOrder.LittleEndian, ValueType.Unsigned, 1, -125, 518, 0, -125, 125)},
-			{nameof(TSC1.Tsc1TransmissionRate), new( 32, 3, ByteOrder.LittleEndian, ValueType.Enum, 1, 0, 3349, 0, 0, 7)},
-			{nameof(TSC1.Tsc1ControlPurpose), new( 35, 5, ByteOrder.LittleEndian, ValueType.Enum, 1, 0, 3350, 0, 0, 31)},
-			{nameof(TSC1.EngineRequestedTorqueHighResolution), new( 40, 4, ByteOrder.LittleEndian, ValueType.Enum, 0.125, 0, 4191, 0, 0, 0.875)},
-			{nameof(TSC1.MessageCounter), new( 56, 4, ByteOrder.LittleEndian, ValueType.Unsigned, 1, 0, 4206, 0, 0, 15)},
-			{nameof(TSC1.MessageChecksum), new( 60, 4, ByteOrder.LittleEndian, ValueType.Unsigned, 1, 0, 4207, 0, 0, 15)},
+			{nameof(TSC1.EngineOverrideControlMode), new( 0, 2, ByteOrder.OrderLittleEndian, ValueType.Enum, 1, 0, 695, 0, 0, 3, 975961898)},
+			{nameof(TSC1.EngineRequestedSpeedControlConditions), new( 2, 2, ByteOrder.OrderLittleEndian, ValueType.Enum, 1, 0, 696, 0, 0, 3, 2846823130)},
+			{nameof(TSC1.OverrideControlModePriority), new( 4, 2, ByteOrder.OrderLittleEndian, ValueType.Enum, 1, 0, 897, 0, 0, 3, 648919367)},
+			{nameof(TSC1.EngineRequestedSpeedSpeedLimit), new( 8, 16, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 0.125, 0, 898, 0, 0, 8031.88, 4226213315)},
+			{nameof(TSC1.EngineRequestedTorqueTorqueLimit), new( 24, 8, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 1, -125, 518, 0, -125, 125, 2378174033)},
+			{nameof(TSC1.Tsc1TransmissionRate), new( 32, 3, ByteOrder.OrderLittleEndian, ValueType.Enum, 1, 0, 3349, 0, 0, 7, 3962202020)},
+			{nameof(TSC1.Tsc1ControlPurpose), new( 35, 5, ByteOrder.OrderLittleEndian, ValueType.Enum, 1, 0, 3350, 0, 0, 31, 3870894311)},
+			{nameof(TSC1.EngineRequestedTorqueHighResolution), new( 40, 4, ByteOrder.OrderLittleEndian, ValueType.Enum, 0.125, 0, 4191, 0, 0, 0.875, 400440828)},
+			{nameof(TSC1.MessageCounter), new( 56, 4, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 1, 0, 4206, 0, 0, 15, 2738406898)},
+			{nameof(TSC1.MessageChecksum), new( 60, 4, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 1, 0, 4207, 0, 0, 15, 1671931877)},
 		});
 
     }

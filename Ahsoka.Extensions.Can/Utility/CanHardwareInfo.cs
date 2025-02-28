@@ -1,9 +1,5 @@
-﻿using Ahsoka.System;
-using System;
+﻿using Ahsoka.Core;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ahsoka.Utility
 {
@@ -24,13 +20,13 @@ namespace Ahsoka.Utility
             {
                 case PlatformFamily.Windows64:
                 case PlatformFamily.Ubuntu64:
-                case PlatformFamily.MacosArm64:
+                case PlatformFamily.MacOSArm64:
                     return new CANHardwareInfoExtension() { CANPorts = [new CanPort() { Port = 0 }] };
 
                 case PlatformFamily.OpenViewLinux:
                     return new CANHardwareInfoExtension()
                     {
-                        CANPorts = [new CanPort() { Port = 0, SocketCanInterfacePath = "can0", CoprocessorFirmwarePath = "/lib/firmware/rproc-m4-fw", CoprocessorSerialPath = "/dev/ttyRPMSG0" }, 
+                        CANPorts = [new CanPort() { Port = 0, SocketCanInterfacePath = "can0", CoprocessorFirmwarePath = "/lib/firmware/rproc-m4-fw", CoprocessorSerialPath = "/dev/ttyRPMSG0" },
                                     new CanPort() { Port = 1, SocketCanInterfacePath = "can1", CoprocessorFirmwarePath = "/lib/firmware/rproc-m4-fw", CoprocessorSerialPath = "/dev/ttyRPMSG0" }]
                     };
 
@@ -42,7 +38,7 @@ namespace Ahsoka.Utility
             }
         }
 
-      
+
         /// <summary>
         /// Collection of Module / Adapter Information Objects.
         /// </summary>
@@ -53,7 +49,7 @@ namespace Ahsoka.Utility
     /// <summary>
     /// Can Port Info
     /// </summary>
-    public class CanPort : ICanDeserializeBase
+    public class CanPort
     {
         /// <summary>
         /// Adapter Index

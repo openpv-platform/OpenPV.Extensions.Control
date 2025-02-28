@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:material="using:Material.Icons.Avalonia"
+             xmlns:progRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="Ahsoka.DeveloperTools.Views.IOFrequencyInputEditView">
+
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/UserInputStyles.axaml" />
+	</UserControl.Styles>
+
+  <Border Margin="5">
+    <Grid RowDefinitions="auto,auto,*">
+
+      <Grid Grid.Row="0" ColumnDefinitions="auto,*" Margin="0,0,0,0" >
+        <TextBlock Foreground="SteelBlue" FontSize="16" Text="{Binding ChannelNum, StringFormat='Frequency Input {0}', FallbackValue='Frequency Input'}" Margin="3" />
+        <Border Grid.Column="1" BorderBrush="Gainsboro" Margin="4,10,0,10" BorderThickness="0,1,0,0" Height="2"/>
+      </Grid>
+      
+      <!-- Nothing to edit for frequency input at this point -->
+
+    </Grid>
+  </Border>
+</UserControl>

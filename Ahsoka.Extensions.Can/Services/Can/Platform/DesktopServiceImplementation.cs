@@ -74,8 +74,8 @@ internal class DesktopServiceImplementation : CanServiceImplementation
         // Kick off a producer task
         foreach (var message in canMessageDataCollection.Messages)
         {
-            ProcessMessage(message);
-            messageQueue.Add(message);
+            if (ProcessMessage(message))
+                messageQueue.Add(message);
         }
     }
 

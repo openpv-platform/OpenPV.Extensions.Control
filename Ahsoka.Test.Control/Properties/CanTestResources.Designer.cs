@@ -62,21 +62,52 @@ namespace Ahsoka.Test.Control.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to {
-        ///  &quot;version&quot;: &quot;3.4.1.10014&quot;,
+        ///  &quot;name&quot;: &quot;STDemoPackage.1&quot;,
+        ///  &quot;localIpAddress&quot;: &quot;192.168.8.2&quot;,
+        ///  &quot;remoteIpAddress&quot;: &quot;192.168.8.1&quot;,
+        ///  &quot;ports&quot;: [
+        ///    {
+        ///      &quot;port&quot;: 1,
+        ///      &quot;canInterfacePath&quot;: &quot;can1&quot;,
+        ///      &quot;baudRate&quot;: &quot;Baud250kb&quot;,
+        ///      &quot;canInterface&quot;: &quot;SocketCan&quot;,
+        ///      &quot;promiscuousTransmit&quot;: false,
+        ///      &quot;promiscuousReceive&quot;: false,
+        ///      &quot;userDefined&quot;: false
+        ///    }
+        ///  ],
+        ///  &quot;nodes&quot;: [
+        ///    {
+        ///      &quot;idValid&quot;: 0,
+        ///      &quot;port&quot;: 1,
+        ///      &quot;id&quot;: 0,
+        ///      &quot;name&quot;: &quot;DBG&quot;,
+        ///      &quot;comment&quot;: &quot;&quot;,
+        ///      &quot;nodeType&quot;: &quot;UserDefined [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string CANServiceConfiguration {
+            get {
+                return ResourceManager.GetString("CANServiceConfiguration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///  &quot;version&quot;: &quot;4.0.1.20095&quot;,
         ///  &quot;applicationType&quot;: &quot;Dotnet&quot;,
-        ///  &quot;systemOrientation&quot;: &quot;DefaultOrientation&quot;,
         ///  &quot;execCommand&quot;: &quot;Ahsoka.CS.CAN&quot;,
         ///  &quot;packageName&quot;: &quot;Ahsoka.CS.CAN&quot;,
         ///  &quot;packageDescription&quot;: &quot;CAN Services Demo&quot;,
         ///  &quot;applicationVersion&quot;: &quot;1.0&quot;,
         ///  &quot;packageApplicationFolder&quot;: &quot;publish&quot;,
         ///  &quot;packageOutputDirectory&quot;: &quot;../PackageOutput&quot;,
-        ///  &quot;startupLogoPath&quot;: &quot;EnovLogo.png&quot;,
-        ///  &quot;includeInstallerUI&quot;: false,
-        ///  &quot;includeFirmwareUpdate&quot;: false,
         ///  &quot;licenses&quot;: [],
-        ///  &quot;dotNetInfo&quot;: {
-        ///    &quot;projectPath&quot;: &quot; [rest of string was truncated]&quot;;.
+        ///  &quot;optimizedServiceManager&quot;: false,
+        ///  &quot;customPackageInfo&quot;: {
+        ///    &quot;includeApplication&quot;: false,
+        ///    &quot;includeBootLogo&quot;: false,
+        ///    &quot;includeInstallerUI&quot;: false,
+        ///    &quot;includeFirmwareUpdate&quot;: [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string OpenLinuxST_PackageInfo {
             get {
@@ -102,12 +133,12 @@ namespace Ahsoka.Test.Control.Properties {
         ///  ],
         ///  &quot;nodes&quot;: [
         ///    {
-        ///      &quot;idValid&quot;: 0,
         ///      &quot;id&quot;: 0,
         ///      &quot;name&quot;: &quot;DBG&quot;,
         ///      &quot;comment&quot;: &quot;&quot;,
         ///      &quot;nodeType&quot;: &quot;UserDefined&quot;,
-        ///      &quot;transpo [rest of string was truncated]&quot;;.
+        ///      &quot;transportProtocol&quot;: &quot;Raw&quot;,
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string STDemoPackage_1_cancalibration {
             get {

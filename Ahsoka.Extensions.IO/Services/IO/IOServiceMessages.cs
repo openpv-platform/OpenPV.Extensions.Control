@@ -1,6 +1,7 @@
+using Ahsoka.Core;
 using Ahsoka.Installer;
-using Ahsoka.ServiceFramework;
 using Ahsoka.Services.System;
+using Org.BouncyCastle.Crypto;
 using System.Collections.Generic;
 
 namespace Ahsoka.Services.IO;
@@ -100,7 +101,7 @@ public class IOServiceMessages : AhsokaMessagesBase
     public const string AnalogOutput_3 = $"{AnalogOutput_}3";
 
 
-    public IOServiceMessages()
+    public IOServiceMessages() : base(IOService.Name)
     {
         // Requests to Set Digital / Analog Outputs
         this.RegisterServiceRequest(IOMessageTypes.Ids.SetDigitalOutput, typeof(DigitalOutput), typeof(SetOutputResponse));
@@ -131,14 +132,21 @@ public class IOServiceMessages : AhsokaMessagesBase
 
     }
 
-    public override Dictionary<string, byte[]> GetAdditionalClientResources(ApplicationType type, bool includeImplementation)
+    protected override Dictionary<string, byte[]> OnGetAdditionalClientResources(ApplicationType type, bool includeImplementation = true)
     {
-        var result = base.GetAdditionalClientResources(type);
-        result.Add("Ahsoka.Proto\\IOService.proto", Properties.IOResources.IOService);
+        var result = base.OnGetAdditionalClientResources(type);
+        result.Add("Ahsoka.Proto\\IOService.proto", GetProtoMessageFile());
         return result;
     }
 
-  
+    /// <InheritDoc/>
+    public override byte[] GetProtoMessageFile()
+    {
+        return this.GenerateProtoFile("AhsokaIO", typeof(SystemMessageTypes.Ids),
+            typeof(IOApplicationConfiguration),
+            typeof(IOConfiguration));
+    }
+
     protected override void OnGetParameters(out string service, List<ParameterData> values, PackageInformation packageInfo)
     {
         service = IOService.Name;

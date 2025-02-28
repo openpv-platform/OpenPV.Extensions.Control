@@ -1,9 +1,10 @@
-﻿using Ahsoka.DeveloperTools.Core;
+﻿using Ahsoka.Core;
+using Ahsoka.Core.Hardware;
+using Ahsoka.Core.Utility;
+using Ahsoka.DeveloperTools.Core;
 using Ahsoka.DeveloperTools.Views;
 using Ahsoka.Extensions.Can.UX.ViewModels.Nodes;
 using Ahsoka.Services.Can;
-using Ahsoka.System;
-using Ahsoka.System.Hardware;
 using Ahsoka.Utility;
 using Avalonia.Controls;
 using Avalonia.Threading;
@@ -22,11 +23,16 @@ namespace Ahsoka.DeveloperTools;
 internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
 {
     #region Fields
-
+    string errorText = string.Empty;
     CanGroupNode<MessageViewModel> rootMessageNode = null;
     CanGroupNode<CanSetupViewModel> rootToolNode = null;
     CanGroupNode<PortViewModel> rootPortNode = null;
     CanGroupNode<NodeViewModel> rootNodeNode = null;
+
+    MessageViewModel selectedMessage;
+    NodeViewModel selectedNode;
+    PortViewModel selectedPort;
+    CanSetupViewModel selectedGenerate;
 
     private CanClientConfiguration canConfiguration = new();
     string configurationPath;
@@ -37,6 +43,8 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
     #endregion
 
     #region Properties
+    public bool IsSelected { get; set; }
+
     public ObservableCollection<ICanTreeNode> RootNodes
     {
         get;
@@ -48,25 +56,57 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
         get { return selectedTreeNode; }
         set
         {
+            if (selectedTreeNode != null)
+                selectedTreeNode.IsSelected = false;
+
             var firstItem = value?.GetChildren().FirstOrDefault();
             if (firstItem != null)
                 value = firstItem;
 
+            MessageViewModel = value as MessageViewModel;
+            NodeViewModel = value as NodeViewModel;
+            PortViewModel = value as PortViewModel;
+            GenerateViewModel = value as CanSetupViewModel;
+
             selectedTreeNode = value;
+            if (selectedTreeNode != null)
+                selectedTreeNode.IsSelected = true;
+
             OnPropertyChanged();
-            OnPropertyChanged(nameof(SelectedUserControl));
         }
     }
 
-    public UserControl SelectedUserControl
+
+    public MessageViewModel MessageViewModel
     {
-        get
-        {
-            return selectedTreeNode?.GetUserControl();
-        }
-        set
-        {
-        }
+        get { return selectedMessage; }
+        set { selectedMessage = value; OnPropertyChanged(); }
+    }
+
+
+    public CanSetupViewModel GenerateViewModel
+    {
+        get { return selectedGenerate; }
+        set { selectedGenerate = value; OnPropertyChanged(); }
+    }
+
+
+    public NodeViewModel NodeViewModel
+    {
+        get { return selectedNode; }
+        set { selectedNode = value; OnPropertyChanged(); }
+    }
+
+    public PortViewModel PortViewModel
+    {
+        get { return selectedPort; }
+        set { selectedPort = value; OnPropertyChanged(); }
+    }
+
+    public string ErrorText
+    {
+        get { return errorText; }
+        set { errorText = value; OnPropertyChanged(); }
     }
 
     public bool GeneratorEnabled
@@ -90,7 +130,15 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
     public string GeneratorOutputFile
     {
         get { return CanConfiguration.GeneratorOutputFile; }
-        set { CanConfiguration.GeneratorOutputFile = value; OnPropertyChanged(); }
+        set { CanConfiguration.GeneratorOutputFile = value; UpdateErrorText(); OnPropertyChanged(); }
+    }
+
+    private void UpdateErrorText()
+    {
+        if (GeneratorOutputFile.ToLower().StartsWith("obj") && GeneratorOutputFile.EndsWith(".cs"))
+        {
+            ErrorText = $"Warning: Make sure '{GeneratorOutputFile}' is a compiled file in your project";
+        }
     }
 
     public CanClientConfiguration CanConfiguration
@@ -98,12 +146,6 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
         get => canConfiguration;
         set => canConfiguration = value;
     }
-
-    public CANPortEditView PortEditView { get; init; } = new();
-
-    public CANNodeEditView NodeEditView { get; init; } = new();
-
-    public CANMessageEditView MessageEditView { get; init; } = new();
 
     public ObservableCollection<PortViewModel> Ports
     {
@@ -123,12 +165,23 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
 
     public CanSetupViewModel()
     {
-
+        
     }
 
     protected override UserControl OnGetView()
     {
+        ClearCurrentView();
+
+        // Return new View
         return new CANSetup() { DataContext = this };
+    }
+
+    private void ClearCurrentView()
+    {
+        // Clear any previous views 
+        selectedTreeNode = null;
+        selectedTreeNode = rootMessageNode.Children.Count > 0 ? rootMessageNode.Children.First() : rootPortNode.Children.FirstOrDefault();
+        OnPropertyChanged();
     }
 
     protected override void OnInitExtension(HardwareInfo hardwareInfo, string projectInfoFolder, string configurationFile)
@@ -136,6 +189,9 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
         this.hardwareInfo = hardwareInfo;
         projectFolder = projectInfoFolder;
         configurationPath = configurationFile;
+
+        if (String.IsNullOrEmpty(configurationPath))
+            configurationPath = CreateConfigurationName();
 
         LoadCANConfiguration();
     }
@@ -187,7 +243,6 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
         CanConfiguration = null;
         configurationPath = null;
         SelectedTreeNode = null;
-        SelectedUserControl = null;
     }
 
     internal async void SetConfigurationDirectory()
@@ -200,7 +255,8 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
         if (path != null && File.Exists(path))
         {
             var targetPath = Path.Combine(projectFolder, CreateConfigurationName());
-            File.Copy(path, targetPath, true);
+            if (path != targetPath)
+                File.Copy(path, targetPath, true);
 
             configurationPath = CreateConfigurationName();
             LoadCANConfiguration();
@@ -263,7 +319,7 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
 
     private string CreateConfigurationName()
     {
-        return $"CANConfiguration.json";
+        return $"CANServiceConfiguration.json";
     }
 
     internal void RemoveConfiguration()
@@ -293,7 +349,7 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
                     CanConfiguration = ConfigurationFileLoader.LoadFile<CanClientConfiguration>(pathToConfig);
 
                     CanConfiguration.GeneratorNamespace = String.IsNullOrEmpty(CanConfiguration.GeneratorNamespace) ? "Ahsoka.CS.CAN" : CanConfiguration.GeneratorNamespace;
-                    CanConfiguration.GeneratorOutputFile = String.IsNullOrEmpty(CanConfiguration.GeneratorOutputFile) ? "obj\\GeneratedCanObjects.cs" : CanConfiguration.GeneratorOutputFile;
+                    CanConfiguration.GeneratorOutputFile = String.IsNullOrEmpty(CanConfiguration.GeneratorOutputFile) ? "Generated/GeneratedCanObjects.cs" : CanConfiguration.GeneratorOutputFile;
                     CanConfiguration.GeneratorBaseClass = String.IsNullOrEmpty(CanConfiguration.GeneratorBaseClass) ? "CanViewModelBase" : CanConfiguration.GeneratorBaseClass;
                 }
                 catch
@@ -306,13 +362,13 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
                 CanConfiguration = new(); // Create Default 
             }
         }
-       
+
         RootNodes.Clear();
         rootMessageNode = new() { NodeDescription = "Messages", Icon = MaterialIconKind.Folder, IsExpanded = true };
         rootNodeNode = new() { NodeDescription = "Nodes", Icon = MaterialIconKind.Folder, IsExpanded = true };
         rootPortNode = new() { NodeDescription = "Ports", Icon = MaterialIconKind.Folder, IsExpanded = true };
-        rootToolNode = new() { NodeDescription = "Can Tools",  Icon = MaterialIconKind.Toolbox, IsExpanded = true };
-        
+        rootToolNode = new() { NodeDescription = "Can Tools", Icon = MaterialIconKind.Toolbox, IsExpanded = true };
+
         // Add Hardware Ports - Do First for DropDowns
         AddHardwarePorts();
 
@@ -326,7 +382,7 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
 
         // Setup Tools
         rootToolNode.Children.Add(this);
-    
+
         // Add Nodes to Tree in Order
         RootNodes.Add(rootMessageNode);
         RootNodes.Add(rootNodeNode);
@@ -339,18 +395,18 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
         SelectedTreeNode = rootMessageNode.Children.Count > 0 ? rootMessageNode.Children.First() : rootPortNode.Children.FirstOrDefault();
 
         CheckForAnyNode();
+
+        UpdateErrorText();
     }
 
     internal void CheckForAnyNode()
     {
-        bool include = Nodes.Any(x => x.IsJ1939 && x.NodeDefinition.NodeType != NodeType.Any);
-
         var standardDefinitions = CanSystemInfo.StandardCanMessages;
         var standardNode = standardDefinitions.Nodes.First(x => x.Name == "ANY");
-        
+
         var node = Nodes.FirstOrDefault(x => x.Name == "ANY");
         var inList = node != null;
-        if (include && !inList)
+        if (!inList)
         {
             node = new NodeViewModel(this, CustomerToolViewModel, standardNode);
             Nodes.Insert(0, node);
@@ -412,7 +468,7 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
 
     private void ValidateConfiguration()
     {
-        if (canConfiguration == null)
+        if (canConfiguration != null)
             foreach (var message in rootMessageNode.Children)
             {
                 if (message is MessageViewModel messageNode)
@@ -488,13 +544,6 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
         {
             return MaterialIconKind.Tools;
         }
-    }
-
-    public UserControl GetUserControl()
-    {
-        var view = new CANGenerateView();
-        view.DataContext = this;
-        return view;
     }
 
     public IEnumerable<ICanTreeNode> GetChildren() { return Enumerable.Empty<ICanTreeNode>(); }

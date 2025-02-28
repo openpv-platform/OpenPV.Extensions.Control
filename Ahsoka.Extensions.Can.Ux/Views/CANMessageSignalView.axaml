@@ -26,14 +26,17 @@
 			
 					<Border Margin="20,20,20,20" Padding="3" BorderBrush="WhiteSmoke" BorderThickness="0,0,0,0">
 						<StackPanel>
-							<Grid Margin="5" ColumnDefinitions="120,Auto" RowDefinitions="*,*,*,*,*">
-								<TextBlock Text="Default Value:" Grid.Row="0" Grid.Column="0"/>
-								<TextBox Text="{Binding SelectedSignal.DefaultValid}" Grid.Row="0" Width="125"
+							<Grid Margin="5" ColumnDefinitions="130,Auto" RowDefinitions="*,*,*,*,*">
+								<TextBlock Text="Undefined Value:" Grid.Row="0" Grid.Column="0"/>
+								<StackPanel Orientation="Horizontal" Grid.Column="1">
+									<TextBox Text="{Binding SelectedSignal.DefaultValid}"  Grid.Row="0" Width="125"
 										 TextWrapping="NoWrap" Grid.Column="1" HorizontalContentAlignment="Center" />
-
+									<TextBlock Text="Models return this value when CAN Data is not set:" TextWrapping="Wrap" 
+											   Grid.Row="0" Foreground="DimGray" FontSize="11" FontStyle="Italic" MaxWidth="200" Grid.Column="0"/>
+								</StackPanel>
 								<TextBlock Text="Min / Max:" Grid.Row="1" Grid.Column="0"/>
 								<StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
-									<TextBox  Text="{Binding SelectedSignal.MinimumValid}"  HorizontalContentAlignment="Center" Grid.Row="1" Width="125"  TextWrapping="NoWrap" Grid.Column="1" />
+									<TextBox  Text="{Binding SelectedSignal.MinimumValid}" HorizontalContentAlignment="Center" Grid.Row="1" Width="125"  TextWrapping="NoWrap" Grid.Column="1" />
 									<TextBox  Text="{Binding SelectedSignal.MaximumValid}"  HorizontalContentAlignment="Center" Margin="10,0,0,0" Grid.Row="1" Width="125"  TextWrapping="NoWrap" Grid.Column="1" />
 								</StackPanel>
 							</Grid>
@@ -43,7 +46,7 @@
 
 							<Grid Margin="5" ColumnDefinitions="120,Auto" RowDefinitions="*,*,*,*,*">
 								<TextBlock Text="Byte Order:" Grid.Row="1" Grid.Column="0"/>
-								<ComboBox ItemsSource="{Binding ByteOrders}"  SelectedItem="{Binding SelectedSignal.ByteOrder}" Width="250" Grid.Row="1" Grid.Column="1" />
+								<ComboBox ItemsSource="{Binding ByteOrders}"  SelectedItem="{Binding SelectedSignal.Signal.ByteOrder}" Width="250" Grid.Row="1" Grid.Column="1" />
 
 								<TextBlock Text="Value Type:" Grid.Row="2" Grid.Column="0"/>
 								<ComboBox ItemsSource="{Binding ValueTypes}"  SelectedItem="{Binding SelectedSignal.ValueType}" Width="250" Grid.Row="2" Grid.Column="1" />

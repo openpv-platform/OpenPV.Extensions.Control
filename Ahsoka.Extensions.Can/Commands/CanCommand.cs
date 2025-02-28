@@ -1,15 +1,16 @@
-﻿using Ahsoka.Installer;
+﻿using Ahsoka.Core;
+using Ahsoka.Core.Utility;
+using Ahsoka.Installer;
 using Ahsoka.Services.Can;
-using Ahsoka.System;
-using Ahsoka.Utility;
-using ELFSharp.MachO;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 
 namespace Ahsoka.Commands;
 
+[ExcludeFromCodeCoverage]
 [CommandLinePlugin]
 internal static class CanCommands
 {
@@ -46,8 +47,9 @@ internal class CanCodeGenerator : IExtensionGenerator
                 if (commandtypes.HasFlag(CommandTypes.ModelGenerators))
                 {
                     var calibration = JsonUtility.Deserialize<CanClientConfiguration>(File.ReadAllText(configFile));
-                    commandsToExecute.Add($"--GenerateCANClasses \"{Path.GetFileName(packageInfo.GetPackageInfoPath())}\" \"{calibration.GeneratorOutputFile}\" \"{calibration.GeneratorNamespace}\" \"{calibration.GeneratorBaseClass}\" {packageInfo.ApplicationType}",
-                              GeneratorCommandType.AhsokaCommandLine);
+                    if (calibration.GeneratorEnabled)
+                        commandsToExecute.Add($"--GenerateCANClasses \"{Path.GetFileName(packageInfo.GetPackageInfoPath())}\" \"{calibration.GeneratorOutputFile}\" \"{calibration.GeneratorNamespace}\" \"{calibration.GeneratorBaseClass}\" {packageInfo.ApplicationType}",
+                                  GeneratorCommandType.AhsokaCommandLine);
                 }
 
             }

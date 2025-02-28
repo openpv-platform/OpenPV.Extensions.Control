@@ -3,11 +3,11 @@
 
 #include "CanService.pb.h"
 #include "canHandler.h"
-#include "zmq_message_list.h"
 #include "encodeCanMessages.h"
+#include <stdint.h>
 
 extern void handleReceiveCanMessages(canMessageSimple_t* canMessages, uint32_t numMessages);
-extern void canMessageHandler(zmq_message_list_t* list);
+extern void canMessageHandler(uint8_t* header, uint32_t headerLength, uint8_t* data, uint32_t dataLength);
 extern void sendCoprocessorReady(void);
 #endif
 

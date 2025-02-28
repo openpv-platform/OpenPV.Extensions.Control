@@ -1,0 +1,57 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:material="using:Material.Icons.Avalonia"
+             xmlns:progRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="Ahsoka.DeveloperTools.Views.IOCurveEditView">
+
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/UserInputStyles.axaml" />
+	</UserControl.Styles>
+  <Border Margin="5">
+    <Grid RowDefinitions="auto,auto,*">
+      
+      <Grid Grid.Row="0" ColumnDefinitions="auto,*" Margin="0,0,0,0" >
+        <TextBlock Foreground="SteelBlue" FontSize="16" Text="{Binding Name, FallbackValue='Curve'}" Margin="3" />
+        <Border Grid.Column="1" BorderBrush="Gainsboro" Margin="4,10,0,10" BorderThickness="0,1,0,0" Height="2"/>
+      </Grid>
+      
+      <Grid Grid.Row="1" ColumnDefinitions="Auto,Auto" RowDefinitions="38,38">
+        <TextBlock Text="Name:" Grid.Row="0" Grid.Column="0"/>
+        <TextBox Text="{Binding Name}" Width="175" Grid.Row="0" Grid.Column="1" />
+        <TextBlock Text="Input Type:" Grid.Row="1" Grid.Column="0"/>
+        <ComboBox ItemsSource="{Binding InputTypes}" SelectedItem="{Binding InputType}" Width="175" Grid.Row="1" Grid.Column="1" />
+      </Grid>
+
+      <Border Grid.Row="7" Margin="20,0,20,0"  BorderBrush="WhiteSmoke" BorderThickness="0,0,0,0">
+        <DockPanel  LastChildFill="True">
+          <Border DockPanel.Dock="Top" BorderBrush="Gainsboro"  BorderThickness="0,1,0,0" Margin="95,20,0,20" Height="2"/>
+          <TextBlock DockPanel.Dock="Top" Margin="-10,-34,0,10" Text="COORDINATES" Foreground="SteelBlue" HorizontalAlignment="Left" Background="White" />
+
+          <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="20,-44,0,0" Background="White" HorizontalAlignment="Right" >
+            <Button Command="{Binding AddCoordinate}" Margin="10,0,3,0"
+               Width="26" Height="26" Background="Transparent" BorderBrush="Transparent">
+              <material:MaterialIcon Width="20" Height="20" Foreground="SteelBlue" Kind="Plus"></material:MaterialIcon>
+            </Button>
+            <Button Command="{Binding RemoveCoordinate}"
+              Width="26" Height="26" Background="Transparent" BorderBrush="Transparent">
+              <material:MaterialIcon Width="20" Height="20" Foreground="SteelBlue" Kind="Minus"></material:MaterialIcon>
+            </Button>
+          </StackPanel>
+
+          <DataGrid DockPanel.Dock="Top" SelectionMode="Single"
+               ItemsSource="{Binding Coordinates}" SelectedItem="{Binding SelectedCoordinate}"
+               Margin="10,10,20,20" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="X" CellStyleClasses="gdp" Width="Auto" Binding="{Binding X}" IsReadOnly="False"/>
+              <DataGridTextColumn Header="Y" CellStyleClasses="gdp" Width="Auto" Binding="{Binding Y}" IsReadOnly="False"/>
+            </DataGrid.Columns>
+          </DataGrid>
+        </DockPanel>
+      </Border>
+      
+    </Grid>
+  </Border>
+</UserControl>

@@ -1,5 +1,4 @@
 using Ahsoka.Core.IO.Hardware;
-using Ahsoka.System.Hardware;
 
 
 namespace Ahsoka.Services.IO.Platform;

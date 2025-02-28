@@ -1,7 +1,6 @@
-﻿using Ahsoka.ServiceFramework;
+﻿using Ahsoka.Core;
 using System;
 using System.Collections.Generic;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Ahsoka.Services.Can;
 
@@ -94,16 +93,16 @@ internal class CanDataServicHandler
             if (value != null)
                 service.UpdateCacheValue(item.Name, value);
         }
-        catch 
+        catch
         {
-            AhsokaLogging.LogMessage(AhsokaVerbosity.High,$"An error occured reading CAN Message Property {item.Name} with data '{ BitConverter.ToString(message.Data)}'");
+            AhsokaLogging.LogMessage(AhsokaVerbosity.High, $"An error occured reading CAN Message Property {item.Name} with data '{BitConverter.ToString(message.Data)}'");
         }
     }
-  
+
     class CanMessageInfo
     {
         public CanPropertyInfo MultiPlexor;
-        public Dictionary<uint,List<CanPropertyInfo>> MuxProperties = new();
+        public Dictionary<uint, List<CanPropertyInfo>> MuxProperties = new();
         public List<CanPropertyInfo> StandardProperties = new();
     }
 }

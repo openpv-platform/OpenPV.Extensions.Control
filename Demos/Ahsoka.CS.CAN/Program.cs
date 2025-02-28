@@ -1,17 +1,20 @@
-﻿using Ahsoka.Dispatch;
-using Ahsoka.ServiceFramework;
+﻿using Ahsoka.Core;
+using Ahsoka.Core.Dispatch;
 using Ahsoka.Services.Can;
 using Ahsoka.Services.System;
-using Ahsoka.System;
 using System;
+using System.ComponentModel;
+using System.Linq;
 
 namespace Ahsoka.CS.CAN;
 
 public class Program
 {
-    static readonly CairoUI basicUI = new();
+    static MainUI mainUi = new MainUI();
+
     static uint lastSpeed = 0;
     static readonly uint speedDirection = 1000;
+    static uint count = 0;
 
     public static void Main()
     {
@@ -20,6 +23,14 @@ public class Program
         // so we can access things like brightness
         SystemServiceClient systemClient = new();
         CanServiceClient canClient = new();
+
+        // Start our UI and Setup the Various Buttons and Text Areas
+        var window = mainUi.StartUI("OpenPV Can Demo");
+        mainUi.InitStateChanged(false, "Waiting for Can");
+
+        // These Events will listen for our Model Changes and Refresh Our UI.
+        // we are also calling the RefreshUI once to start to init the status values
+        RefreshUI(count, 0, new PropertyChangedEventArgs(""));
 
         Dispatcher.Default.AddStartupItem(systemClient);
 
@@ -32,14 +43,25 @@ public class Program
         // Open the Channel After the System has Started the Services
         Dispatcher.Default.InvokeDispatcher(IntializeCAN, EventArgs.Empty, canClient);
 
-        // Start a Basic UI.  This function will start our UI 
-        // as well as run the Dispatcher in its Main Thread
-        basicUI.StartAndRun(Dispatcher.Default);
+        // Start a Basic UI and run in the Dispatcher's Main Thread
+        Dispatcher.Default.StartAndRun(window.Invoke);
+
+        // Now start the Main Drawing Loop 
+        // we will block here until the app shuts down.
+        window.ShowAndRun();
+
+        Dispatcher.Default.Stop();
 
         // Execute Shutdown
         ApplicationContext.Exit();
 
         return;
+    }
+
+    private static void RefreshUI(uint count, uint id, PropertyChangedEventArgs e)
+    {
+        mainUi.UpdateStatusText("Received Message Count:", $"{count}");
+        mainUi.UpdateStatusText("Last Id:", id.ToString("X"));
     }
 
 
@@ -66,6 +88,8 @@ public class Program
             TimeoutBeforeUpdateInMs = int.MaxValue / 2, // Don't timeout
             TransmitIntervalInMs = 100
         });
+
+        mainUi.InitStateChanged(true, "Can Ready");
     }
 
     private static void RecieveCanData(object sender, CanServiceClient.AhsokaNotificationArgs canArgs)
@@ -75,9 +99,11 @@ public class Program
         {
             foreach (var item in message.Messages)
             {
+                count++;
                 MotorCmd debug = new(item);
                 AhsokaLogging.LogMessage(AhsokaVerbosity.High, $"Received Message {debug.Id}");
             }
+            RefreshUI(count, message.Messages.Last().Id & 0x1FFFFFFF, new PropertyChangedEventArgs(""));
         }
         else if (canArgs.TransportId == CanMessageTypes.Ids.NetworkStateChanged &&
             canArgs.NotificationObject is CanState state)

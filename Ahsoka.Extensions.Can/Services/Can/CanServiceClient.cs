@@ -1,5 +1,4 @@
-﻿using Ahsoka.ServiceFramework;
-using Ahsoka.System;
+﻿using Ahsoka.Core;
 using System.Collections.Generic;
 
 namespace Ahsoka.Services.Can;
@@ -49,7 +48,7 @@ public class CanServiceClient : AhsokaClientBase<CanMessageTypes.Ids>
     /// </summary>
     public void OpenCommunicationChannel()
     {
-        Calibrations = SendNotificationWithResponse<CanApplicationConfiguration>(CanMessageTypes.Ids.OpenCommunicationChannel);
+        Calibrations = SendMessageWithResponse<CanApplicationConfiguration>(CanMessageTypes.Ids.OpenCommunicationChannel);
     }
 
     /// <summary>
@@ -57,7 +56,7 @@ public class CanServiceClient : AhsokaClientBase<CanMessageTypes.Ids>
     /// </summary>
     public void CloseCommunicationChannel()
     {
-        SendNotificationWithResponse<EmptyNotification>(CanMessageTypes.Ids.CloseCommunicationChannel);
+        SendMessageWithResponse<EmptyNotification>(CanMessageTypes.Ids.CloseCommunicationChannel);
         Calibrations = null;
     }
 
@@ -75,7 +74,7 @@ public class CanServiceClient : AhsokaClientBase<CanMessageTypes.Ids>
         };
         collection.Messages.AddRange(messages);
 
-        return SendNotificationWithResponse<CanMessageResult>(CanMessageTypes.Ids.SendCanMessages, collection);
+        return SendMessageWithResponse<CanMessageResult>(CanMessageTypes.Ids.SendCanMessages, collection);
     }
 
     /// <summary>
@@ -98,7 +97,7 @@ public class CanServiceClient : AhsokaClientBase<CanMessageTypes.Ids>
     /// <param name="message"></param>
     public CanMessageResult SendRecurringCanMessage(RecurringCanMessage message)
     {
-        return SendNotificationWithResponse<CanMessageResult>(CanMessageTypes.Ids.SendRecurringCanMessage, message);
+        return SendMessageWithResponse<CanMessageResult>(CanMessageTypes.Ids.SendRecurringCanMessage, message);
     }
 
     /// <summary>
@@ -107,6 +106,6 @@ public class CanServiceClient : AhsokaClientBase<CanMessageTypes.Ids>
     /// <param name="filter"></param>
     public void ApplyCanFilter(ClientCanFilter filter)
     {
-        SendNotificationWithResponse(CanMessageTypes.Ids.ApplyMessageFilter, filter);
+        SendMessageWithResponse(CanMessageTypes.Ids.ApplyMessageFilter, filter);
     }
 }

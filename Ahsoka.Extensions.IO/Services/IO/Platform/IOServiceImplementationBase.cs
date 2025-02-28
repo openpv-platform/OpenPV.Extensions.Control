@@ -1,5 +1,5 @@
+using Ahsoka.Core;
 using Ahsoka.Core.IO.Hardware;
-using Ahsoka.ServiceFramework;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
@@ -24,7 +24,7 @@ internal abstract class IOServiceImplementationBase
     private IDigitalInputImplementation digitalInputImplementation;
     private IDigitalOutputImplementation digitalOutputImplementation;
 
-    ConcurrentDictionary<int,GetInputResponse> latestAnalogValues = new();
+    ConcurrentDictionary<int, GetInputResponse> latestAnalogValues = new();
     ConcurrentDictionary<int, GetInputResponse> latestDigitalValues = new();
     #endregion
 
@@ -97,17 +97,17 @@ internal abstract class IOServiceImplementationBase
                     latestDigitalValues[item] = newValue;
                 }
             }
-            catch (IOException ex) 
-            { 
-                AhsokaLogging.LogMessage(AhsokaVerbosity.High, ex.ToString()); 
+            catch (IOException ex)
+            {
+                AhsokaLogging.LogMessage(AhsokaVerbosity.High, ex.ToString());
             }
         }
     }
 
     protected abstract void OnHandleInit(IOHardwareInfoExtension IOInfo,
-        out IAnalogInputImplementation analogInputImplementation, 
-        out IAnalogOutputImplementation analogOutputImplementation, 
-        out IDigitalInputImplementation digitalInputImplementation, 
+        out IAnalogInputImplementation analogInputImplementation,
+        out IAnalogOutputImplementation analogOutputImplementation,
+        out IDigitalInputImplementation digitalInputImplementation,
         out IDigitalOutputImplementation digitalOutputImplementation);
 
     // Functions to Retrieve IO Pins
@@ -133,7 +133,8 @@ internal abstract class IOServiceImplementationBase
 
     public SetOutputResponse SetDigitalOut(DigitalOutput d)
     {
-        if (!digitalOutList.DigitalOutputs.Any(x => x.Pin == d.Pin))
+        var output = digitalOutList.DigitalOutputs.FirstOrDefault(x => x.Pin == d.Pin);
+        if (output == null)
             return new() { ErrorDescription = "Output Pin Not Found!" };
 
         lock (_ioService)
@@ -143,6 +144,7 @@ internal abstract class IOServiceImplementationBase
             // Notify Data Service of New Value.
             _ioService.UpdateCacheValue(IOServiceMessages.DigitalOutput_ + d.Pin.ToString(), (int)d.State);
 
+            output.State = d.State;
             return returnValue;
         }
     }
@@ -166,7 +168,7 @@ internal abstract class IOServiceImplementationBase
     public GetInputResponse GetAnalogInput(AnalogInput aIn)
     {
         if (!analogInList.AnalogInputs.Any(x => x.Pin == aIn.Pin))
-            return new() { ErrorDescription = "Output Pin Not Found!" };
+            return new() { ErrorDescription = "Input Pin Not Found!" };
 
         // Return Current Value if timer is running
         // if not, call the input read directly
@@ -186,7 +188,7 @@ internal abstract class IOServiceImplementationBase
     public GetInputResponse GetDigitalInput(DigitalInput dIn)
     {
         if (!digitalInList.DigitalInputs.Any(x => x.Pin == dIn.Pin))
-            return new() { ErrorDescription = "Output Pin Not Found!" };
+            return new() { ErrorDescription = "Input Pin Not Found!" };
 
         // Return Current Value if timer is running
         // if not, call the input read directly

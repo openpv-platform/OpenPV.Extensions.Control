@@ -16,7 +16,6 @@ namespace AhsokaCAN
         public: 
 
             uint GetId() { return message.id(); } 
-            void SetId(uint value) { message.set_id(value); } 
 
             CanViewModelBase(uint canID, int dlc)
             {
@@ -99,10 +98,13 @@ namespace AhsokaCAN
             }
 
             virtual std::map<int, CanPropertyInfo>& GetMetadata() = 0;
-            
-        private: 
-       
+
+        protected:
+
             CanMessageData message;
+
+        private:
+
             std::vector<uint64_t>* data;
     };
 }

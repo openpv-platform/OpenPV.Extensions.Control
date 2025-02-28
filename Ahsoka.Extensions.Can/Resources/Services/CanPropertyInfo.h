@@ -86,15 +86,15 @@ namespace AhsokaCAN
 
                 T retVal;
 
-                if (dataType == ValueType::Signed)
+                if (dataType == ValueType::SIGNED)
                     return (T)Unpack(data[messageIndex], scaleValue, getRaw);
-                else if (dataType == ValueType::Unsigned)
+                else if (dataType == ValueType::UNSIGNED)
                     return (T)Unpack(data[messageIndex], scaleValue, getRaw);
-                else if (dataType == ValueType::Float)
+                else if (dataType == ValueType::FLOAT)
                     return (T)Unpack(data[messageIndex], scaleValue, getRaw);
-                else if (dataType == ValueType::Double)
+                else if (dataType == ValueType::DOUBLE)
                     return (T)Unpack(data[messageIndex], scaleValue, getRaw);
-                else if (dataType == ValueType::Enum)
+                else if (dataType == ValueType::ENUM)
                     return (T)(Unpack(data[messageIndex], scaleValue, getRaw));
                 
                 return retVal;
@@ -112,15 +112,15 @@ namespace AhsokaCAN
                 rawValue = scaleValue ? (rawValue - offset) / scale : rawValue;
 
                 // Convert to Byte[8]
-                if (dataType == ValueType::Float)
+                if (dataType == ValueType::FLOAT)
                     iVal =   (long)(float)rawValue; 
-                else if (dataType == ValueType::Double)
+                else if (dataType == ValueType::DOUBLE)
                     iVal =  (long)(double)rawValue; 
                 else
                     iVal = (long)std::round(rawValue);                
 
                 // Pack signal
-                if (byteOrder == ByteOrder::LittleEndian) // Little endian 
+                if (byteOrder == ByteOrder::ORDER_LITTLE_ENDIAN) // Little endian 
                      return (((uint64_t)iVal & bitMask) << startBit);
                 else // Big endian
                     return MirrorMsg(((uint64_t)iVal & bitMask) << GetStartBitLE());
@@ -133,14 +133,14 @@ namespace AhsokaCAN
                 uint64_t bitMask = BitMask();
 
                 // Unpack signal
-                if (byteOrder == ByteOrder::LittleEndian) // Little endian 
+                if (byteOrder == ByteOrder::ORDER_LITTLE_ENDIAN) // Little endian 
                     iVal = (long)((data >> startBit) & bitMask);
                 else // Big endian 
                     iVal = (long)((MirrorMsg(data) >> GetStartBitLE()) & bitMask);
 
-                if (dataType == ValueType::Float)
+                if (dataType == ValueType::FLOAT)
                     retVal = (float)iVal;
-                else if (dataType == ValueType::Double)
+                else if (dataType == ValueType::DOUBLE)
                     retVal = (double)iVal;
                 else 
                     retVal = iVal;
@@ -192,22 +192,22 @@ namespace AhsokaCAN
                     max = DBL_MAX;
                 }
 
-                if (dataType == ValueType::Float)
+                if (dataType == ValueType::FLOAT)
                 {
                     minValue = std::max(min, (double)FLT_MIN);
                     maxValue = std::min(max, (double)FLT_MAX);
                 }
-                else if (dataType == ValueType::Double)
+                else if (dataType == ValueType::DOUBLE)
                 {
                     minValue = std::max(min, DBL_MIN);
                     maxValue = std::min(max, DBL_MAX);
                 }
-                else if (dataType == ValueType::Unsigned || dataType == ValueType::Enum)
+                else if (dataType == ValueType::UNSIGNED || dataType == ValueType::ENUM)
                 {
                     minValue = std::max(min, (double)0);
                     maxValue = std::min(max, (double)UINT32_MAX);
                 }
-                else if (dataType == ValueType::Signed)    
+                else if (dataType == ValueType::SIGNED)    
                 {
                     minValue = std::max(min, (double)INT_MIN);
                     maxValue = std::min(max, (double)INT_MAX);

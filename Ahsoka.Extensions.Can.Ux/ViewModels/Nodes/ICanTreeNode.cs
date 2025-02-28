@@ -1,10 +1,6 @@
-﻿using Avalonia.Controls;
-using Material.Icons;
-using System.Collections;
+﻿using Material.Icons;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Reflection.Metadata.Ecma335;
-using System.ServiceModel.Description;
 
 namespace Ahsoka.Extensions.Can.UX.ViewModels.Nodes;
 
@@ -23,11 +19,11 @@ internal interface ICanTreeNode
 
     public bool IsEditable { get; }
 
+    public bool IsSelected { get; set; }
+
     public string NodeDescription { get; set; }
 
     public MaterialIconKind Icon { get; }
-
-    public UserControl GetUserControl();
 
     public IEnumerable<ICanTreeNode> GetChildren();
 }

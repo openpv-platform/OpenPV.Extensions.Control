@@ -1,5 +1,5 @@
-﻿using Ahsoka.Services.System.Platform;
-using Ahsoka.System;
+﻿using Ahsoka.Core;
+using Ahsoka.Services.System.Platform;
 
 namespace Ahsoka.Commands;
 

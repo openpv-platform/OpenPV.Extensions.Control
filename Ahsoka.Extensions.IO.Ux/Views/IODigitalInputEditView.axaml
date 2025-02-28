@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:material="using:Material.Icons.Avalonia"
+             xmlns:progRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="Ahsoka.DeveloperTools.Views.IODigitalInputEditView">
+
+	<UserControl.Styles>
+		<StyleInclude Source="/Styles/UserInputStyles.axaml" />
+	</UserControl.Styles>
+
+  <Border Margin="5">
+    <Grid RowDefinitions="auto,auto,*">
+
+      <Grid Grid.Row="0" ColumnDefinitions="auto,*" Margin="0,0,0,0" >
+        <TextBlock Foreground="SteelBlue" FontSize="16" Text="{Binding ChannelNum, StringFormat='Digital Input {0}', FallbackValue='Digital Input'}" Margin="3" />
+        <Border Grid.Column="1" BorderBrush="Gainsboro" Margin="4,10,0,10" BorderThickness="0,1,0,0" Height="2"/>
+      </Grid>
+
+      <Grid Grid.Row="1" ColumnDefinitions="Auto,*" RowDefinitions="*,*,*,*,*">
+        <TextBlock Text="Type:" Grid.Row="0" Grid.Column="0"/>
+        <ComboBox Width="175" ItemsSource="{Binding DigitalInputTypes}" SelectedItem="{Binding Type}" Grid.Row="0" Grid.Column="1" />
+        <TextBlock  Text="Threshold:" Grid.Row="1" Grid.Column="0"/>
+        <TextBox Width="100" Text="{Binding Threshold}" Grid.Row="1" Grid.Column="1"/>
+      </Grid>
+
+    </Grid>
+  </Border>
+</UserControl>

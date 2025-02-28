@@ -1,11 +1,10 @@
-﻿using Ahsoka.DeveloperTools.Core;
+﻿using Ahsoka.Core.Utility;
+using Ahsoka.DeveloperTools.Core;
 using Ahsoka.DeveloperTools.Views;
 using Ahsoka.Extensions.Can.UX.ViewModels.Nodes;
 using Ahsoka.Services.Can;
 using Ahsoka.Services.Can.Messages;
-using Ahsoka.Utility;
 using Avalonia.Controls;
-using Avalonia.Media;
 using Material.Icons;
 using System;
 using System.Collections.Generic;
@@ -29,7 +28,7 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNo
     #region Properties
     public IEnumerable<PortViewModel> Ports
     {
-        get { return ParentViewModel.Ports.Where(x=>x.IsEnabled); }
+        get { return ParentViewModel.Ports.Where(x => x.IsEnabled); }
     }
 
     public ObservableCollection<SelectedMessageViewModel> Messages
@@ -74,16 +73,16 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNo
         get { return selectedPort; }
         set
         {
-            
-            if(selectedPort != value) 
-            foreach(var item in Messages)
-                item.CanReceive = item.CanTransmit = false;
+
+            if (selectedPort != value)
+                foreach (var item in Messages)
+                    item.CanReceive = item.CanTransmit = false;
 
             selectedPort = value;
             if (value != null)
                 NodeDefinition.Ports = [(int)value.Port];
 
-          
+
             OnPropertyChanged();
         }
     }
@@ -160,8 +159,9 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNo
         set
         {
             isSelected = value; OnPropertyChanged();
-            OnPropertyChanged(nameof(IconColor));
-            OnPropertyChanged(nameof(BackColor));
+
+            if (isSelected)
+                RefreshMessageList();
         }
     }
 
@@ -253,10 +253,10 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNo
     [Range(0, 7)]
     public uint ECUInstance
     {
-        get { return NodeDefinition.J1939Info.ECUinstance; }
+        get { return NodeDefinition.J1939Info.ECUInstance; }
         set
         {
-            NodeDefinition.J1939Info.ECUinstance = value;
+            NodeDefinition.J1939Info.ECUInstance = value;
             OnPropertyChanged();
         }
     }
@@ -304,18 +304,6 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNo
             OnPropertyChanged();
         }
     }
-
-    public IBrush IconColor
-    {
-        get { return IsSelected ? Brushes.SteelBlue : Brushes.Gainsboro; }
-        set { }
-    }
-
-    public IBrush BackColor
-    {
-        get { return IsSelected ? Brushes.WhiteSmoke : Brushes.White; }
-        set { }
-    }
     #endregion
 
     #region Methods
@@ -341,7 +329,7 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNo
         }
 
         NodeDefinition = definition;
-     
+
         if (NodeDefinition.J1939Info?.Addresses == "")
             NodeDefinition.J1939Info.Addresses = "0,0";
 
@@ -370,21 +358,19 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNo
     private void RefreshMessageList()
     {
         this.Messages.Clear();
-        foreach(var item in ParentViewModel.Messages)
+        foreach (var item in ParentViewModel.Messages)
             this.Messages.Add(new SelectedMessageViewModel(this, item));
     }
 
- 
-
     internal void UpdateAddressClaim()
     {
-         var node = ParentViewModel.Nodes.FirstOrDefault(x => x.IsSelf);
-         if (node != null)
-         {
-             node.NodeDefinition.J1939Info.UseAddressClaim = ParentViewModel.CanConfiguration.Nodes.Any(x => x.TransportProtocol == TransportProtocol.J1939 &&
-                                                                         x.J1939Info.AddressType != NodeAddressType.Static) ||
-                                                                         node.ACMax > node.ACMin;
-         }
+        var node = ParentViewModel.Nodes.FirstOrDefault(x => x.IsSelf);
+        if (node != null)
+        {
+            node.NodeDefinition.J1939Info.UseAddressClaim = ParentViewModel.CanConfiguration.Nodes.Any(x => x.TransportProtocol == TransportProtocol.J1939 &&
+                                                                        x.J1939Info.AddressType != NodeAddressType.Static) ||
+                                                                        node.ACMax > node.ACMin;
+        }
     }
 
     private void RefreshAddressDetails()
@@ -508,16 +494,6 @@ internal class NodeViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTreeNo
         }
     }
 
-    public UserControl GetUserControl()
-    {
-        var view = ParentViewModel.NodeEditView;
-        view.DataContext = null;
-        RefreshMessageList();
-        view.DataContext = this;
-        
-        return view;
-    }
-
     public IEnumerable<ICanTreeNode> GetChildren() { return Enumerable.Empty<ICanTreeNode>(); }
 
     #endregion
@@ -540,18 +516,18 @@ internal class SelectedMessageViewModel : ChildViewModelBase<NodeViewModel>
 
     public bool CanReceive
     {
-        get 
+        get
         {
             int portID = nodeVM.NodeDefinition.Port;
             int nodeID = messageVM.MessageDefinition.ReceiveNodes[nodeVM.NodeDefinition.Port];
-            return nodeID == nodeVM.NodeDefinition.Id; 
+            return nodeID == nodeVM.NodeDefinition.Id;
         }
         set
         {
             if (value)
                 messageVM.MessageDefinition.ReceiveNodes[nodeVM.NodeDefinition.Port] = nodeVM.NodeDefinition.Id;
             else
-                messageVM.MessageDefinition.ReceiveNodes[nodeVM.NodeDefinition.Port] = MessageViewModel.AnyNodeID; 
+                messageVM.MessageDefinition.ReceiveNodes[nodeVM.NodeDefinition.Port] = MessageViewModel.AnyNodeID;
 
             OnPropertyChanged();
         }

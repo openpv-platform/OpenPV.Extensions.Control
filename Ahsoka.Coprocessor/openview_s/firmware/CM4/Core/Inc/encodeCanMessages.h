@@ -2,7 +2,7 @@
 #define __ENCODECANMESSAGES_H__
 
 #include "CanService.pb.h"
-#include "zmq_message_list.h"
+#include <stdint.h>
 
 typedef struct canMessageSimple
 {
@@ -25,8 +25,8 @@ typedef struct canMessageData
 	uint32_t length;
 }canMessageData_t;
 
-extern zmtp_msg_t* encodeCanMessageType(AhsokaCAN_CanMessageTypes_Ids type);
-extern zmtp_msg_t* encodeCanMessageCollection(canMessageSimple_t* canMessages, uint32_t numMessages);
+extern uint32_t encodeCanMessageType(AhsokaCAN_CanMessageTypes_Ids type, uint8_t* data, uint32_t max_length);
+extern uint32_t encodeCanMessageCollection(canMessageSimple_t* canMessages, uint32_t numMessages, uint8_t* data, uint32_t max_length);
 
 #endif
 

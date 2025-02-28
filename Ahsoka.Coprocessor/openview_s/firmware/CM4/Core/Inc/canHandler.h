@@ -2,11 +2,10 @@
 #define __CANHANDLER_H__
 
 #include "CanService.pb.h"
-#include "CanConfiguration.pb.h"
 
-#define TIMER_RESOLUTION  5
+#define TIMER_RESOLUTION  1
 #define MAX_PORTS 2
-#define PDU2_THRESHOLD 240
+#define PDU2_THRESHOLD 0xF00000
 
 typedef void (*crcFunc)(uint32_t, uint8_t*, uint8_t, uint32_t);
 // This structure is used by both transmit and receive messages.
@@ -26,7 +25,6 @@ typedef struct canMessage_type
     uint8_t overrideDestination;
     uint8_t dlc;
     uint8_t rollCountBitPos;  // set to 0 if there is no roll count
-    uint32_t idMask;
     uint32_t transmitNodeId;
     uint32_t receiverNodeId;
 }canMessage_t;

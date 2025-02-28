@@ -1,5 +1,4 @@
-﻿using Ahsoka.ServiceFramework;
-using Ahsoka.System;
+﻿using Ahsoka.Core;
 using Ahsoka.Utility;
 using System;
 using System.Collections.Generic;
@@ -10,14 +9,22 @@ using System.Threading.Tasks;
 namespace Ahsoka.Services.Can.Messages;
 internal class TPMessageHandler : J1939MessageHandlerBase
 {
-    readonly List<TPSession> sessions = new();
+    enum SessionType
+    {
+        ReceiveCTS = 0,
+        ReceiveBAM = 1,
+        TransmitCTS = 2,
+        TransmitBAM = 3,
+    }
+
+    Dictionary<SessionType, List<TPSession>> sessions = new();
     new readonly J1939ProtocolHandler Protocol = null;
 
     internal const uint childPDUF = 0xEB;
 
     protected TPMessageHandler(CanHandler messageHandler, J1939ProtocolHandler protocolHandler, CanServiceImplementation service)
         : base(messageHandler, protocolHandler, service, 0xEC, 0, 3)
-    { 
+    {
         Protocol = protocolHandler;
     }
 
@@ -42,8 +49,11 @@ internal class TPMessageHandler : J1939MessageHandlerBase
         }
     }
 
-    protected override void OnInit()
+    internal override void OnInit()
     {
+        if (Enabled)
+            foreach (SessionType session in Enum.GetValues(typeof(SessionType)))
+                sessions.Add(session, new List<TPSession>());
         return;
     }
 
@@ -56,66 +66,93 @@ internal class TPMessageHandler : J1939MessageHandlerBase
         if (j1939Id.PDUF != PDUF && j1939Id.PDUF != childPDUF)
             return false;
 
-        foreach (var session in sessions)
+        lock (sessions)
         {
-            if (session.HandleMessageReceive(messageData))
-                return true;
+            foreach (var sessionType in sessions)
+            {
+                if (sessionType.Value.Count > 0)
+                    if (sessionType.Value.First().HandleMessageReceive(messageData))
+                        return true;
+            }
+
+            if (j1939Id.PDUF == PDUF)
+            {
+                var RTS = new J1939PropertyDefinitions.TPCM(BitConverter.ToUInt64(messageData.Data));
+
+                var RTSId = new J1939PropertyDefinitions.Id(RTS.PGN << 8)
+                {
+                    SourceAddress = j1939Id.SourceAddress,
+                    PDUS = j1939Id.PDUS,
+                };
+
+                if (RTS.ControlByte is J1939PropertyDefinitions.CMControl.RTS or J1939PropertyDefinitions.CMControl.BAM)
+                {
+
+                    SessionType sessionType = j1939Id.PDUS == J1939PropertyDefinitions.BroadcastAddress ? SessionType.ReceiveBAM : SessionType.ReceiveCTS;
+                    if (sessions[sessionType].Count() == 0 &&
+                        Protocol.InAvailableMessages(RTSId.WriteToUint(), true))
+                    {
+                        sessions[sessionType].Add(new TPSession(this, Protocol, Service, sessionType, messageData));
+                        sessions[sessionType].First().StartTask();
+                        AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"Multi-packet receive session started");
+                    }
+                    else if (j1939Id.PDUS == Protocol.CanState.CurrentAddress)
+                    {
+                        CanMessageData response = new()
+                        {
+                            Dlc = 8,
+                            Id = CreateMessageId(Protocol.CanState.CurrentAddress, j1939Id.SourceAddress)
+                        };
+                        var abort = new J1939PropertyDefinitions.TPCM() { ControlByte = J1939PropertyDefinitions.CMControl.Abort, AbortReason = 1, AbortRole = 1, PGN = (messageData.Id >> 8) & 0x3FFFF };
+                        response.Data = BitConverter.GetBytes(abort.WriteToUint());
+
+                        var messageCollection = new CanMessageDataCollection
+                        {
+                            CanPort = Service.Port
+                        };
+                        messageCollection.Messages.Add(response);
+                        Service.SendCanMessages(messageCollection);
+                        AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"Multi-packet receive session aborted, already receiving");
+                    }
+
+                }
+            }
         }
 
-        if (j1939Id.PDUF == PDUF)
-        {
-            var RTS = new J1939PropertyDefinitions.TPCM(BitConverter.ToUInt64(messageData.Data));
-
-            if (sessions.Where(x => !x.Transmitting).Count() < 2 &&
-            sessions.Where(x => !x.Transmitting && x.DestinationAddress == J1939PropertyDefinitions.BroadcastAddress).Any() &&
-            sessions.Where(x => !x.Transmitting && x.DestinationAddress == j1939Id.PDUS).Any() &&
-            Protocol.InAvailableMessages(RTS.PGN))
-            {
-                sessions.Add(new TPSession(this, Protocol, Service));
-                sessions.Last().StartReceiveSession(messageData);
-            }
-            else
-            {
-                CanMessageData response = new()
-                {
-                    Dlc = 8,
-                    Id = CreateMessageId(Protocol.CanState.CurrentAddress, j1939Id.SourceAddress)
-                };
-                var abort = new J1939PropertyDefinitions.TPCM() { ControlByte = J1939PropertyDefinitions.CMControl.Abort, AbortReason = 1, AbortRole = 1, PGN = (messageData.Id >> 8) & 0x3FFFF };
-                response.Data = BitConverter.GetBytes(RTS.WriteToUint());
-
-                var messageCollection = new CanMessageDataCollection
-                {
-                    CanPort = Service.Port
-                };
-                messageCollection.Messages.Add(response);
-                Service.SendCanMessages(messageCollection);
-            }
-        }
 
         return true;
     }
 
     internal override bool OnSend(SendInformation sendInfo, out CanMessageResult result)
     {
-        result = null;
-        if (!Enabled || (sendInfo.messageData != null && sendInfo.messageData.Dlc <= 8))
-            return false;
-
-        AhsokaLogging.LogMessage(AhsokaVerbosity.High, "TP Send");
-
-        var j1939Id = new J1939PropertyDefinitions.Id(sendInfo.messageData.Id);
-        if (sessions.Where(x => x.Transmitting).Count() == 2)
-            result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"No space for additional Multi-packet sessions" };
-        else if (sessions.Where(x => x.Transmitting && x.DestinationAddress == J1939PropertyDefinitions.BroadcastAddress).Count() == 1)
-            result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"Can only send one broadcast message at a time" };
-        else if (sessions.Where(x => x.Transmitting && x.DestinationAddress == j1939Id.PDUS).Count() == 1)
-            result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"Message to this address already in progress" };
-        else
+        try
         {
-            sessions.Add(new TPSession(this, Protocol, Service));
-            sessions.Last().StartTransmitSession(sendInfo.messageData);
-            result = new CanMessageResult() { Status = MessageStatus.Success, Message = $"Multi-packet transmit session started" };
+            result = null;
+            if (!Enabled || (sendInfo.messageData != null && sendInfo.messageData.Dlc <= 8))
+                return false;
+
+            lock (sessions)
+            {
+                var j1939Id = new J1939PropertyDefinitions.Id(sendInfo.messageData.Id);
+                SessionType sessionType = j1939Id.PDUS == J1939PropertyDefinitions.BroadcastAddress ? SessionType.TransmitBAM : SessionType.TransmitCTS;
+                sessions[sessionType].Add(new TPSession(this, Protocol, Service, sessionType, sendInfo.messageData));
+
+                //tech debt, must return error so message is not sent normally
+                if (sessions[sessionType].Count() > 1)
+                    result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"Message Queued, another message with of type {sessionType} is being transmitted" };
+                else
+                {
+                    sessions[sessionType].First().StartTask();
+                    result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"Multi-packet transmit session started" };
+                }
+            }
+
+            AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"{result.Message}");
+        }
+        catch (Exception ex)
+        {
+            AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP send failed with message: {ex.Message}");
+            result = new CanMessageResult() { Status = MessageStatus.Error, Message = $"TP send failed with message: {ex.Message}" };
         }
 
         return true;
@@ -123,11 +160,22 @@ internal class TPMessageHandler : J1939MessageHandlerBase
 
     private void EndSession(TPSession session)
     {
-        sessions.Remove(session);
+        lock (sessions)
+        {
+            var sessionList = sessions[session.SessionType];
+            sessionList.Remove(session);
+
+            if (sessionList.Count > 0)
+            {
+                Thread.Sleep(10);
+                sessionList.First().StartTask();
+            }
+        }
     }
 
     private class TPSession
     {
+        const int Tb = 10;  //timeout min before sending BAM
         const int Tr = 200; //timeout max before sending next packet
         const int Th = 500; //timeout max between "hold connection" CTS
         const int T1 = 750; //timeout after receipt of last packet, more expected
@@ -139,6 +187,8 @@ internal class TPMessageHandler : J1939MessageHandlerBase
         readonly CanServiceImplementation service;
         readonly J1939ProtocolHandler protocol;
         readonly CanMessageDataCollection messageCollection;
+
+        Task sessionTask;
         int numberOfPackets;
 
         readonly List<CanMessageData> receivedMessages = new();
@@ -147,18 +197,26 @@ internal class TPMessageHandler : J1939MessageHandlerBase
 
         internal uint DestinationAddress { get; private set; } //for originator messages
         internal uint SourceAddress { get; private set; } //for originator messages
-        internal bool Transmitting { get; private set; }
+        internal SessionType SessionType { get; private set; }
+        internal bool Transmitting { get { return SessionType > SessionType.ReceiveBAM; } }
 
-        internal TPSession(TPMessageHandler handler, J1939ProtocolHandler protocol, CanServiceImplementation service)
+        internal TPSession(TPMessageHandler handler, J1939ProtocolHandler protocol, CanServiceImplementation service, SessionType sessionType, CanMessageData messageData)
         {
             this.handler = handler;
             this.protocol = protocol;
             this.service = service;
+            this.SessionType = sessionType;
 
             messageCollection = new CanMessageDataCollection
             {
                 CanPort = service.Port
             };
+
+            if (Transmitting)
+                CreateTransmitSession(messageData);
+            else
+                CreateReceiveSession(messageData);
+
         }
 
         internal bool HandleMessageReceive(CanMessageData messageData)
@@ -178,19 +236,27 @@ internal class TPMessageHandler : J1939MessageHandlerBase
             return false;
         }
 
-        internal void StartTransmitSession(CanMessageData messageData)
+        internal void StartTask()
         {
-            Task.Run(() =>
-            {
-                numberOfPackets = (int)(messageData.Dlc / 7 + (messageData.Dlc % 7 > 0 ? 1 : 0));
+            sessionTask.Start();
+            sessionTask.ContinueWith(shutdown => handler.EndSession(this));
+        }
 
-                var j1939Id = new J1939PropertyDefinitions.Id(messageData.Id);
-                var PGN = (messageData.Id >> 8) & 0x3FFFF;
-                DestinationAddress = j1939Id.PDUS;
-                SourceAddress = protocol.CanState.CurrentAddress;
-                Transmitting = true;
-                if (j1939Id.PDUS == J1939PropertyDefinitions.BroadcastAddress)
+        private void CreateTransmitSession(CanMessageData messageData)
+        {
+            numberOfPackets = (int)(messageData.Data.Length / 7 + (messageData.Dlc % 7 > 0 ? 1 : 0));
+
+            var j1939Id = new J1939PropertyDefinitions.Id(messageData.Id);
+            var PGN = (messageData.Id >> 8) & 0x3FFFF;
+            DestinationAddress = j1939Id.PDUS;
+            SourceAddress = protocol.CanState.CurrentAddress;
+
+            sessionTask = new Task(() =>
+            {
+
+                if (SessionType == SessionType.TransmitBAM)
                 {
+                    AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Transmit BAM Started");
                     var response = new CanMessageData
                     {
                         Id = handler.CreateMessageId(SourceAddress, J1939PropertyDefinitions.BroadcastAddress)
@@ -201,13 +267,15 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                     messageCollection.Messages.Add(response);
                     service.SendCanMessages(messageCollection);
 
-                    TPEvent.Wait(Tr / 2);
+                    TPEvent.Wait(Tb);
 
                     response.Id = (handler.CreateMessageId(SourceAddress, J1939PropertyDefinitions.BroadcastAddress) & 0xFF00FFFF) | TPMessageHandler.childPDUF << 16;
-                    SendPackets(messageData, response, 1, (uint)numberOfPackets);
+                    SendPackets(messageData, response.Id, 1, (uint)numberOfPackets, Tb);
+                    AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Transmit BAM Completed");
                 }
-                else
+                else if (SessionType == SessionType.TransmitCTS)
                 {
+                    AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Transmit Started");
                     var response = new CanMessageData
                     {
                         Id = handler.CreateMessageId(SourceAddress, DestinationAddress)
@@ -244,12 +312,19 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                                     CTS.PacketsRequested = (uint)(numberOfPackets - CTS.PacketStart) + 1;
                                 }
 
+                                AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Transmit CTS Received sending {CTS.PacketsRequested} packets starting at {CTS.PacketStart}");
                                 response.Id = (handler.CreateMessageId(SourceAddress, DestinationAddress) & 0xFF00FFFF) | TPMessageHandler.childPDUF << 16;
-                                SendPackets(messageData, response, CTS.PacketStart, CTS.PacketsRequested);
+                                SendPackets(messageData, response.Id, CTS.PacketStart, CTS.PacketsRequested);
                                 delay = T3;
                             }
-                            else if (CTS.ControlByte is J1939PropertyDefinitions.CMControl.EndOfMsgACK or J1939PropertyDefinitions.CMControl.Abort)
+                            else if (CTS.ControlByte is J1939PropertyDefinitions.CMControl.EndOfMsgACK)
                             {
+                                AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Transmit Completed");
+                                transmissionFinished = true;
+                            }
+                            else if (CTS.ControlByte is J1939PropertyDefinitions.CMControl.Abort)
+                            {
+                                AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Transmit received Abort Signal");
                                 transmissionFinished = true;
                             }
                         }
@@ -261,28 +336,27 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                             messageCollection.Messages.Clear();
                             messageCollection.Messages.Add(response);
                             service.SendCanMessages(messageCollection);
+                            AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Transmit Timeout");
                             transmissionFinished = true;
                         }
                     }
                 }
-            }).ContinueWith((result) =>
-            {
-                handler.EndSession(this);
             });
         }
 
-        internal void StartReceiveSession(CanMessageData messageData)
+        private void CreateReceiveSession(CanMessageData messageData)
         {
-            Task.Run(() =>
+            var j1939Id = new J1939PropertyDefinitions.Id(messageData.Id);
+            var PGN = (messageData.Id >> 8) & 0x3FFFF;
+            DestinationAddress = j1939Id.PDUS;
+            SourceAddress = j1939Id.SourceAddress;
+
+            sessionTask = new Task(() =>
             {
-                var j1939Id = new J1939PropertyDefinitions.Id(messageData.Id);
-                var PGN = (messageData.Id >> 8) & 0x3FFFF;
-                DestinationAddress = j1939Id.PDUS;
-                SourceAddress = j1939Id.SourceAddress;
-                Transmitting = false;
                 var sequenceNumber = 1;
-                if (j1939Id.PDUS == J1939PropertyDefinitions.BroadcastAddress)
+                if (SessionType == SessionType.ReceiveBAM)
                 {
+                    AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Receive BAM Started");
                     var BAM = new J1939PropertyDefinitions.TPCM(BitConverter.ToUInt64(messageData.Data));
 
                     var message = new CanMessageData();
@@ -309,21 +383,26 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                                         Array.Copy(dt.Data, 1, message.Data, 7 * (sequenceNumber - 1), bytesToCopy);
                                         sequenceNumber++;
                                     }
-                                    else break;
                                 }
                                 receivedMessages.Clear();
                                 recievedEvent.Reset();
                             }
                         }
-                        else break;
+                        else
+                        {
+                            AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Receive BAM Timed Out");
+                            return;
+                        }
                     }
 
+                    AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Receive BAM Completed");
                     messageCollection.Messages.Clear();
                     messageCollection.Messages.Add(message);
                     service.Service.NotifyCanMessages(messageCollection);
                 }
-                else if (j1939Id.PDUS == protocol.CanState.CurrentAddress)
+                else if (SessionType == SessionType.ReceiveCTS)
                 {
+                    AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Receive Started");
                     var RTS = new J1939PropertyDefinitions.TPCM(BitConverter.ToUInt64(messageData.Data));
                     if (RTS.PacketsPerCTS > RTS.NumPackets)
                         RTS.PacketsPerCTS = RTS.NumPackets;
@@ -360,6 +439,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                             messageCollection.Messages.Clear();
                             messageCollection.Messages.Add(message);
                             service.Service.NotifyCanMessages(messageCollection);
+                            AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Receive Completed");
                             receiveFinished = true;
                         }
                         else
@@ -375,7 +455,8 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                             service.SendCanMessages(messageCollection);
                             var delay = T2;
 
-                            while (sequenceNumber < nextPacket)
+                            AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Receive requesting {packetsRequested} packets starting from {sequenceNumber}");
+                            while ((sequenceNumber < nextPacket) && !receiveFinished)
                             {
                                 errorOccured = false;
                                 if (recievedEvent.Wait(delay))
@@ -384,7 +465,19 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                                     {
                                         foreach (var dt in receivedMessages)
                                         {
-                                            if (dt.Data[0] == sequenceNumber)
+                                            J1939PropertyDefinitions.Id dtId = new(dt.Id);
+                                            if (dtId.PDUF == handler.PDUF)
+                                            {
+                                                var TPCM = new J1939PropertyDefinitions.TPCM(BitConverter.ToUInt64(dt.Data));
+                                                if (TPCM.ControlByte == J1939PropertyDefinitions.CMControl.Abort)
+                                                {
+                                                    AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Received Abort Message");
+                                                    errorOccured = true;
+                                                    numRetransmits = 3;
+                                                    break;
+                                                }
+                                            }
+                                            else if (dt.Data[0] == sequenceNumber)
                                             {
                                                 var bytesToCopy = sequenceNumber == RTS.NumPackets ? message.Dlc % 7 : 7;
                                                 Array.Copy(dt.Data, 1, message.Data, 7 * (sequenceNumber - 1), bytesToCopy);
@@ -393,6 +486,7 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                                             }
                                             else
                                             {
+                                                AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Receive Out of Order");
                                                 errorOccured = true;
                                                 break;
                                             }
@@ -402,11 +496,17 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                                     }
 
                                 }
-                                else errorOccured = true;
+                                else
+                                {
+                                    AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Receive Timeout");
+                                    errorOccured = true;
+                                }
 
                                 if (errorOccured)
+                                {
                                     if (++numRetransmits > 2)
                                     {
+                                        AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"TP Receive Aborted");
                                         var abort = new J1939PropertyDefinitions.TPCM() { ControlByte = J1939PropertyDefinitions.CMControl.Abort, AbortReason = 5, AbortRole = 1, PGN = PGN };
                                         response.Data = BitConverter.GetBytes(abort.WriteToUint());
                                         messageCollection.Messages.Clear();
@@ -414,30 +514,44 @@ internal class TPMessageHandler : J1939MessageHandlerBase
                                         service.SendCanMessages(messageCollection);
                                         receiveFinished = true;
                                     }
-                                    else break;
+                                    break;
+                                }
+
                             }
                         }
                     }
                 }
-            }).ContinueWith((result) =>
-            {
-                handler.EndSession(this);
             });
         }
 
-        private void SendPackets(CanMessageData messageData, CanMessageData packet, uint sequenceNumber, uint numPacketsToSend)
+        private void SendPackets(CanMessageData messageData, uint packetId, uint sequenceNumber, uint numPacketsToSend, int delay = 0)
         {
+            messageCollection.Messages.Clear();
             for (uint i = sequenceNumber; i < sequenceNumber + numPacketsToSend; i++)
             {
-                messageCollection.Messages.Clear();
-                packet.Data = new byte[] { (byte)i, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+                CanMessageData packet = new()
+                {
+                    Id = packetId,
+                    Dlc = 8,
+                    Data = [(byte)i, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
+                };
                 var bytesToCopy = i == numberOfPackets ? messageData.Dlc % 7 : 7;
                 Array.Copy(messageData.Data, 7 * (i - 1), packet.Data, 1, bytesToCopy);
                 messageCollection.Messages.Add(packet);
+
+                //transmit groups of six messages, helps smooth large transmissions
+                if (delay > 0 || (i - sequenceNumber + 1) % 6 == 0)
+                {
+                    service.SendCanMessages(messageCollection);
+                    messageCollection.Messages.Clear();
+                    TPEvent.Wait(delay);
+                }
+            }
+            if (messageCollection.Messages.Count > 0)
                 service.SendCanMessages(messageCollection);
 
-                TPEvent.Wait(Tr / 2);
-            }
+            TPEvent.Wait(Tr / 2);
         }
     }
+
 }

@@ -5,7 +5,6 @@
 #include "pb_decode.h"
 #include "pb_encode.h"
 #include "CanService.pb.h"
-#include "CanConfiguration.pb.h"
 #include "decodeCanConfiguration.h"
 #include "nodeList.h"
 
@@ -130,7 +129,6 @@ bool decodeMessage(pb_istream_t *stream, const pb_field_iter_t *field, void **ar
 				// initialize message values.
 				node->msg->id = message.id;
 				node->msg->msgType = message.message_type;
-				node->msg->idMask = message.id_mask;
 				node->msg->overrideDestination = message.override_source_address;
 				node->msg->overrideSource = message.override_source_address;
 				node->msg->rate = message.rate;
@@ -201,7 +199,6 @@ bool decodeMessage(pb_istream_t *stream, const pb_field_iter_t *field, void **ar
 				node->msg->dlc = message.dlc;
 				node->msg->crc = NULL;  // for now.
 				node->msg->crcPos = 0;
-				node->msg->idMask = message.id_mask;
 				node->msg->overrideDestination = message.override_source_address;
 				node->msg->overrideSource = message.override_source_address;
 				addCanMessageList(&rxList[i], node);
@@ -236,9 +233,9 @@ bool decodeNode(pb_istream_t *stream, const pb_field_iter_t *field, void **arg)
         //iterate over ports node is available on
         while(decodeList != NULL)
 		{
-        	if(message.J1939Info.address_type == AhsokaCAN_NodeAddressType_static)
+        	if(message.j1939_info.address_type == AhsokaCAN_NodeAddressType_STATIC)
 			{
-				node->address = message.J1939Info.address_value_one;
+				node->address = message.j1939_info.address_value_one;
 			}
         	else
         	{
@@ -246,12 +243,12 @@ bool decodeNode(pb_istream_t *stream, const pb_field_iter_t *field, void **arg)
         	}
 
 			// add node to list of nodes here!
-			if(message.node_type == AhsokaCAN_NodeType_Self)
+			if(message.node_type == AhsokaCAN_NodeType_SELF)
 			{
 				// this is the transmitter node
 				txNode[decodeList->id] = node;
 			}
-			else if(message.node_type == AhsokaCAN_NodeType_Any)
+			else if(message.node_type == AhsokaCAN_NodeType_ANY)
 			{
 				// this is the broadcast node
 				broadcastNode[decodeList->id] = node;
@@ -275,36 +272,36 @@ void decodeCANCalibration(void)
 	AhsokaCAN_CanApplicationConfiguration msg = AhsokaCAN_CanApplicationConfiguration_init_zero;
 
     // need to decode ports before decoding calibration nodes.
-	msg.CanPortConfiguration.MessageConfiguration.ports.arg = NULL;
-	msg.CanPortConfiguration.MessageConfiguration.ports.funcs.decode = decodePort;
+	msg.can_port_configuration.message_configuration.ports.arg = NULL;
+	msg.can_port_configuration.message_configuration.ports.funcs.decode = decodePort;
 
 	uint8_t* localIpAddress = NULL;
 	uint8_t* remoteIpAddress = NULL;
-	msg.CanPortConfiguration.CommunicationConfiguration.local_ip_address.arg = localIpAddress;
-	msg.CanPortConfiguration.CommunicationConfiguration.local_ip_address.funcs.decode = decodeString;
-	msg.CanPortConfiguration.CommunicationConfiguration.remote_ip_address.arg = remoteIpAddress;
-	msg.CanPortConfiguration.CommunicationConfiguration.remote_ip_address.funcs.decode = decodeString;
+	msg.can_port_configuration.communication_configuration.local_ip_address.arg = localIpAddress;
+	msg.can_port_configuration.communication_configuration.local_ip_address.funcs.decode = decodeString;
+	msg.can_port_configuration.communication_configuration.remote_ip_address.arg = remoteIpAddress;
+	msg.can_port_configuration.communication_configuration.remote_ip_address.funcs.decode = decodeString;
 
 	uint8_t* buffer = (uint8_t*)0x800;
 	pb_istream_t stream = pb_istream_from_buffer(buffer, (64*1024)-0x800);
 	pb_decode(&stream, AhsokaCAN_CanApplicationConfiguration_fields, &msg);
 
-	localIpAddress = msg.CanPortConfiguration.CommunicationConfiguration.local_ip_address.arg;
-	remoteIpAddress = msg.CanPortConfiguration.CommunicationConfiguration.remote_ip_address.arg;
+	localIpAddress = msg.can_port_configuration.communication_configuration.local_ip_address.arg;
+	remoteIpAddress = msg.can_port_configuration.communication_configuration.remote_ip_address.arg;
 
     // need to decode nodes before decoding calibration messages.
-	msg.CanPortConfiguration.MessageConfiguration.ports.funcs.decode = NULL;
-	msg.CanPortConfiguration.MessageConfiguration.nodes.arg = NULL;
-	msg.CanPortConfiguration.MessageConfiguration.nodes.funcs.decode = decodeNode;
+	msg.can_port_configuration.message_configuration.ports.funcs.decode = NULL;
+	msg.can_port_configuration.message_configuration.nodes.arg = NULL;
+	msg.can_port_configuration.message_configuration.nodes.funcs.decode = decodeNode;
 
 	buffer = (uint8_t*)0x800;
 	stream = pb_istream_from_buffer(buffer, (64*1024)-0x800);
 	pb_decode(&stream, AhsokaCAN_CanApplicationConfiguration_fields, &msg);
 
 	// status will be false here
-	msg.CanPortConfiguration.MessageConfiguration.nodes.funcs.decode = NULL;
-	msg.CanPortConfiguration.MessageConfiguration.messages.arg = NULL;
-	msg.CanPortConfiguration.MessageConfiguration.messages.funcs.decode = decodeMessage;
+	msg.can_port_configuration.message_configuration.nodes.funcs.decode = NULL;
+	msg.can_port_configuration.message_configuration.messages.arg = NULL;
+	msg.can_port_configuration.message_configuration.messages.funcs.decode = decodeMessage;
 
 	buffer = (uint8_t*)0x800;
 	stream = pb_istream_from_buffer(buffer, (64*1024)-0x800);

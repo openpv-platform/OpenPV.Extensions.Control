@@ -1,4 +1,4 @@
-using Ahsoka.ServiceFramework;
+using Ahsoka.Core;
 using System;
 using System.Collections.Generic;
 using System.Device.Gpio;
@@ -31,7 +31,7 @@ internal static class MuxSelectUtils
     static GpioController muxControllerA;
     static GpioController muxControllerB;
     static GpioController muxControllerC;
-   
+
     static MuxSelectUtils()
     {
         muxControllerA = new(PinNumberingScheme.Logical, new LibGpiodDriver(MuxChipA));
@@ -69,7 +69,7 @@ internal static class MuxSelectUtils
             muxController.ClosePin(MuxPin);
             return true;
         }
-        catch (IOException ex) 
+        catch (IOException ex)
         {
             if (throwOnError)
             {
@@ -84,8 +84,8 @@ internal static class MuxSelectUtils
     public static void SetMuxSelect(ADCInput index)
     {
         // Set Mux Select A
-        bool result = SetMux(muxControllerA, MuxPinA, BitMask[index][0],false);
-        if (!result) 
+        bool result = SetMux(muxControllerA, MuxPinA, BitMask[index][0], false);
+        if (!result)
             result = SetMux(muxControllerA, MuxPinA, BitMask[index][0], true); // Retry
 
         // Set Mux Select B
@@ -136,7 +136,7 @@ static class ADCUtils
         if (_voltsScaleValue == 0 && File.Exists(_voltsScalePath))
             _voltsScaleValue = float.Parse(File.ReadAllText(_voltsScalePath));
 
-        if (_voltsOffsetValue == -1 && File.Exists(_voltsOffsetPath) )
+        if (_voltsOffsetValue == -1 && File.Exists(_voltsOffsetPath))
             _voltsOffsetValue = float.Parse(File.ReadAllText(_voltsOffsetPath));
 
         lock (_syncRoot)

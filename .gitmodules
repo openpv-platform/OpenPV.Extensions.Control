@@ -3,4 +3,4 @@
 	url = ../Forks.stm32_mw_lwip
 [submodule "Ahsoka.Shared"]
 	path = Ahsoka.Shared
-	url = https://enovation.visualstudio.com/OpenPV/_git/OpenPV.Shared
+	url = ../OpenPV.Shared

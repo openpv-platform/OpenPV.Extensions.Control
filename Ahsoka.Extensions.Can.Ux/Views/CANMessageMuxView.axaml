@@ -27,7 +27,7 @@
 							<Grid Margin="5" ColumnDefinitions="110,Auto" RowDefinitions="*,*,*,*,*">
 								<TextBlock Text="Mux Role:" Grid.Row="1" Grid.Column="0"/>
 								<ComboBox ItemsSource="{Binding MuxRoles}"
-										  SelectedItem="{Binding SelectedSignal.MuxRole}" Width="200" Grid.Row="1" Grid.Column="1" />
+										  SelectedItem="{Binding SelectedSignal.Signal.MuxRole}" Width="200" Grid.Row="1" Grid.Column="1" />
 
 								<TextBlock Text="Group:" Grid.Row="2" Grid.Column="0"/>
 								<TextBox Text="{Binding SelectedSignal.MuxGroupValid}"  HorizontalContentAlignment="Center" Grid.Row="2" Width="125"  TextWrapping="NoWrap" Grid.Column="1" />

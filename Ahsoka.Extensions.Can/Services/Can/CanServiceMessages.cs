@@ -1,17 +1,15 @@
-﻿using Ahsoka.Installer;
-using Ahsoka.ServiceFramework;
+﻿using Ahsoka.Core;
+using Ahsoka.Installer;
 using Ahsoka.Services.System;
-using Ahsoka.System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace Ahsoka.Services.Can;
 
 internal class CanServiceMessages : AhsokaMessagesBase
 {
-    public CanServiceMessages()
+    public CanServiceMessages() : base(CanService.Name)
     {
         this.RegisterServiceRequest(CanMessageTypes.Ids.OpenCommunicationChannel, typeof(EmptyNotification), typeof(CanApplicationConfiguration), false, false);
         this.RegisterServiceRequest(CanMessageTypes.Ids.CloseCommunicationChannel, typeof(EmptyNotification), typeof(EmptyNotification), false, false);
@@ -31,20 +29,27 @@ internal class CanServiceMessages : AhsokaMessagesBase
         this.RegisterServiceRequest(CanMessageTypes.Ids.CoprocessorHeartbeat, typeof(EmptyNotification), typeof(EmptyNotification), false, true);
     }
 
-    public override Dictionary<string, byte[]> GetAdditionalClientResources(ApplicationType type, bool includeImplementation)
+    protected override Dictionary<string, byte[]> OnGetAdditionalClientResources(ApplicationType type, bool includeImplementation = true)
     {
-        var result = base.GetAdditionalClientResources(type);
+        var result = base.OnGetAdditionalClientResources(type);
         result.Add("inc\\services\\CanServiceClientExtensions.h", Properties.CANResources.CanServiceClientExtensionsH);
         result.Add("inc\\services\\IHasCanData.h", Properties.CANResources.IHasCanData);
         result.Add("inc\\services\\CanServiceClientIncludes.h", Properties.CANResources.CanServiceClientIncludes);
 
-        result.Add("Ahsoka.Proto\\CanConfiguration.proto", Properties.CANResources.CanConfiguration);
-        result.Add("Ahsoka.Proto\\CanService.proto", Properties.CANResources.CanService);
+        result.Add("Ahsoka.Proto\\CanService.proto", GetProtoMessageFile());
 
-        if (includeImplementation) 
+        if (includeImplementation)
             result.Add("inc\\services\\CanServiceClientExtensions.cxx", Properties.CANResources.CanServiceClientExtensionsCXX);
 
         return result;
+    }
+
+    /// <InheritDoc/>
+    public override byte[] GetProtoMessageFile()
+    {
+        return this.GenerateProtoFile("AhsokaCAN", typeof(CanMessageTypes.Ids),
+            typeof(CanApplicationConfiguration),
+            typeof(CanClientConfiguration));
     }
 
     /// <InheritDoc/>

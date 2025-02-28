@@ -1,0 +1,114 @@
+{
+  "name": "STDemoPackage.1",
+  "localIpAddress": "192.168.8.2",
+  "remoteIpAddress": "192.168.8.1",
+  "ports": [
+    {
+      "port": 1,
+      "canInterfacePath": "can1",
+      "baudRate": "Baud250kb",
+      "canInterface": "EcomWindows",
+      "promiscuousTransmit": false,
+      "promiscuousReceive": false,
+      "userDefined": false
+    }
+  ],
+  "nodes": [
+    {
+      "id": 1,
+      "name": "CONTROLLER",
+      "comment": "",
+      "nodeType": "Self",
+      "transportProtocol": "J1939",
+      "j1939Info": {
+        "addressType": "Static",
+        "addressValueOne": 10,
+        "addressValueTwo": 0,
+        "addressValueThree": 0,
+        "industryGroup": 0,
+        "vehicleSystemInstance": 0,
+        "vehicleSystem": 0,
+        "function": 5,
+        "functionInstance": 0,
+        "ecuInstance": 0,
+        "manufacturerCode": 0,
+        "name": 0,
+        "addresses": "40,40",
+        "useAddressClaim": false,
+        "addressOneValid": 10,
+        "addressTwoValid": 0,
+        "addressThreeValid": 0
+      },
+      "ports": [
+        1
+      ],
+      "idValid": 1,
+      "port": 1
+    },
+    {
+      "id": 255,
+      "name": "ANY",
+      "comment": "",
+      "nodeType": "Any",
+      "transportProtocol": "J1939",
+      "j1939Info": {
+        "addressType": "Static",
+        "addressValueOne": 255,
+        "addressValueTwo": 0,
+        "addressValueThree": 0,
+        "industryGroup": 0,
+        "vehicleSystemInstance": 0,
+        "vehicleSystem": 0,
+        "function": 0,
+        "functionInstance": 0,
+        "ecuInstance": 0,
+        "manufacturerCode": 0,
+        "name": 0,
+        "addresses": "0,0",
+        "useAddressClaim": false,
+        "addressOneValid": 255,
+        "addressTwoValid": 0,
+        "addressThreeValid": 0
+      },
+      "ports": [
+        1
+      ],
+      "idValid": 255,
+      "port": 1
+    }
+  ],
+  "messages": [
+    {
+      "id": 2150301696,
+      "name": "Service",
+      "messageType": "J1939ExtendedFrame",
+      "dlc": 0,
+      "rate": 0,
+      "comment": "",
+      "hasRollCount": false,
+      "rollCountBit": 0,
+      "rollCountLength": 0,
+      "crcType": "None",
+      "crcBit": 0,
+      "timeoutMs": 0,
+      "filterReceipts": false,
+      "userDefined": true,
+      "transmitNodes": [
+        -1,
+        255
+      ],
+      "receiveNodes": [
+        -1,
+        255
+      ],
+      "overrideSourceAddress": true,
+      "overrideDestinationAddress": true,
+      "signals": []
+    }
+  ],
+  "generatorEnabled": true,
+  "generatorNamespace": "Ahsoka.CS.CAN",
+  "generatorOutputFile": "Generated/GeneratedCanObjects.cs",
+  "generatorBaseClass": "CanViewModelBase",
+  "version": "4.1.1.20010"
+}

@@ -1,13 +1,12 @@
+using Ahsoka.Core;
+using Ahsoka.Core.Hardware;
+using Ahsoka.Core.Utility;
 using Ahsoka.Installer;
 using Ahsoka.Installer.Components;
-using Ahsoka.ServiceFramework;
 using Ahsoka.Services.Can;
 using Ahsoka.Services.Can.Messages;
+using Ahsoka.Services.Can.Platform;
 using Ahsoka.Services.IO;
-using Ahsoka.Services.Network;
-using Ahsoka.Services.System;
-using Ahsoka.System;
-using Ahsoka.System.Hardware;
 using Ahsoka.Test.Control.Properties;
 using Ahsoka.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -31,7 +30,7 @@ public class CanServiceTests : LinearTestBase
     readonly List<CanMessageData> messages = new();
 
 
-    internal static void GetParametersTests(PackageInformation info )
+    internal static void GetParametersTests(PackageInformation info)
     {
         var knownValues = AhsokaMessagesBase.GetAllSystemParameters(info);
 
@@ -68,7 +67,7 @@ public class CanServiceTests : LinearTestBase
         File.Delete(canDBCFile);
         File.Delete(canConfigFile);
 
-        AhsokaRuntime.ShutdownAll();
+        AhsokaRuntime.Default.StopAllEndPoints();
     }
 
 
@@ -142,20 +141,19 @@ public class CanServiceTests : LinearTestBase
         tsc1.HasRollCount = true;
         tsc1.MessageType = MessageType.J1939ExtendedFrame;
         tsc1.TransmitNodes = firstMessage.TransmitNodes;
-        tsc1.ReceiveNodes = new int[2] { -1, 2};
+        tsc1.ReceiveNodes = new int[2] { -1, 2 };
 
         // Write Config File
         if (File.Exists(configPath))
-           File.Delete(configPath);
+            File.Delete(configPath);
 
         using (FileStream output = File.OpenWrite(configPath))
             ProtoBuf.Serializer.Serialize(output, appConfig);
 
         // Create Service Client and Start Runtime
         CanServiceClient client = new();
-        AhsokaRuntime.CreateBuilder()
-            .AddClients(client)
-            .StartWithInternalServices();
+        client.Start();
+
 
         // Start Comms with CoProcessor.
         client.OpenCommunicationChannel();
@@ -340,9 +338,9 @@ public class CanServiceTests : LinearTestBase
         packageInformation.ServiceInfo.RuntimeConfiguration.ExtensionInfo = new List<ExtensionInfo>() { new ExtensionInfo() { ExtensionName = "CAN Service Extension", ConfigurationFile = canConfigFile } };
 
         // Load Test Generator
-        Ahsoka.System.Extensions.AddPrivateExtension(Assembly.GetExecutingAssembly());
+        Ahsoka.Core.Extensions.AddPrivateExtension(Assembly.GetExecutingAssembly());
 
-        
+
         File.WriteAllText(canPackageInfoFile, JsonUtility.Serialize(packageInformation));
 
         packageInformation = PackageInformation.LoadPackageInformation(canPackageInfoFile);
@@ -355,7 +353,7 @@ public class CanServiceTests : LinearTestBase
         CanMetadataTools.GenerateMessageClasses(canPackageInfoFile, outputFileNameDotNet, "TestNameSpace", null, Installer.ApplicationType.Dotnet);
         string classFileContent = File.ReadAllText(outputFileNameDotNet);
         Assert.IsTrue(classFileContent.Length > 0);
-        
+
         Assert.IsTrue(classFileContent.Contains("/*ExtendHeader*/"));
         Assert.IsTrue(classFileContent.Contains("/*ExtendConstructor*/"));
         Assert.IsTrue(classFileContent.Contains("/*ExtendSetter*/"));
@@ -370,7 +368,7 @@ public class CanServiceTests : LinearTestBase
         Assert.IsTrue(classFileContent.Contains("/*ExtendMethods+Header*/"));
         Assert.IsTrue(classFileContent.Contains("/*ExtendAfterClassOutput*/"));
 
-        string cppFile = Path.Combine(Path.GetDirectoryName(outputFileNameCPP),Path.GetFileNameWithoutExtension(outputFileNameCPP) + ".cpp");
+        string cppFile = Path.Combine(Path.GetDirectoryName(outputFileNameCPP), Path.GetFileNameWithoutExtension(outputFileNameCPP) + ".cpp");
         classFileContent = File.ReadAllText(cppFile);
         Assert.IsTrue(classFileContent.Length > 0);
 
@@ -378,24 +376,24 @@ public class CanServiceTests : LinearTestBase
         Assert.IsTrue(classFileContent.Contains("/*ExtendConstructor*/"));
         Assert.IsTrue(classFileContent.Contains("/*ExtendSetter*/"));
         Assert.IsTrue(classFileContent.Contains("/*ExtendMethods+Impl*/"));
-       
-        
+
+
         // Generate Class File.
         File.Delete(outputFileNameDotNet);
         File.Delete(outputFileNameCPP);
         File.Delete(cppFile);
-     }
+    }
 
     [TestMethod]
     public void TestCanViewModel()
     {
         TestCanModel model = CreateTestViewModel();
-
         Assert.IsTrue(model.TestSigned == 64);
         Assert.IsTrue(model.TestUnsigned == 256);
         Assert.IsTrue(model.TestEnum == TestEnumValues.Test2EnumTwo);
         Assert.IsTrue(model.TestFloat == 12345.0f);
         Assert.IsTrue(model.TestDouble == 54321.0f);
+        Assert.IsTrue(model.TestBit == 1);
 
         // Get UnScaled Value..should be half of Normal Value
         UInt32 value = model.GetRawValue<UInt32>("TestUnsigned");
@@ -407,9 +405,9 @@ public class CanServiceTests : LinearTestBase
 
         var data = model.CreateCanMessageData();
         Assert.IsTrue(data.Id == 500);
-        Assert.IsTrue(data.Dlc == 16);
+        Assert.IsTrue(data.Dlc == 17);
 
-        CanPropertyInfo info = new CanPropertyInfo(0, 32, ByteOrder.LittleEndian, ValueType.Unsigned, 1000, 0, 0);
+        CanPropertyInfo info = new CanPropertyInfo(0, 32, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 1000, 0, 0);
 
         var candata = new byte[8] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
         var result = info.GetValue<uint>(candata, true);
@@ -419,6 +417,7 @@ public class CanServiceTests : LinearTestBase
     {
         TestCanModel model = new()
         {
+            TestBit = 1,
             TestSigned = 64,
             TestUnsigned = 256,
             TestEnum = TestEnumValues.Test2EnumTwo,
@@ -444,6 +443,88 @@ public class CanServiceTests : LinearTestBase
 
         File.Delete(canDBCFile);
         File.Delete(canConfigFile);
+    }
+
+    [TestMethod]
+    public void TestCanHandler()
+    {
+        string file = "CANServiceConfiguration.json";
+        File.WriteAllText(file, CanTestResources.CANServiceConfiguration);
+
+        var service = new CanService();
+
+        var impl = new DesktopServiceImplementation();
+        var config = CanMetadataTools.GenerateApplicationConfig(SystemInfo.HardwareInfo, ConfigurationFileLoader.LoadFile<CanClientConfiguration>(file), false);
+        impl.Open(service, config.CanPortConfiguration, 1);
+
+        var handler = new CanHandler(impl);
+        handler.Init();
+
+        // Wait for Address Claim to Finish.   
+        // In real system recieve messages are redirected until AC is done.
+        Thread.Sleep(500);
+
+        CanMessageDataCollection collection = new() { CanPort = 1 };
+
+        //Test raw extended frame
+        TestRaw rawMessage = new() { Test = 10 };
+        collection.Messages.Add(rawMessage.CreateCanMessageData());
+
+        //Test J1939 with static node addresses
+        TestStatic staticMessage = new() { NewSignal = 1 };
+        collection.Messages.Add(staticMessage.CreateCanMessageData());
+
+        //Test J1939 with overridden addresses
+        TestOverride overrideMessage = new() { Test = 10 };
+        overrideMessage.Protocol.SourceAddress = 127;
+        overrideMessage.Protocol.DestinationAddress = 16;
+        collection.Messages.Add(overrideMessage.CreateCanMessageData());
+
+        //Confirm messages available in config
+        var output = handler.ConfirmAvailable(collection);
+        Assert.IsTrue(output.Status == MessageStatus.Success);
+
+        foreach (var message in collection.Messages)
+            handler.ProcessMessage(message);
+
+        //Confirm processes ids are correct
+        Assert.IsTrue(collection.Messages[0].Id == 0x80E2AFDC);
+        Assert.IsTrue(collection.Messages[1].Id == 0x803C0A28);
+        Assert.IsTrue(collection.Messages[2].Id == 0x802B107F);
+
+        //Test address claim send
+        SendInformation sendInfo = new() { name = "AC", destinationAddress = 255, sourceAddress = 40 };
+        handler.SendPredefined(sendInfo);
+
+        //Test receiving AC message
+        J1939PropertyDefinitions.Id acId = new(0x98EEFF00);
+        acId.SourceAddress = 20;
+        CanMessageData acData = new()
+        {
+            Id = acId.WriteToUint(),
+            Dlc = 8,
+            Data = [1, 0, 0, 0, 0, 0, 0, 0]
+        };
+        handler.Receive(acData);
+
+        //Test AC recive at same address
+        acId.SourceAddress = 40;
+        acData.Id = acId.WriteToUint();
+        handler.Receive(acData);
+
+        //Test broadcast multipacket
+        TestMultiPacket testMultiPacket = new() { Data1 = 12, Data2 = 2.4 };
+        testMultiPacket.Protocol.SourceAddress = 40;
+        testMultiPacket.Protocol.DestinationAddress = 255;
+        sendInfo = new() { messageData = testMultiPacket.CreateCanMessageData() };
+        handler.SendPredefined(sendInfo);
+
+        Thread.Sleep(3000);
+
+        //Test AC receive from higher priority node
+        //Shuts off J1939 transmission
+        acData.Data[7] = 1;
+        handler.Receive(acData);
     }
 }
 
@@ -471,11 +552,38 @@ public static class CanModelMetadata
         // TestCanModel Metadata - 500
         metaData.Add(500, new Dictionary<string, CanPropertyInfo>()
         {
-            { "TestEnum", new(4, 8, ByteOrder.LittleEndian, ValueType.Enum, 1, 0, 1,uniqueId: 1) },
-            { "TestUnsigned", new(12, 8, ByteOrder.LittleEndian, ValueType.Unsigned, 2, 0, 2,uniqueId: 2) },
-            { "TestSigned", new(20, 8, ByteOrder.LittleEndian, ValueType.Signed, 1, 0, 3, 3,uniqueId:3 ) },
-            { "TestFloat", new(32, 32, ByteOrder.LittleEndian, ValueType.Float, 1, 0, 4, 4,uniqueId:4 ) },
-            { "TestDouble", new(64, 64, ByteOrder.LittleEndian, ValueType.Double, 1, 0, 5, 5,uniqueId:5 ) }
+            { "TestEnum", new(4, 8, ByteOrder.OrderLittleEndian, ValueType.Enum, 1, 0, 1,uniqueId: 1) },
+            { "TestUnsigned", new(12, 8, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 2, 0, 2,uniqueId: 2) },
+            { "TestSigned", new(20, 8, ByteOrder.OrderLittleEndian, ValueType.Signed, 1, 0, 3, 3,uniqueId:3 ) },
+            { "TestFloat", new(32, 32, ByteOrder.OrderLittleEndian, ValueType.Float, 1, 0, 4, 4,uniqueId:4 ) },
+            { "TestDouble", new(64, 64, ByteOrder.OrderLittleEndian, ValueType.Double, 1, 0, 5, 5,uniqueId:5 ) },
+            { "TestBit", new(64 + 64, 1, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 1, 0, 6, 1,uniqueId: 1) },
+        });
+
+        // Decode Info for TestOverride 2818048
+        metaData.Add(2818048, new Dictionary<string, CanPropertyInfo>()
+        {
+            {nameof(TestOverride.Test), new( 0, 64, ByteOrder.OrderLittleEndian, ValueType.Double, 1, 0, 0, 0, 0, 0, 1259925567)},
+        });
+
+        // Decode Info for TestRaw 14856156
+        metaData.Add(14856156, new Dictionary<string, CanPropertyInfo>()
+        {
+            {nameof(TestRaw.Test), new( 0, 24, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 1, 0, 0, 0, 0, 0, 997346722)},
+        });
+
+        // Decode Info for TestStatic 3932160
+        metaData.Add(3932160, new Dictionary<string, CanPropertyInfo>()
+        {
+            {nameof(TestStatic.NewSignal), new( 0, 24, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 1, 0, 0, 0, 0, 0, 2063764300)},
+        });
+
+        // Decode Info for TestMultiPacket 204800000
+        metaData.Add(204800000, new Dictionary<string, CanPropertyInfo>()
+        {
+            {nameof(TestMultiPacket.Crc), new( 0, 8, ByteOrder.OrderLittleEndian, ValueType.Unsigned, 1, 0, 0, 0, 0, 0, 3329861171)},
+            {nameof(TestMultiPacket.Data1), new( 8, 56, ByteOrder.OrderLittleEndian, ValueType.Double, 1, 0, 1, 0, 0, 0, 1715044506)},
+            {nameof(TestMultiPacket.Data2), new( 64, 64, ByteOrder.OrderLittleEndian, ValueType.Double, 1, 0, 2, 0, 0, 0, 3289022618)},
         });
     }
 }
@@ -503,6 +611,13 @@ public partial class TestCanModel : CanViewModelBase
         set { OnSetValue(value); }
     }
 
+    public int TestBit
+    {
+        get { return OnGetValue<int>(); }
+        set { OnSetValue(value); }
+    }
+
+
     public float TestFloat
     {
         get { return OnGetValue<float>(); }
@@ -520,7 +635,7 @@ public partial class TestCanModel : CanViewModelBase
     #region Auto Generated Methods
     protected override Dictionary<string, CanPropertyInfo> GetMetadata() { return CanModelMetadata.GetMetadata(500); }
     static TestCanModel() { }
-    public TestCanModel() : base(500, 16) { } // CANID: 0x1f4
+    public TestCanModel() : base(500, 17) { } // CANID: 0x1f4
     public TestCanModel(CanMessageData message) : base(message) { }
     #endregion
 }
@@ -532,6 +647,152 @@ public enum TestEnumValues
 }
 
 
+public partial class TestOverride : CanViewModelBase
+{
+    public const uint CanId = 2818048; // CANID: 0x2b0000
+    public const int Dlc = 8;
+    #region Auto Generated Properties
+    J1939Helper protocol;
+    public J1939Helper Protocol
+    {
+        get
+        {
+            if (protocol == null)
+                protocol = new J1939Helper(message);
+            return protocol;
+        }
+    }
 
 
+    public double Test
+    {
+        get { return OnGetValue<double>(); }
+        set { OnSetValue(value); }
+    }
 
+    #endregion
+
+    #region Auto Generated Methods
+    protected override Dictionary<string, CanPropertyInfo> GetMetadata() { return CanModelMetadata.GetMetadata(CanId); }
+    public TestOverride() : base(CanId, Dlc)
+    {
+    }
+    public TestOverride(CanMessageData message) : base(message)
+    {
+    }
+
+    #endregion
+}
+
+public partial class TestRaw : CanViewModelBase
+{
+    public const uint CanId = 14856156; // CANID: 0xe2afdc
+    public const int Dlc = 3;
+    #region Auto Generated Properties
+
+    public uint Test
+    {
+        get { return OnGetValue<uint>(); }
+        set { OnSetValue(value); }
+    }
+
+    #endregion
+
+    #region Auto Generated Methods
+    protected override Dictionary<string, CanPropertyInfo> GetMetadata() { return CanModelMetadata.GetMetadata(CanId); }
+    public TestRaw() : base(CanId, Dlc)
+    {
+    }
+    public TestRaw(CanMessageData message) : base(message)
+    {
+    }
+
+    #endregion
+}
+
+public partial class TestStatic : CanViewModelBase
+{
+    public const uint CanId = 3932160; // CANID: 0x3c0000
+    public const int Dlc = 3;
+    #region Auto Generated Properties
+    J1939Helper protocol;
+    public J1939Helper Protocol
+    {
+        get
+        {
+            if (protocol == null)
+                protocol = new J1939Helper(message);
+            return protocol;
+        }
+    }
+
+
+    public uint NewSignal
+    {
+        get { return OnGetValue<uint>(); }
+        set { OnSetValue(value); }
+    }
+
+    #endregion
+
+    #region Auto Generated Methods
+    protected override Dictionary<string, CanPropertyInfo> GetMetadata() { return CanModelMetadata.GetMetadata(CanId); }
+    public TestStatic() : base(CanId, Dlc)
+    {
+    }
+    public TestStatic(CanMessageData message) : base(message)
+    {
+    }
+
+    #endregion
+}
+
+
+public partial class TestMultiPacket : CanViewModelBase
+{
+    public const uint CanId = 204800000; // CANID: 0xc350000
+    public const int Dlc = 16;
+    #region Auto Generated Properties
+    J1939Helper protocol;
+    public J1939Helper Protocol
+    {
+        get
+        {
+            if (protocol == null)
+                protocol = new J1939Helper(message);
+            return protocol;
+        }
+    }
+
+
+    public uint Crc
+    {
+        get { return OnGetValue<uint>(); }
+        set { OnSetValue(value); }
+    }
+
+    public double Data1
+    {
+        get { return OnGetValue<double>(); }
+        set { OnSetValue(value); }
+    }
+
+    public double Data2
+    {
+        get { return OnGetValue<double>(); }
+        set { OnSetValue(value); }
+    }
+
+    #endregion
+
+    #region Auto Generated Methods
+    protected override Dictionary<string, CanPropertyInfo> GetMetadata() { return CanModelMetadata.GetMetadata(CanId); }
+    public TestMultiPacket() : base(CanId, Dlc)
+    {
+    }
+    public TestMultiPacket(CanMessageData message) : base(message)
+    {
+    }
+
+    #endregion
+}

@@ -14,4 +14,5 @@ public partial class CANMessageSignalView : UserControl
     {
         AvaloniaXamlLoader.Load(this);
     }
+
 }

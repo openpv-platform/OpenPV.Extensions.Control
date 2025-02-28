@@ -1,24 +1,20 @@
 ﻿
+using Ahsoka.Core;
+using Ahsoka.Core.Hardware;
+using Ahsoka.Core.Utility;
 using Ahsoka.Services.Can;
 using Ahsoka.Services.IO;
-using Ahsoka.System;
-using Ahsoka.System.Hardware;
 using Ahsoka.Test.Control.Properties;
-using Ahsoka.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace Ahsoka.Test;
 
 [TestClass]
 public class TestInitializer : LinearTestBase
 {
-   [AssemblyInitialize]
+    [AssemblyInitialize]
     public static void AssemblyInit(TestContext context)
     {
         // Just forcing Libraries to Load
@@ -35,7 +31,7 @@ public class TestInitializer : LinearTestBase
             HardwareInfo.AddHardwareInfo(hd);
         }
 
-        Ahsoka.System.Extensions.LoadExtensions();
+        Ahsoka.Core.Extensions.LoadExtensions();
 
         /// Prep Windows for Tests
         var progress = new Progress<string>(Console.WriteLine);

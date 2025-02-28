@@ -1,4 +1,5 @@
 #include "AhsokaServices.h"
+#include "AhsokaRuntimeProcess.h"
 #include <iostream>
 #include <string>
 #include "candemo.hpp"
@@ -7,21 +8,18 @@
 
 int main(int argc, char *argv[])
 {
+    auto process = AhsokaRuntimeProcess::StartServiceExecutable("./CommandLine/Ahsoka.CommandLine");
 
     // Create Client for System to allow Comunication with the PC Tools
     // could also be used for interacting with Hardware Info, Brightness and other
     // hardware features.
     AhsokaSystem::SystemServiceClient client;
+    client.Start();
 
     // Create a CAN Client
     // Our CMAKE build will generate the code we include
     AhsokaCAN::CanServiceClient canClient;
-
-    auto runtime = AhsokaRuntime::CreateBuilder()
-        .AddClient(&client)
-        .AddClient(&canClient)
-        .SetServiceExecutable("./CommandLine/Ahsoka.CommandLine") // Path to Ahsoka Service CommandLine
-        .StartWithExternalServices();
+    canClient.Start();
 
     AhsokaRuntime::ReleaseStartup();
 
@@ -36,8 +34,9 @@ int main(int argc, char *argv[])
     CANDemo demo;
     demo.RunDemo(canClient);
 
-    runtime.RequestShutdown();
-    runtime.WaitForShutdown();
+    client.RequestServiceShutdown();
+
+    process->EndProcess();
 
     std::cout << "Shutdown Completed" << std::endl;
 

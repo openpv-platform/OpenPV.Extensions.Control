@@ -1,5 +1,4 @@
-﻿using Ahsoka.System;
-using Ahsoka.Utility;
+﻿using Ahsoka.Core.Utility;
 using System;
 using System.Runtime.InteropServices;
 
@@ -61,7 +60,7 @@ public class CanPropertyInfo
     /// <param name="defaultValue"></param>
     /// <param name="minValue"></param>
     /// <param name="maxValue"></param>
-    public CanPropertyInfo(int startBit, int bitLength, ByteOrder byteOrder, ValueType dataType, double scale, double offset, int signalId = -1, double defaultValue = 0, double minValue = double.MinValue, double maxValue = double.MaxValue , uint uniqueId = 0)
+    public CanPropertyInfo(int startBit, int bitLength, ByteOrder byteOrder, ValueType dataType, double scale, double offset, int signalId = -1, double defaultValue = 0, double minValue = double.MinValue, double maxValue = double.MaxValue, uint uniqueId = 0)
     {
         this.SignalId = signalId;
         this.StartBit = startBit;
@@ -214,7 +213,7 @@ public class CanPropertyInfo
             iVal = (long)Math.Round(rawValue);
 
         // Pack signal
-        if (byteOrder == ByteOrder.LittleEndian) // Little endian 
+        if (byteOrder == ByteOrder.OrderLittleEndian) // Little endian 
             return (((ulong)iVal & bitMask) << StartBit);
         else // Big endian
             return MirrorMsg(((ulong)iVal & bitMask) << GetStartBitLE());
@@ -227,7 +226,7 @@ public class CanPropertyInfo
         ulong bitMask = BitMask();
 
         // Unpack signal
-        if (byteOrder == ByteOrder.LittleEndian) // Little endian 
+        if (byteOrder == ByteOrder.OrderLittleEndian) // Little endian 
             iVal = (long)((data >> StartBit) & bitMask);
         else // Big endian 
             iVal = (long)((MirrorMsg(data) >> GetStartBitLE()) & bitMask);
@@ -249,7 +248,7 @@ public class CanPropertyInfo
 
         // Ensure value lies within bounds
         returnValue = Math.Max(minValue, Math.Min(maxValue, returnValue));
-        
+
         return returnValue;
     }
 
@@ -279,10 +278,10 @@ public class CanPropertyInfo
     }
 
     private void SetBounds(ValueType dataType, double min, double max)
-    {        
+    {
         if (min == 0 && max == 0)
         {
-            min = double.MinValue; 
+            min = double.MinValue;
             max = double.MaxValue;
         }
 

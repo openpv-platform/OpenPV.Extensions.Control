@@ -1,8 +1,8 @@
-﻿using Ahsoka.Utility;
+﻿using Ahsoka.Core.Utility;
+using Ahsoka.Services.Can;
 using Avalonia;
 using Avalonia.Svg.Skia;
 using System;
-using System.Threading;
 
 namespace Ahsoka.DeveloperTools;
 
@@ -23,6 +23,9 @@ internal class Program
         GC.KeepAlive(typeof(SvgImage).Assembly);
 
         var builder = BuildAvaloniaApp();
+
+        //force library load
+        var test = new CanService();
 
         return builder.StartWithClassicDesktopLifetime(args, Avalonia.Controls.ShutdownMode.OnMainWindowClose);
 
