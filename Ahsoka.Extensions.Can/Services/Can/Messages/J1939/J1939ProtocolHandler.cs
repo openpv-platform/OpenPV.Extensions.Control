@@ -13,7 +13,7 @@ internal class J1939ProtocolHandler : BaseProtocolHandler
 
 
     readonly List<object> startupQueue = new();
-    internal bool transmittingJ1939 = false;
+    internal bool transmittingJ1939 = true;
 
     internal CanState CanState { get; init; } = new();
 

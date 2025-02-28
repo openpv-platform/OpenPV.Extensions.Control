@@ -1,5 +1,5 @@
 {
-  "version": "4.0.1.10063",
+  "version": "4.1.1.20011",
   "applicationType": "Dotnet",
   "execCommand": "Ahsoka.Gateway.Target",
   "packageName": "Ahsoka.Gateway.Target",
@@ -36,7 +36,6 @@
       "requireChallenge": "NotRequired",
       "services": [
         {
-          "socketType": "TcpSocket",
           "serviceName": "CanService",
           "tcpListenAddress": "*",
           "tcpConnectionAddress": "localhost",
@@ -45,7 +44,6 @@
           "behaviors": "AutoStart"
         },
         {
-          "socketType": "TcpSocket",
           "serviceName": "SystemService",
           "tcpListenAddress": "*",
           "tcpConnectionAddress": "localhost",
@@ -60,8 +58,8 @@
   "screenConfiguration": {
     "showUnknownSurfaces": false,
     "bootLogoPath": "EnovLogo.png",
-    "orientation": "DefaultOrientation",
-    "surfaceSetups": []
+    "orientation": 0,
+    "surfaceSetup": []
   },
   "hardwareConfiguration": {
     "hardwareItems": [],

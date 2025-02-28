@@ -42,19 +42,17 @@ internal class ACMessageHandler : J1939MessageHandlerBase
     internal override void OnInit()
     {
         protocol = (J1939ProtocolHandler)Protocol;
+        protocol.transmittingJ1939 = false;
 
-        if (Enabled)
-            Task.Run(() =>
-            {
-                InitializeAddressClaim();
-            }).ContinueWith(result =>
-            {
-                AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"J1939 Address Claim Initialization Finished");
-                if (protocol.transmittingJ1939)
-                    protocol.ReleaseStartupQueue();
-            });
-        else
-            protocol.transmittingJ1939 = true;
+        Task.Run(() =>
+        { 
+            InitializeAddressClaim();
+        }).ContinueWith(result =>
+        {
+            AhsokaLogging.LogMessage(AhsokaVerbosity.Medium, $"J1939 Address Claim Initialization Finished");
+            if (protocol.transmittingJ1939)
+                protocol.ReleaseStartupQueue();
+        });
     }
 
     internal override bool OnReceive(CanMessageData messageData)
@@ -172,7 +170,6 @@ internal class ACMessageHandler : J1939MessageHandlerBase
         J1939PropertyDefinitions.ParseAddresses(Service.Self.J1939Info.Addresses, out var minAddress, out var maxAddress);
 
         bool addressClaimed = false;
-        protocol.transmittingJ1939 = false;
         while (!addressClaimed)
         {
             var response = new CanMessageData();

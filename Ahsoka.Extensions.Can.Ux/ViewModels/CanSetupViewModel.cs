@@ -190,6 +190,9 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
         projectFolder = projectInfoFolder;
         configurationPath = configurationFile;
 
+        if (String.IsNullOrEmpty(configurationPath))
+            configurationPath = CreateConfigurationName();
+
         LoadCANConfiguration();
     }
 

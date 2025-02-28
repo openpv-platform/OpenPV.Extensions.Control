@@ -15,17 +15,12 @@
   ],
   "nodes": [
     {
-      "idValid": 1,
-      "port": 1,
       "id": 1,
       "name": "CONTROLLER",
       "comment": "",
       "nodeType": "Self",
       "transportProtocol": "J1939",
       "j1939Info": {
-        "addressOneValid": 10,
-        "addressTwoValid": 0,
-        "addressThreeValid": 0,
         "addressType": "Static",
         "addressValueOne": 10,
         "addressValueTwo": 0,
@@ -35,28 +30,28 @@
         "vehicleSystem": 0,
         "function": 5,
         "functionInstance": 0,
-        "ecUinstance": 0,
+        "ecuInstance": 0,
         "manufacturerCode": 0,
         "name": 0,
         "addresses": "41,41",
-        "useAddressClaim": false
+        "useAddressClaim": false,
+        "addressOneValid": 10,
+        "addressTwoValid": 0,
+        "addressThreeValid": 0
       },
       "ports": [
         1
-      ]
+      ],
+      "idValid": 1,
+      "port": 1
     },
     {
-      "idValid": 255,
-      "port": 1,
       "id": 255,
       "name": "ANY",
       "comment": "",
       "nodeType": "Any",
       "transportProtocol": "J1939",
       "j1939Info": {
-        "addressOneValid": 255,
-        "addressTwoValid": 0,
-        "addressThreeValid": 0,
         "addressType": "Static",
         "addressValueOne": 255,
         "addressValueTwo": 0,
@@ -66,15 +61,20 @@
         "vehicleSystem": 0,
         "function": 0,
         "functionInstance": 0,
-        "ecUinstance": 0,
+        "ecuInstance": 0,
         "manufacturerCode": 0,
         "name": 0,
         "addresses": "0,0",
-        "useAddressClaim": false
+        "useAddressClaim": false,
+        "addressOneValid": 255,
+        "addressTwoValid": 0,
+        "addressThreeValid": 0
       },
       "ports": [
         1
-      ]
+      ],
+      "idValid": 255,
+      "port": 1
     }
   ],
   "messages": [
@@ -106,10 +106,9 @@
       "signals": []
     }
   ],
-  "diagnosticEvents": [],
   "generatorEnabled": true,
   "generatorNamespace": "Ahsoka.CS.CAN",
   "generatorOutputFile": "Generated/GeneratedCanObjects.cs",
   "generatorBaseClass": "CanViewModelBase",
-  "version": "4.0.1.10063"
+  "version": "4.1.1.20011"
 }
