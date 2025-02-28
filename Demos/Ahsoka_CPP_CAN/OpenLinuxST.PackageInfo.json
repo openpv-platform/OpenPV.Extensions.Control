@@ -1,14 +1,14 @@
 {
   "version": "4.1.1.20012",
   "applicationType": "Cpp",
-  "execCommand": "Ahsoka.QT.CAN",
-  "packageName": "Ahsoka.QT.CAN",
-  "packageDescription": "CAN Starter project for using QT with OpenPV",
-  "applicationVersion": "1.0",
-  "packageApplicationFolder": "..\\Outputs",
-  "packageOutputDirectory": "..\\..\\PackageOutput",
+  "execCommand": "Ahsoka.CPP.CAN",
+  "packageName": "Ahsoka.CPP.CAN",
+  "packageDescription": "Project demonstating CAN usage in C\u002B\u002B",
+  "applicationVersion": "3.0",
+  "packageApplicationFolder": "Outputs",
+  "packageOutputDirectory": "..\\PackageOutput",
   "licenses": [],
-  "optimizedServiceManager": false,
+  "optimizedServiceManager": true,
   "customPackageInfo": {
     "includeApplication": false,
     "includeBootLogo": false,
@@ -16,8 +16,8 @@
     "includeFirmwareUpdate": false
   },
   "cppInfo": {
-    "projectPath": "..",
-    "projectType": "QT"
+    "projectPath": ".",
+    "projectType": "VSCode"
   },
   "serviceInfo": {
     "runtimeConfiguration": {
@@ -33,19 +33,19 @@
       "requireChallenge": "NotRequired",
       "services": [
         {
+          "serviceName": "CanService",
+          "tcpListenAddress": "*",
+          "tcpConnectionAddress": "localhost",
+          "dataChannel": 5107,
+          "isExtension": true,
+          "behaviors": "AutoStart"
+        },
+        {
           "serviceName": "SystemService",
           "tcpListenAddress": "*",
           "tcpConnectionAddress": "localhost",
           "dataChannel": 5001,
           "isExtension": false,
-          "behaviors": "AutoStart"
-        },
-        {
-          "serviceName": "CanService",
-          "tcpListenAddress": "*",
-          "tcpConnectionAddress": "localhost",
-          "dataChannel": 5007,
-          "isExtension": true,
           "behaviors": "AutoStart"
         }
       ]
@@ -54,7 +54,7 @@
   },
   "screenConfiguration": {
     "showUnknownSurfaces": false,
-    "bootLogoPath": "",
+    "bootLogoPath": "Assets\\Background.png",
     "orientation": 0,
     "surfaceSetup": []
   },

@@ -1,0 +1,208 @@
+{
+  "name": "CanService",
+  "localIpAddress": "192.168.8.2",
+  "remoteIpAddress": "192.168.8.1",
+  "ports": [
+    {
+      "port": 1,
+      "canInterfacePath": "can1",
+      "baudRate": "Baud250kb",
+      "canInterface": "SocketCan",
+      "promiscuousTransmit": false,
+      "promiscuousReceive": false,
+      "userDefined": false
+    }
+  ],
+  "nodes": [
+    {
+      "id": 0,
+      "name": "TestNode",
+      "comment": "",
+      "nodeType": "Self",
+      "transportProtocol": "Raw",
+      "j1939Info": {
+        "addressType": "Static",
+        "addressValueOne": 0,
+        "addressValueTwo": 0,
+        "addressValueThree": 0,
+        "industryGroup": 0,
+        "vehicleSystemInstance": 0,
+        "vehicleSystem": 0,
+        "function": 0,
+        "functionInstance": 0,
+        "ecuInstance": 0,
+        "manufacturerCode": 0,
+        "name": 0,
+        "addresses": "0,0",
+        "useAddressClaim": false,
+        "addressOneValid": 0,
+        "addressTwoValid": 0,
+        "addressThreeValid": 0
+      },
+      "ports": [
+        1
+      ],
+      "idValid": 0,
+      "port": 1
+    },
+    {
+      "id": 255,
+      "name": "ANY",
+      "comment": "",
+      "nodeType": "Any",
+      "transportProtocol": "J1939",
+      "j1939Info": {
+        "addressType": "Static",
+        "addressValueOne": 255,
+        "addressValueTwo": 0,
+        "addressValueThree": 0,
+        "industryGroup": 0,
+        "vehicleSystemInstance": 0,
+        "vehicleSystem": 0,
+        "function": 0,
+        "functionInstance": 0,
+        "ecuInstance": 0,
+        "manufacturerCode": 0,
+        "name": 0,
+        "addresses": "0,0",
+        "useAddressClaim": false,
+        "addressOneValid": 255,
+        "addressTwoValid": 0,
+        "addressThreeValid": 0
+      },
+      "ports": [
+        0
+      ],
+      "idValid": 255,
+      "port": 0
+    }
+  ],
+  "messages": [
+    {
+      "id": 500,
+      "name": "TestMessage",
+      "messageType": "RawStandardFrame",
+      "dlc": 16,
+      "rate": 0,
+      "comment": "",
+      "hasRollCount": false,
+      "rollCountBit": 0,
+      "rollCountLength": 0,
+      "crcType": "None",
+      "crcBit": 0,
+      "timeoutMs": 0,
+      "filterReceipts": false,
+      "userDefined": true,
+      "transmitNodes": [
+        -1,
+        0
+      ],
+      "receiveNodes": [
+        -1,
+        -1
+      ],
+      "overrideSourceAddress": false,
+      "overrideDestinationAddress": false,
+      "signals": [
+        {
+          "id": 0,
+          "name": "TestEnum",
+          "startBit": 4,
+          "bitLength": 8,
+          "byteOrder": "OrderLittleEndian",
+          "valueType": "Enum",
+          "defaultValue": 0,
+          "scale": 1,
+          "offset": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "unit": "",
+          "muxRole": "NotMultiplexed",
+          "muxGroup": 0,
+          "comment": "",
+          "values": {
+            "1": "Test2EnumOne",
+            "2": "Test2EnumTwo"
+          }
+        },
+        {
+          "id": 1,
+          "name": "TestUnsigned",
+          "startBit": 12,
+          "bitLength": 8,
+          "byteOrder": "OrderLittleEndian",
+          "valueType": "Unsigned",
+          "defaultValue": 0,
+          "scale": 2,
+          "offset": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "unit": "",
+          "muxRole": "NotMultiplexed",
+          "muxGroup": 0,
+          "comment": "",
+          "values": {}
+        },
+        {
+          "id": 2,
+          "name": "TestSigned",
+          "startBit": 22,
+          "bitLength": 8,
+          "byteOrder": "OrderLittleEndian",
+          "valueType": "Signed",
+          "defaultValue": 0,
+          "scale": 1,
+          "offset": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "unit": "",
+          "muxRole": "NotMultiplexed",
+          "muxGroup": 0,
+          "comment": "",
+          "values": {}
+        },
+        {
+          "id": 3,
+          "name": "TestFloat",
+          "startBit": 32,
+          "bitLength": 32,
+          "byteOrder": "OrderLittleEndian",
+          "valueType": "Float",
+          "defaultValue": 0,
+          "scale": 1,
+          "offset": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "unit": "",
+          "muxRole": "NotMultiplexed",
+          "muxGroup": 0,
+          "comment": "",
+          "values": {}
+        },
+        {
+          "id": 4,
+          "name": "TestDouble",
+          "startBit": 64,
+          "bitLength": 64,
+          "byteOrder": "OrderLittleEndian",
+          "valueType": "Double",
+          "defaultValue": 0,
+          "scale": 1,
+          "offset": 0,
+          "minimum": 0,
+          "maximum": 0,
+          "unit": "",
+          "muxRole": "NotMultiplexed",
+          "muxGroup": 0,
+          "comment": "",
+          "values": {}
+        }
+      ]
+    }
+  ],
+  "generatorEnabled": true,
+  "generatorNamespace": "AhsokaCAN",
+  "generatorOutputFile": "Generated/CanModels.Generated.h",
+  "generatorBaseClass": "CanViewModelBase",
+  "version": "4.1.1.20012"
+}

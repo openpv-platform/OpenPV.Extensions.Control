@@ -1,5 +1,5 @@
 {
-  "version": "4.1.1.20004",
+  "version": "4.1.1.10010",
   "applicationType": "Dotnet",
   "execCommand": "Ahsoka.CS.CAN",
   "packageName": "Ahsoka.CS.CAN",
