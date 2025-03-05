@@ -3,7 +3,7 @@
   "applicationType": "Dotnet",
   "systemOrientation": "DefaultOrientation",
   "execCommand": "Ahsoka.CS.GTK",
-  "packageName": "Ahsoka.CS.GTK",
+  "packageName": "Ahsoka.CS.GTK.Pro",
   "packageDescription": "GTK IO Demo",
   "applicationVersion": "1.0",
   "packageApplicationFolder": "publish",

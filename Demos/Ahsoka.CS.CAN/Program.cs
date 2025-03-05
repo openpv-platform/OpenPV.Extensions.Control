@@ -103,7 +103,9 @@ public class Program
                 MotorCmd debug = new(item);
                 AhsokaLogging.LogMessage(AhsokaVerbosity.High, $"Received Message {debug.Id}");
             }
-            RefreshUI(count, message.Messages.Last().Id & 0x1FFFFFFF, new PropertyChangedEventArgs(""));
+            
+            if (message.Messages.Count > 0)
+                RefreshUI(count, message.Messages.Last().Id & 0x1FFFFFFF, new PropertyChangedEventArgs(""));
         }
         else if (canArgs.TransportId == CanMessageTypes.Ids.NetworkStateChanged &&
             canArgs.NotificationObject is CanState state)

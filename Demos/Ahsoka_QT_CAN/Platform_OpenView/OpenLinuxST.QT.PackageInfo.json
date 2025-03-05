@@ -1,8 +1,8 @@
 {
-  "version": "4.1.1.20012",
+  "version": "4.4.1.10001",
   "applicationType": "Cpp",
   "execCommand": "Ahsoka.QT.CAN",
-  "packageName": "Ahsoka.QT.CAN",
+  "packageName": "Ahsoka.QT.CAN.Select",
   "packageDescription": "CAN Starter project for using QT with OpenPV",
   "applicationVersion": "1.0",
   "packageApplicationFolder": "..\\Outputs",
