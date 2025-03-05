@@ -3,7 +3,7 @@
   "applicationType": "Cpp",
   "systemOrientation": "DefaultOrientation",
   "execCommand": "Ahsoka.QT.CAN",
-  "packageName": "Ahsoka.QT.CAN",
+  "packageName": "Ahsoka.QT.CAN.Pro",
   "packageDescription": "CAN Starter project for using QT with OpenPV",
   "applicationVersion": "1.0",
   "packageApplicationFolder": "Outputs",
@@ -12,7 +12,7 @@
   "includeFirmwareUpdate": false,
   "licenses": [],
   "cppInfo": {
-    "projectPath": "."
+    "projectPath": ".."
   },
   "serviceInfo": {
     "runtimeConfiguration": {

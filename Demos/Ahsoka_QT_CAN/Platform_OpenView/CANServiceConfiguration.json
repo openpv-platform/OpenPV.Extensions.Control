@@ -1035,5 +1035,5 @@
   "generatorNamespace": "DEMO_CAN",
   "generatorOutputFile": "..\\Generated\\CANModels.generated.h",
   "generatorBaseClass": "CanViewModelBase",
-  "version": "4.1.1.20012"
+  "version": "4.4.1.10001"
 }
