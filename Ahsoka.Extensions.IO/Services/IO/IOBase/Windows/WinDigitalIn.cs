@@ -9,6 +9,7 @@ internal class WinDigitalInput : IDigitalInputImplementation
         */
         GetInputResponse response = new()
         {
+            Ret = ReturnCode.Success,
             Value = pin * .5,
             ErrorDescription = "Windows Digital Inputs Not Implemented"
         };

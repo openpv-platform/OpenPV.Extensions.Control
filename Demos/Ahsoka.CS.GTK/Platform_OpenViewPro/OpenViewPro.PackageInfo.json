@@ -13,8 +13,8 @@
   "includeFirmwareUpdate": false,
   "licenses": [],
   "dotNetInfo": {
-    "projectPath": "Ahsoka.CS.GTK.csproj",
-    "publishProfile": "Properties/PublishProfiles/LinuxProfilePro.pubxml"
+    "projectPath": "..\\Ahsoka.CS.GTK.csproj",
+    "publishProfile": "..\\Properties\\PublishProfiles\\LinuxProfilePro.pubxml"
   },
   "serviceInfo": {
     "runtimeConfiguration": {
