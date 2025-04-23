@@ -142,7 +142,7 @@ public class IOServiceMessages : AhsokaMessagesBase
     /// <InheritDoc/>
     public override byte[] GetProtoMessageFile()
     {
-        return this.GenerateProtoFile("AhsokaIO", typeof(SystemMessageTypes.Ids),
+        return this.GenerateProtoFile("AhsokaIO", typeof(IOMessageTypes.Ids),
             typeof(IOApplicationConfiguration),
             typeof(IOConfiguration));
     }

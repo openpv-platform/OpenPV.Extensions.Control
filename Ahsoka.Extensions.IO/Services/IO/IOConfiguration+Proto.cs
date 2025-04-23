@@ -180,16 +180,16 @@ public enum DigitalInputType
 
 public enum PorBehavior
 {
-    Off = 0,
-    OnPositive = 1,
-    OnNegative = 2,
-    LastCommand = 3,
+    PorOff = 0,
+    PorOnPositive = 1,
+    PorOnNegative = 2,
+    PorLastCommand = 3,
 }
 
 public enum LocBehavior
 {
-    Off = 0,
-    OnPositive = 1,
-    OnNegative = 2,
-    LastCommand = 3,
+    LocOff = 0,
+    LocOnPositive = 1,
+    LocOnNegative = 2,
+    LocLastCommand = 3,
 }

@@ -50,13 +50,6 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
                 {
                     MessageDefinition.Id = NegateExtendedBit(MessageDefinition.Id);
                     j1939Id.ExtractValues(MessageDefinition.Id);
-                    this.OverrideSourceAddress = true;
-                    this.OverrideDestinationAddress = true;
-                }
-                else
-                {
-                    this.OverrideSourceAddress = false;
-                    this.OverrideDestinationAddress = false;
                 }
 
 
@@ -381,7 +374,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
 
         if (definition == null)
         {
-            definition = new() { Name = "New Message", Id = 100, TransmitNodes = new int[] { NodeDisabled, NodeDisabled }, ReceiveNodes = new int[] { NodeDisabled, NodeDisabled }, UserDefined = true };
+            definition = new() { Name = "New Message", Id = 100, TransmitNodes = new int[] { NodeDisabled, NodeDisabled }, ReceiveNodes = new int[] { NodeDisabled, NodeDisabled }, OverrideSourceAddress = true, OverrideDestinationAddress = true, UserDefined = true };
 
             foreach (var port in ParentViewModel.Ports.Where(x => x.IsEnabled))
             {

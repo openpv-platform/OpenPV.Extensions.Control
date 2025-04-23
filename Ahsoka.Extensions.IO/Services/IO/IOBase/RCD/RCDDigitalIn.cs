@@ -53,9 +53,7 @@ internal class RCDDigitalInput : IDigitalInputImplementation
         else
         {
             var outputPin = outputPins[pin];
-            outputPin.controller.OpenPin(outputPin.pin, PinMode.InputPullUp);
-            var state = outputPin.controller.Read(outputPin.pin);
-            outputPin.controller.ClosePin(outputPin.pin);
+            var state = GPIOUtils.GetGPIOValue(outputPin);
             response.Value = state == PinValue.High ? 5.0 : 0.0;
             response.Ret = ReturnCode.Success;
         }

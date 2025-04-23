@@ -117,7 +117,7 @@ static class ADCUtils
     static readonly string _voltsOffsetPath = @"/sys/devices/platform/soc/48003000.adc/48003000.adc:adc@0/iio:device0/in_voltage_offset";
     static readonly string _voltsRawPath = @"/sys/devices/platform/soc/48003000.adc/48003000.adc:adc@0/iio:device0/in_voltage5_raw";
 
-    static readonly object _syncRoot = new();
+    internal static readonly object SyncRoot = new();
 
     static float _voltsScaleValue = 0;
     static float _voltsOffsetValue = -1;
@@ -139,7 +139,7 @@ static class ADCUtils
         if (_voltsOffsetValue == -1 && File.Exists(_voltsOffsetPath))
             _voltsOffsetValue = float.Parse(File.ReadAllText(_voltsOffsetPath));
 
-        lock (_syncRoot)
+        lock (SyncRoot)
         {
             MuxSelectUtils.SetMuxSelect(channel);
 
@@ -168,5 +168,30 @@ static class ADCUtils
         float MpVolts = (VoltsRawValue + _voltsOffsetValue) * _voltsScaleValue;
 
         return MpVolts;
+    }
+}
+
+[ExcludeFromCodeCoverage]
+internal static class GPIOUtils
+{
+    public static PinValue GetGPIOValue(PinConfig outputPin)
+    {
+        lock (ADCUtils.SyncRoot)
+        {
+            outputPin.controller.OpenPin(outputPin.pin, PinMode.InputPullUp);
+            var state = outputPin.controller.Read(outputPin.pin);
+            outputPin.controller.ClosePin(outputPin.pin);
+            return state;
+        }
+    }
+
+    public static void SetGPIOValue(PinConfig outputPin, PinValue value)
+    {
+        lock (ADCUtils.SyncRoot)
+        {
+            outputPin.controller.OpenPin(outputPin.pin, PinMode.Output);
+            outputPin.controller.Write(outputPin.pin, value);
+            outputPin.controller.ClosePin(outputPin.pin);
+        }  
     }
 }

@@ -31,6 +31,7 @@ typedef enum
 static HDLCStates State;
 static void processRxMessages(void* argument);
 static void sendChar(uint8_t c);
+static void checkByte(uint8_t c);
 static void SendEncodedData(uint8_t* bytes, uint32_t length);
 static uint32_t crc32(const uint8_t *data, size_t length);
 static uint32_t GetCRC32(unsigned char *p, unsigned long len);
@@ -210,26 +211,31 @@ static void SendEncodedData(uint8_t* bytes, uint32_t length)
 
     for(int x = 0; x < length; x++)
     {
-        // check to see if we need to escape the value.
-        if (bytes[x] == FLAG_BYTE || bytes[length] == ESC_BYTE)
-        {
-        	sendChar(ESC_BYTE);
-
-            sendChar((bytes[x] ^ ESC_MODIFIER));
-        }
-        else
-        {
-            sendChar(bytes[x]);
-
-        }
+        checkByte(bytes[x]);
     }
+
     // now add the CRC to the end
-    sendChar(crc & 0xff);
-    sendChar((crc >> 8) & 0xff);
-    sendChar((crc >> 16) & 0xff);
-	sendChar((crc >> 24) & 0xff);
+    checkByte(crc & 0xff);
+    checkByte((crc >> 8) & 0xff);
+    checkByte((crc >> 16) & 0xff);
+    checkByte((crc >> 24) & 0xff);
 
     sendChar(FLAG_BYTE);
+}
+
+// check to see if we need to escape the value.
+void checkByte(uint8_t b)
+{
+	if (b == FLAG_BYTE || b == ESC_BYTE)
+	{
+		sendChar(ESC_BYTE);
+
+		sendChar((b ^ ESC_MODIFIER));
+	}
+	else
+	{
+		sendChar(b);
+	}
 }
 
 // we might want to do a table based implementation for speed.

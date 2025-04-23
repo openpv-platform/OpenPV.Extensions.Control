@@ -425,7 +425,7 @@ public sealed class FramedSerialSocket
 
         myList.Add(FLAG_BYTE);   // add the flags
 
-        foreach (byte b in bytes)
+        foreach (byte b in bytes.Concat(hash))
         {
             // check to see if we need to escape the value.
             if (b == FLAG_BYTE || b == ESC_BYTE)
@@ -437,10 +437,6 @@ public sealed class FramedSerialSocket
             {
                 myList.Add(b);
             }
-        }
-        foreach (byte b in hash)
-        {
-            myList.Add(b);
         }
         myList.Add(FLAG_BYTE); // closing flag
 

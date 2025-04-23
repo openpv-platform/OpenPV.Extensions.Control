@@ -245,9 +245,11 @@ public partial class MessageDefinition
     [ProtoMember(19, IsPacked = true)]
     public int[] ReceiveNodes { get; set; }
 
+    //Only used for J1939 messages
     [ProtoMember(20)]
     public bool OverrideSourceAddress { get; set; }
 
+    //Only used for J1939 messages
     [ProtoMember(21)]
     public bool OverrideDestinationAddress { get; set; }
 
