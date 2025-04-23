@@ -530,6 +530,17 @@ internal class SelectedMessageViewModel : ChildViewModelBase<NodeViewModel>
                 messageVM.MessageDefinition.ReceiveNodes[nodeVM.NodeDefinition.Port] = MessageViewModel.AnyNodeID;
 
             OnPropertyChanged();
+            OnPropertyChanged(nameof(CanReceiveText));
+        }
+    }
+
+    public string CanReceiveText
+    {
+        get
+        {
+            if (CanReceive)
+                return "Recieved only by this Node";
+            else return $"Recieved by {nodeVM.ParentViewModel.Nodes.FirstOrDefault(x => x.NodeDefinition.Id == messageVM.MessageDefinition.ReceiveNodes[nodeVM.NodeDefinition.Port]).NodeDefinition.Name}";
         }
     }
 
@@ -549,6 +560,17 @@ internal class SelectedMessageViewModel : ChildViewModelBase<NodeViewModel>
                 messageVM.MessageDefinition.TransmitNodes[nodeVM.NodeDefinition.Port] = MessageViewModel.AnyNodeID;
 
             OnPropertyChanged();
+            OnPropertyChanged(nameof(CanTransmitText));
+        }
+    }
+
+    public string CanTransmitText
+    {
+        get
+        {       
+            if (CanTransmit)
+                return "Sent only by this Node";
+            else return $"Sent by {nodeVM.ParentViewModel.Nodes.FirstOrDefault(x => x.NodeDefinition.Id == messageVM.MessageDefinition.TransmitNodes[nodeVM.NodeDefinition.Port]).NodeDefinition.Name}";
         }
     }
 

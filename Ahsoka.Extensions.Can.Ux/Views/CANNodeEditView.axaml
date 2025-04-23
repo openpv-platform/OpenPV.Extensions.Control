@@ -117,8 +117,7 @@
 								<DataTemplate >
 									<StackPanel Orientation="Horizontal">
 										<CheckBox  Margin="8,3" IsChecked="{Binding CanReceive}"/>
-										<TextBlock Margin="-8,3" IsVisible="{Binding CanReceive}"  FontSize="10"  Text="Recieved only by this Node" Foreground="SteelBlue" HorizontalAlignment="Left"   />
-										<TextBlock  Margin="-8,3" IsVisible="{Binding !CanReceive}"  FontSize="10"  Text="Recieved by any Node" Foreground="DimGray" HorizontalAlignment="Left"/>
+										<TextBlock Margin="-8,3" FontSize="10"  Text="{Binding CanReceiveText}" HorizontalAlignment="Left"   />
 									</StackPanel>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
@@ -128,8 +127,7 @@
 								<DataTemplate >
 									<StackPanel Orientation="Horizontal">
 										<CheckBox  Margin="8,3" IsChecked="{Binding CanTransmit}"/>
-										<TextBlock Margin="-8,3" IsVisible="{Binding CanTransmit}"  FontSize="10"  Text="Sent only by this Node" Foreground="SteelBlue" HorizontalAlignment="Left"   />
-										<TextBlock  Margin="-8,3" IsVisible="{Binding !CanTransmit}"  FontSize="10"  Text="Sent by any Node" Foreground="DimGray" HorizontalAlignment="Left"/>
+										<TextBlock Margin="-8,3" FontSize="10"  Text="{Binding CanTransmitText}" HorizontalAlignment="Left"   />
 									</StackPanel>
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
