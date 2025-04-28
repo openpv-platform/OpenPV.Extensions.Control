@@ -255,6 +255,12 @@ public partial class MessageDefinition
 
     [ProtoMember(22, IsRequired = true)]
     public List<MessageSignalDefinition> Signals { get; set; } = new List<MessageSignalDefinition>();
+
+    [ProtoMember(23)]
+    public uint Mask { get; set; }
+
+    [ProtoMember(24)]
+    public bool IncludeInDataService { get; set; }
 }
 
 // Message / Signal Descriptions, Filters Etc.

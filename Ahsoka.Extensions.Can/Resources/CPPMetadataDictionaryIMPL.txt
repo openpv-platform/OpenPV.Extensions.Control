@@ -22,12 +22,8 @@
 
     unique_ptr<CanViewModelBase> CanModelMetadata::CreateObject(CanMessageData data)
     {
-        switch (data.id())
-        {
 %METADATA_BUILDER%
-            default:
-                return nullptr;
-        }
+        return nullptr;
     }
 
     CanModelMetadata* CanModelMetadata::CanMetadata()

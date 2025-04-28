@@ -26,12 +26,8 @@ public class CanModelMetadata : ICanMetadata
 
     public CanViewModelBase CreateObject(CanMessageData data)
     {
-        switch (data.Id)
-        {
 %METADATA_BUILDER%
-            default:
-                return null;
-        }
+        return null;
     }
 
     public static CanModelMetadata EventMetadata

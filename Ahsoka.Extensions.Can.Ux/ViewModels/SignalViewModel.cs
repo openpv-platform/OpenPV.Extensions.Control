@@ -62,7 +62,6 @@ internal class SignalViewModel : ChildViewModelBase<MessageViewModel>
                 this.MinimumValid = newMin;
 
             OnPropertyChanged();
-
         }
     }
 
@@ -116,7 +115,6 @@ internal class SignalViewModel : ChildViewModelBase<MessageViewModel>
     {
         get { return Signal.DefaultValue; }
         set
-
         {
             double newMax = GetMaxValue(this.ValueType, this.BitLength);
             double newMin = GetMinValue(this.ValueType, this.BitLength);
@@ -151,11 +149,11 @@ internal class SignalViewModel : ChildViewModelBase<MessageViewModel>
             case Services.Can.ValueType.Unsigned:
                 return Math.Pow(2, length) - 1;
             case Services.Can.ValueType.Float:
-                return float.MinValue;
+                return float.MaxValue;
             case Services.Can.ValueType.Double:
-                return double.MinValue;
+                return double.MaxValue;
             case Services.Can.ValueType.Enum:
-                return int.MinValue;
+                return Math.Pow(2, length - 1) - 1;
             default:
                 break;
         }
@@ -176,7 +174,7 @@ internal class SignalViewModel : ChildViewModelBase<MessageViewModel>
             case Services.Can.ValueType.Double:
                 return double.MinValue;
             case Services.Can.ValueType.Enum:
-                return int.MinValue;
+                return -(Math.Pow(2, length - 1));
             default:
                 break;
         }

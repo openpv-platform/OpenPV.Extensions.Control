@@ -44,20 +44,25 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         {
             if (value != MessageDefinition.MessageType)
             {
+                MessageDefinition.Mask = 0x1FFFFFFF; //29 bit mask
                 MessageDefinition.Id = NegateExtendedBit(MessageDefinition.Id);
 
                 if (value == MessageType.J1939ExtendedFrame)
                 {
+                    MessageDefinition.Mask = (uint)(IsPDU2 ? 0x1FFFFF00 : 0x1FFF0000); //PDU2 has a defined PDUS byte
                     MessageDefinition.Id = NegateExtendedBit(MessageDefinition.Id);
                     j1939Id.ExtractValues(MessageDefinition.Id);
                 }
-
 
                 // Restore Extended Frame Bit
                 if (value != MessageType.RawStandardFrame)
                     MessageDefinition.Id = AddExtendedBit(MessageDefinition.Id);
                 else
+                {
+                    MessageDefinition.Mask = 0x7FF; //11 bit mask
                     MessageDefinition.Id = NegateExtendedBit(MessageDefinition.Id);
+                }
+                    
             }
 
             MessageDefinition.MessageType = value;
@@ -75,6 +80,8 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         set
         {
             j1939Id.Priority = value;
+
+            IdMasked = j1939Id.WriteToUint();
             OnPropertyChanged();
         }
     }
@@ -154,6 +161,7 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
             j1939Id.PGN = value;
 
             IdMasked = j1939Id.WriteToUint();
+            MessageDefinition.Mask = (uint)(IsPDU2 ? 0x1FFFFF00 : 0x1FFF0000);
 
             OnPropertyChanged();
             OnPropertyChanged(nameof(PDUF));
@@ -336,6 +344,16 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         }
     }
 
+    public bool AvailableDataService
+    {
+        get { return MessageDefinition.IncludeInDataService; }
+        set
+        {
+            MessageDefinition.IncludeInDataService = value;
+            OnPropertyChanged();
+        }
+    }
+
     [Range(0, 60000)]
     public Int32 Timeout
     {
@@ -374,7 +392,8 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
 
         if (definition == null)
         {
-            definition = new() { Name = "New Message", Id = 100, TransmitNodes = new int[] { NodeDisabled, NodeDisabled }, ReceiveNodes = new int[] { NodeDisabled, NodeDisabled }, OverrideSourceAddress = true, OverrideDestinationAddress = true, UserDefined = true };
+            definition = new() { Name = "New Message", Id = 100, TransmitNodes = new int[] { NodeDisabled, NodeDisabled }, ReceiveNodes = new int[] { NodeDisabled, NodeDisabled }, 
+                OverrideSourceAddress = true, OverrideDestinationAddress = true, UserDefined = true, IncludeInDataService = true, Mask = 0x1FFFFFFF };
 
             foreach (var port in ParentViewModel.Ports.Where(x => x.IsEnabled))
             {
@@ -491,9 +510,12 @@ internal class MessageViewModel : ChildViewModelBase<CanSetupViewModel>, ICanTre
         var signalDef = new MessageSignalDefinition
         {
             Name = "New Signal",
-            BitLength = 4,
+            BitLength = 8,
             Id = 0,
             ValueType = Services.Can.ValueType.Unsigned,
+            Maximum = 255,
+            Minimum = 0,
+            DefaultValue = 0,
             Scale = 1.0f
         };
 

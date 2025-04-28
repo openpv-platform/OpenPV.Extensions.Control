@@ -360,8 +360,9 @@ internal static class CanMetadataTools
         StringBuilder metadataAccessors = new();
         StringBuilder metadataCreator = new();
 
-
         var clientCalibration = ConfigurationFileLoader.LoadFile<CanClientConfiguration>(pathToCalibration);
+        clientCalibration.Messages.Sort((x, y) => x.MessageType.CompareTo(y.MessageType));
+
         foreach (var item in clientCalibration.Messages)
         {
             // Create Message Class
@@ -419,8 +420,8 @@ internal static class CanMetadataTools
         metadataBuilder.AppendLine($"\t\t//Add Props for {className} - CANID: {definition.Id}");
         metadataBuilder.AppendLine($"\t\tstd::map<int, CanPropertyInfo> {className}Props;");
 
-        metadataCreator.AppendLine($"\t\t\tcase {definition.Id}:");
-        metadataCreator.AppendLine($"\t\t\t\treturn unique_ptr<{className}>(new {className}(data));");
+        metadataCreator.AppendLine($"\t\tif ({definition.Id} == (data.id() & {definition.Mask}))");
+        metadataCreator.AppendLine($"\t\t\treturn unique_ptr<{className}>(new {className}(data));");
 
         // Add Props First
         foreach (MessageSignalDefinition signalDefinition in definition.Signals)
@@ -597,6 +598,7 @@ internal static class CanMetadataTools
         StringBuilder metadataItems = new();
 
         var clientCalibration = ConfigurationFileLoader.LoadFile<CanClientConfiguration>(pathToCalibration);
+        clientCalibration.Messages.Sort((x, y) => x.MessageType.CompareTo(y.MessageType));
 
         foreach (var item in clientCalibration.Messages)
         {
@@ -636,7 +638,8 @@ internal static class CanMetadataTools
             byteLength = (uint)Math.Ceiling((lastSignal.StartBit + lastSignal.BitLength) / 8.0f);
         }
 
-        fileOutputBuilder.AppendLine($"\tpublic const uint CanId = {definition.Id}; // CANID: 0x{definition.Id.ToString("x")}");
+        fileOutputBuilder.AppendLine($"\tpublic const uint CanId = {definition.Id}; // CanId: 0x{definition.Id.ToString("x")}");
+        fileOutputBuilder.AppendLine($"\tpublic const uint Mask = {definition.Mask}; // Mask: 0x{definition.Mask.ToString("x")}");
         fileOutputBuilder.AppendLine($"\tpublic const int Dlc = {byteLength};");
 
         fileOutputBuilder.AppendLine("\t#region Auto Generated Properties");
@@ -673,8 +676,8 @@ internal static class CanMetadataTools
 
         methodBuilder.AppendLine($"\t}}\r\n");
 
-        metadataBuilder.AppendLine($"\t\t\tcase {className}.CanId:");
-        metadataBuilder.AppendLine($"\t\t\t\treturn new {className}(data);");
+        metadataBuilder.AppendLine($"\t\tif ({className}.CanId == (data.Id & {className}.Mask))");
+        metadataBuilder.AppendLine($"\t\t\treturn new {className}(data);");
         metadataItems.AppendLine($"\r\n\t\t// Decode Info for {className} {definition.Id}");
         metadataItems.AppendLine($"\t\tmetadata.Add({definition.Id}, new Dictionary<string, CanPropertyInfo>()");
         metadataItems.AppendLine("\t\t{");

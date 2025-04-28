@@ -92,14 +92,16 @@
 								 Text="{Binding Timeout}" Grid.Row="1" Width="100"  Grid.Column="1"/>
 						<TextBlock Text="Filter Duplicates:" ToolTip.Tip="Duplicated messages are not sent to the client."/>
 						<CheckBox  Margin="3" IsChecked="{Binding FilterReceipt}"/>
+						<TextBlock Text="Data Service:" ToolTip.Tip="Makes signals available in the data service."/>
+						<CheckBox  Margin="3" IsChecked="{Binding AvailableDataService}"/>
 					</StackPanel>
 
 					<TextBlock Text="J1939 Options:" Grid.Row="3" IsVisible="{Binding IsJ1939, FallbackValue=true}" ToolTip.Tip="PGN Components as Dec"/>
 					<StackPanel MinHeight="35" IsVisible="{Binding IsJ1939, FallbackValue=true}" Orientation="Horizontal" Margin="0,2" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2">
 						<CheckBox  Margin="3,0,-10,0" IsChecked="{Binding OverrideSourceAddress}"/>
 						<TextBlock Text="Override Source Address" ToolTip.Tip="Override / Ignore the Source Address When Sending / Receiving Messages."/>
-						<CheckBox  Margin="18,0,-10,0" IsEnabled="{Binding !IsPDU2}"  IsChecked="{Binding OverrideDestinationAddress}"/>
-						<TextBlock IsEnabled="{Binding !IsPDU2}" Text="Override Destination Address" ToolTip.Tip="Override / Ignore the Destination Address When Sending / Receiving Messages. (for PDU-1 Messages)."/>
+						<CheckBox  Margin="18,0,-10,0" IsVisible="{Binding !IsPDU2}"  IsChecked="{Binding OverrideDestinationAddress}"/>
+						<TextBlock IsVisible="{Binding !IsPDU2}" Text="Override Destination Address" ToolTip.Tip="Override / Ignore the Destination Address When Sending / Receiving Messages. (for PDU-1 Messages)."/>
 					</StackPanel>
 
 				</Grid>
