@@ -16,6 +16,9 @@ internal class CanDataServicHandler
 
     internal void AddMessage(uint id, MessageDefinition message)
     {
+        if (!message.IncludeInDataService)
+            return;
+
         var signalInfo = new CanMessageInfo();
         foreach (var sig in message.Signals)
         {

@@ -110,7 +110,7 @@ internal static class CanMetadataTools
         });
         configuration.RemoteIpAddress = "192.168.8.1";
         configuration.LocalIpAddress = "192.168.8.2";
-        configuration.Version = VersionUtility.GetAppVersionString();
+        configuration.Version = CanVersionUtility.GetAppVersionString();
         File.WriteAllText(canConfigurationOutputPath, JsonUtility.Serialize(configuration));
     }
 
@@ -118,7 +118,7 @@ internal static class CanMetadataTools
     {
         CanClientConfiguration clientCalibration = new()
         {
-            Version = VersionUtility.GetAppVersionString()
+            Version = CanVersionUtility.GetAppVersionString()
         };
 
         var dbc = Parser.ParseFromPath(pathToCanDbc);

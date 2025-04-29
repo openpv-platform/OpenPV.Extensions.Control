@@ -390,7 +390,7 @@ internal class CanSetupViewModel : ExtensionViewModelBase, ICanTreeNode
         RootNodes.Add(rootToolNode);
 
         // Bump Calibration file to Current.
-        CanConfiguration.Version = VersionUtility.GetAppVersionString();
+        CanConfiguration.Version = CanVersionUtility.GetAppVersionString();
 
         SelectedTreeNode = rootMessageNode.Children.Count > 0 ? rootMessageNode.Children.First() : rootPortNode.Children.FirstOrDefault();
 
