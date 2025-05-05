@@ -336,7 +336,7 @@ void scheduleCanMessageTimer(uint32_t port, canMessageTimerList_t* node)
     return;
 }
 
-canMessageTimerList_t* findCanTxMessage(uint32_t port, canMessageTimerList_t* list, uint32_t id, uint8_t msgType, bool* delete)
+canMessageTimerList_t* findCanTxMessage(uint32_t port, canMessageTimerList_t* list, uint32_t id, uint8_t msgType, uint8_t dlc, bool* delete)
 {
 	canMessageTimerList_t* foundNode = NULL;
 
@@ -344,12 +344,15 @@ canMessageTimerList_t* findCanTxMessage(uint32_t port, canMessageTimerList_t* li
 	{
 		foundNode = createCanMessageTimer();
 		foundNode->msg->id = id;
-		foundNode->msg->msgType = AhsokaCAN_MessageType_RAW_EXTENDED_FRAME;
 		foundNode->msg->overrideDestination = 1;
 		foundNode->msg->overrideSource = 1;
 		foundNode->msg->crc = 0;
-		foundNode->msg->dlc = 8;
+		foundNode->msg->dlc = dlc;
 		foundNode->msg->rollCountLength = 0;
+		if((id >> 31) & 1)
+			foundNode->msg->msgType = AhsokaCAN_MessageType_RAW_EXTENDED_FRAME;
+		else
+			foundNode->msg->msgType = AhsokaCAN_MessageType_RAW_STANDARD_FRAME;
 		*delete = true;
 		return foundNode;
 	}
@@ -362,6 +365,7 @@ canMessageTimerList_t* findCanTxMessage(uint32_t port, canMessageTimerList_t* li
 		{
 			foundNode = list;
 			foundNode->msg->id = id;
+			foundNode->msg->dlc = dlc;
 			return foundNode;
 		}
 		list = list->nextMsg;
@@ -386,6 +390,7 @@ canMessageTimerList_t* findCanTxMessage(uint32_t port, canMessageTimerList_t* li
 			{
 				foundNode = list;
 				foundNode->msg->id = id;
+				foundNode->msg->dlc = dlc;
 				return foundNode;
 			}
 		}

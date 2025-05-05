@@ -69,12 +69,11 @@ bool decodeCanMessageCallback(pb_istream_t *stream, const pb_field_iter_t *field
 	{
 		// send the can message here!
 		data = message.data.arg;
-		// need to implement CAN message send that will handle sending multipacket messages if needed.
 		// need to decide who deletes the malloc'd data memory, the CAN send or here?
 		canMessageTimerList_t* node;
 		xSemaphoreTake(timerListMutex[port], portMAX_DELAY);
 		bool delete = false;
-		node = findCanTxMessage(port, txList[port], message.id, true, &delete);
+		node = findCanTxMessage(port, txList[port], message.id, true, message.dlc, &delete);
 		if(node)
 		{
 			// update data!
@@ -147,7 +146,7 @@ void decodeSendRecurringCANMessage(uint8_t* buffer, uint32_t length)
 		// now need to check to see if this message is in the tx list and if it is, start sending it.
 		canMessageTimerList_t* node;
 		bool delete = false;
-		node = findCanTxMessage(message.can_port, txList[message.can_port], message.message.id,false, &delete);
+		node = findCanTxMessage(message.can_port, txList[message.can_port], message.message.id, false, message.message.dlc, &delete);
 		if(node)
 		{
 			// update the values!

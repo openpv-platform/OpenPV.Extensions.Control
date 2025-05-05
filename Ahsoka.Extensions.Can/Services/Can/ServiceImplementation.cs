@@ -14,14 +14,14 @@ internal abstract class CanServiceImplementation
     CanHandler canHandler = null;
     readonly Dictionary<uint, MessageTransmitter> recurringMessageList = new();
     readonly ManualResetEventSlim resetEvent = new(false);
-    bool promiscuousReceive = false;
-    bool promiscuousTransmit = false;
 
     internal uint Port { get; private set; }
     internal CanService Service { get; private set; }
     internal CanPortConfiguration PortConfig { get; private set; }
     internal ClientCanFilter ClientCanFilter { get; private set; }
     internal Dictionary<uint, byte[]> DataFilters { get; private set; } = new();
+    internal bool PromiscuousReceive { get; private set; } = false;
+    internal bool PromiscuousTransmit { get; private set; } = false;
     internal Dictionary<uint, AvailableMessage> AvailableMessages { get; private set; } = new();
     internal NodeDefinition Self { get; private set; }
 
@@ -34,10 +34,10 @@ internal abstract class CanServiceImplementation
         // Create Data Service Handler
         dataHandler = new CanDataServicHandler(service);
 
-        this.promiscuousReceive = PortConfig.MessageConfiguration.Ports.First(x => x.Port == Port).PromiscuousReceive;
-        if (this.promiscuousReceive) AhsokaLogging.LogMessage(AhsokaVerbosity.High, "CAN: Promiscuous Receive Enabled");
-        this.promiscuousTransmit = PortConfig.MessageConfiguration.Ports.First(x => x.Port == Port).PromiscuousTransmit;
-        if (this.promiscuousTransmit) AhsokaLogging.LogMessage(AhsokaVerbosity.High, "CAN: Promiscuous Transmit Enabled");
+        this.PromiscuousReceive = PortConfig.MessageConfiguration.Ports.First(x => x.Port == Port).PromiscuousReceive;
+        if (this.PromiscuousReceive) AhsokaLogging.LogMessage(AhsokaVerbosity.High, "CAN: Promiscuous Receive Enabled");
+        this.PromiscuousTransmit = PortConfig.MessageConfiguration.Ports.First(x => x.Port == Port).PromiscuousTransmit;
+        if (this.PromiscuousTransmit) AhsokaLogging.LogMessage(AhsokaVerbosity.High, "CAN: Promiscuous Transmit Enabled");
 
         // Don't filter nodes in or out when debugging enabled
         Self = PortConfig.MessageConfiguration.Nodes.FirstOrDefault(x => x.NodeType == NodeType.Self);
@@ -70,7 +70,7 @@ internal abstract class CanServiceImplementation
 
     internal CanMessageResult HandleSendCanRequest(CanMessageDataCollection canMessageDataCollection)
     {
-        if (!promiscuousTransmit)
+        if (!PromiscuousTransmit)
         {
             var available = canHandler.ConfirmAvailable(canMessageDataCollection);
             if (available.Status == MessageStatus.Error)
@@ -96,7 +96,7 @@ internal abstract class CanServiceImplementation
 
     internal CanMessageResult HandleSendRecurringRequest(RecurringCanMessage recurringCanMessage)
     {
-        if (!promiscuousTransmit)
+        if (!PromiscuousTransmit)
         {
             var available = canHandler.ConfirmAvailable(recurringCanMessage);
             if (available.Status == MessageStatus.Error)
@@ -117,7 +117,7 @@ internal abstract class CanServiceImplementation
 
     internal bool ProcessMessage(CanMessageData messageData)
     {
-        if (!promiscuousTransmit)
+        if (!PromiscuousTransmit)
             return canHandler.ProcessMessage(messageData);
         return true;
     }
@@ -126,7 +126,7 @@ internal abstract class CanServiceImplementation
     {
         shouldSend = true;
 
-        if (promiscuousReceive)
+        if (PromiscuousReceive)
             return;
 
         if (canHandler == null)

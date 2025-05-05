@@ -22,7 +22,7 @@ internal class ACMessageHandler : J1939MessageHandlerBase
 
     protected override bool IsEnabled()
     {
-        if (Service.Self == null)
+        if (Service.Self == null || Service.PromiscuousTransmit)
             return false;
 
         return Service.Self.J1939Info.UseAddressClaim;
