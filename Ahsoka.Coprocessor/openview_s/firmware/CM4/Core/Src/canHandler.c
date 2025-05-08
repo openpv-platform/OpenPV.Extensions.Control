@@ -336,27 +336,9 @@ void scheduleCanMessageTimer(uint32_t port, canMessageTimerList_t* node)
     return;
 }
 
-canMessageTimerList_t* findCanTxMessage(uint32_t port, canMessageTimerList_t* list, uint32_t id, uint8_t msgType, uint8_t dlc, bool* delete)
+canMessageTimerList_t* findCanTxMessage(uint32_t port, canMessageTimerList_t* list, uint32_t id, uint8_t msgType, uint8_t dlc, bool* delete, bool recurring)
 {
 	canMessageTimerList_t* foundNode = NULL;
-
-	if(promiscuousTx[port])
-	{
-		foundNode = createCanMessageTimer();
-		foundNode->msg->id = id;
-		foundNode->msg->overrideDestination = 1;
-		foundNode->msg->overrideSource = 1;
-		foundNode->msg->crc = 0;
-		foundNode->msg->dlc = dlc;
-		foundNode->msg->rollCountLength = 0;
-		if((id >> 31) & 1)
-			foundNode->msg->msgType = AhsokaCAN_MessageType_RAW_EXTENDED_FRAME;
-		else
-			foundNode->msg->msgType = AhsokaCAN_MessageType_RAW_STANDARD_FRAME;
-		*delete = true;
-		return foundNode;
-	}
-
 	canMessageTimerList_t* listStart = list;
 
 	while(list != NULL)
@@ -364,12 +346,45 @@ canMessageTimerList_t* findCanTxMessage(uint32_t port, canMessageTimerList_t* li
 		if( ((list->msg->id & 0x1FFFFFFF) == (id & 0x1FFFFFFF)) && (list->msg->msgType != AhsokaCAN_MessageType_J1939_EXTENDED_FRAME) )
 		{
 			foundNode = list;
-			foundNode->msg->id = id;
-			foundNode->msg->dlc = dlc;
+			if (promiscuousTx[port])
+			{
+				foundNode->msg->overrideDestination = 1;
+				foundNode->msg->overrideSource = 1;
+				foundNode->msg->crc = 0;
+				foundNode->msg->dlc = dlc;
+				foundNode->msg->rollCountLength = 0;
+			}
+			else
+			{
+				foundNode->msg->dlc = dlc;
+			}
 			return foundNode;
 		}
 		list = list->nextMsg;
 	}
+
+	if(promiscuousTx[port])
+	{
+		canMessageTimerList_t* promNode = createCanMessageTimer();
+		promNode->msg->id = id;
+		promNode->msg->overrideDestination = 1;
+		promNode->msg->overrideSource = 1;
+		promNode->msg->crc = 0;
+		promNode->msg->dlc = dlc;
+		promNode->msg->rollCountLength = 0;
+		if((id >> 31) & 1)
+			promNode->msg->msgType = AhsokaCAN_MessageType_RAW_EXTENDED_FRAME;
+		else
+			promNode->msg->msgType = AhsokaCAN_MessageType_RAW_STANDARD_FRAME;
+
+		if(recurring)
+			addCanMessageTxList(&txList[port], promNode);
+		else
+			delete = true;
+
+		return promNode;
+	}
+
 
     list = listStart;
 	while(list != NULL)

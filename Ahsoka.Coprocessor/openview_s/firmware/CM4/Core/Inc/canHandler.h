@@ -59,7 +59,7 @@ extern void initCanHandler(uint32_t port);
 extern canMessageTimerList_t* createCanMessageTimer(void);
 extern void rescheduleCanMessageTimer(canMessageTimerList_t** list, canMessageTimerList_t* node);
 extern void scheduleCanMessageTimer(uint32_t port, canMessageTimerList_t* node);
-extern canMessageTimerList_t* findCanTxMessage(uint32_t port, canMessageTimerList_t* list, uint32_t id, uint8_t msgType, uint8_t dlc, bool* delete);
+extern canMessageTimerList_t* findCanTxMessage(uint32_t port, canMessageTimerList_t* list, uint32_t id, uint8_t msgType, uint8_t dlc, bool* delete, bool recurring);
 extern void addCanMessageTxList(canMessageTimerList_t** list, canMessageTimerList_t* node);
 
 

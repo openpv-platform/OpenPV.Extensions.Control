@@ -73,7 +73,7 @@ bool decodeCanMessageCallback(pb_istream_t *stream, const pb_field_iter_t *field
 		canMessageTimerList_t* node;
 		xSemaphoreTake(timerListMutex[port], portMAX_DELAY);
 		bool delete = false;
-		node = findCanTxMessage(port, txList[port], message.id, true, message.dlc, &delete);
+		node = findCanTxMessage(port, txList[port], message.id, true, message.dlc, &delete, false);
 		if(node)
 		{
 			// update data!
@@ -146,7 +146,7 @@ void decodeSendRecurringCANMessage(uint8_t* buffer, uint32_t length)
 		// now need to check to see if this message is in the tx list and if it is, start sending it.
 		canMessageTimerList_t* node;
 		bool delete = false;
-		node = findCanTxMessage(message.can_port, txList[message.can_port], message.message.id, false, message.message.dlc, &delete);
+		node = findCanTxMessage(message.can_port, txList[message.can_port], message.message.id, false, message.message.dlc, &delete, true);
 		if(node)
 		{
 			// update the values!
