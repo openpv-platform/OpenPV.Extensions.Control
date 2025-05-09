@@ -388,7 +388,7 @@ public class CanServiceTests : LinearTestBase
     public void TestCanViewModel()
     {
         TestCanModel model = CreateTestViewModel();
-        Assert.IsTrue(model.TestSigned == 64);
+        Assert.IsTrue(model.TestSigned == -1);
         Assert.IsTrue(model.TestUnsigned == 256);
         Assert.IsTrue(model.TestEnum == TestEnumValues.Test2EnumTwo);
         Assert.IsTrue(model.TestFloat == 12345.0f);
@@ -418,7 +418,7 @@ public class CanServiceTests : LinearTestBase
         TestCanModel model = new()
         {
             TestBit = 1,
-            TestSigned = 64,
+            TestSigned = -1,
             TestUnsigned = 256,
             TestEnum = TestEnumValues.Test2EnumTwo,
             TestFloat = 12345.0f,

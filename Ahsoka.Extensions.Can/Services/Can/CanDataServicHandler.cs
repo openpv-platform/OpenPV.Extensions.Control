@@ -88,6 +88,9 @@ internal class CanDataServicHandler
                 case ValueType.Enum:
                     value = item.GetValue<float>(message.Data).ToString();
                     break;
+                case ValueType.SignedEnum:
+                    value = item.GetValue<float>(message.Data).ToString();
+                    break;
                 default:
                     value = null;
                     break;

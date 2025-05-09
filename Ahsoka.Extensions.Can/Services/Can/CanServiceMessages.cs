@@ -97,6 +97,8 @@ internal class CanServiceMessages : AhsokaMessagesBase
             case Can.ValueType.Double:
                 return ParameterValueTypes.Double;
             case Can.ValueType.Enum:
+                return ParameterValueTypes.UnsignedInteger;
+            case Can.ValueType.SignedEnum:
                 return ParameterValueTypes.SignedInteger;
             default:
                 return ParameterValueTypes.UnsignedInteger;

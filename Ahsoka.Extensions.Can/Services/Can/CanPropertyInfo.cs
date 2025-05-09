@@ -221,16 +221,27 @@ public class CanPropertyInfo
 
     private double Unpack(ulong data, bool scaleValue = true, bool getRaw = false)
     {
-        double returnValue = 0;
         long iVal;
+        ulong uVal;
         ulong bitMask = BitMask();
 
         // Unpack signal
         if (byteOrder == ByteOrder.OrderLittleEndian) // Little endian 
-            iVal = (long)((data >> StartBit) & bitMask);
+            uVal = ((data >> StartBit) & bitMask);
         else // Big endian 
-            iVal = (long)((MirrorMsg(data) >> GetStartBitLE()) & bitMask);
+            uVal = (MirrorMsg(data) >> GetStartBitLE()) & bitMask;
 
+        if (dataType == ValueType.Signed || dataType == ValueType.SignedEnum)
+        {
+            // if negative
+            if (((uVal >> BitLength - 1) & 1) > 0)
+            {
+                uVal |= ulong.MaxValue << BitLength;
+            }
+        }
+        iVal = (long)uVal;
+
+        double returnValue;
         if (dataType == ValueType.Float)
             returnValue = FloatConverter.AsFloatingPoint((int)iVal);
         else if (dataType == ValueType.Double)

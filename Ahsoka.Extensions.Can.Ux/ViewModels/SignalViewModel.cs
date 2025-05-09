@@ -153,6 +153,8 @@ internal class SignalViewModel : ChildViewModelBase<MessageViewModel>
             case Services.Can.ValueType.Double:
                 return double.MaxValue;
             case Services.Can.ValueType.Enum:
+                return Math.Pow(2, length) - 1;
+            case Services.Can.ValueType.SignedEnum:
                 return Math.Pow(2, length - 1) - 1;
             default:
                 break;
@@ -174,6 +176,8 @@ internal class SignalViewModel : ChildViewModelBase<MessageViewModel>
             case Services.Can.ValueType.Double:
                 return double.MinValue;
             case Services.Can.ValueType.Enum:
+                return 0;
+            case Services.Can.ValueType.SignedEnum:
                 return -(Math.Pow(2, length - 1));
             default:
                 break;

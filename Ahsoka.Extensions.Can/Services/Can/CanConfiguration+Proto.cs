@@ -425,6 +425,7 @@ public enum ValueType
     Float = 3,
     Double = 4,
     Enum = 5,
+    SignedEnum = 6,
 }
 
 public enum CrcType
